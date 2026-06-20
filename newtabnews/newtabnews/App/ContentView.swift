@@ -32,7 +32,8 @@ struct ContentView: View {
     @State var postToOpen: PostRequest? = nil
     @State var isLoadingPost: Bool = false
     @State var showTipsOnboarding: Bool = false
-    @State var showDigestSheet: Bool = false
+	@State var showDigestSheet: Bool = false
+    @State private var showSplash = true
     @StateObject private var gamificationManager = GamificationManager.shared
     @StateObject private var toastManager = ToastManager.shared
         
@@ -48,22 +49,25 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            if !hasSeenOnboarding {
-                OnboardingView(showOnboarding: $hasSeenOnboarding)
-            } else {
-                mainContent
-                
-                if showTipsOnboarding {
-                    OnboardingTipsView(
-                        showOnboarding: $showTipsOnboarding,
-                        onNavigateToLibrary: {
-                            selectedTab = .library
-                        }
-                    )
-                    .transition(.opacity)
+            Group {
+                if !hasSeenOnboarding {
+                    OnboardingView(showOnboarding: $hasSeenOnboarding)
+                } else {
+                    mainContent
+
+                    if showTipsOnboarding {
+                        OnboardingTipsView(
+                            showOnboarding: $showTipsOnboarding,
+                            onNavigateToLibrary: {
+                                selectedTab = .library
+                            }
+                        )
+                        .transition(.opacity)
+                    }
                 }
             }
-            
+            .allowsHitTesting(!showSplash)
+
             // Badge Unlocked Banner - Global
             VStack {
                 if let badge = gamificationManager.showBadgeUnlocked {
@@ -72,7 +76,7 @@ struct ContentView: View {
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 Spacer()
-                
+
                 if let toast = toastManager.currentToast {
                     ToastBanner(message: toast)
                         .padding(.bottom, 90)
@@ -81,6 +85,12 @@ struct ContentView: View {
             }
             .animation(.spring(), value: gamificationManager.showBadgeUnlocked)
             .animation(.spring(), value: toastManager.currentToast)
+
+            if showSplash {
+                SplashView(showSplash: $showSplash)
+                    .zIndex(999)
+                    .transition(.opacity)
+            }
         }
         .preferredColorScheme(currentTheme.colorScheme)
         .sheet(isPresented: $showDigestSheet) {
@@ -116,6 +126,9 @@ struct ContentView: View {
             if newPhase == .active {
                 clearBadge()
                 syncToWatch()
+                AppReviewManager.shared.handleAppBecameActive()
+            } else if newPhase == .background {
+                AppReviewManager.shared.handleAppEnteredBackground()
             }
         }
         .onChange(of: showTipsOnboarding) { _, newValue in

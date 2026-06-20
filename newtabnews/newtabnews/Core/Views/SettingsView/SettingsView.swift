@@ -7,7 +7,6 @@
 
 import SwiftUI
 import SwiftData
-import StoreKit
 
 struct SettingsView: View {
     
@@ -116,7 +115,7 @@ struct SettingsView: View {
                 
                 Section {
                     Button {
-                        requestAppReview()
+                        AppReviewManager.shared.openAppStoreReviewPage()
                     } label: {
                         HStack(spacing: 12) {
                             Image(systemName: "star.bubble.fill")
@@ -127,12 +126,16 @@ struct SettingsView: View {
                                 Text("Avaliar o App")
                                     .font(.body)
                                     .foregroundStyle(.primary)
-                                Text("Ajude o app a crescer com sua avaliação")
+                                Text("Abre a App Store para você deixar sua avaliação")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                             
                             Spacer()
+                            
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 } header: {
@@ -375,13 +378,19 @@ struct SettingsView: View {
                     }
                     
                     Button {
+                        #if DEBUG
+                        AppReviewManager.shared.resetForTesting()
+                        #else
                         UserDefaults.standard.set(0, forKey: "newsletterOpenCount")
+                        UserDefaults.standard.set(0, forKey: "lastReviewPrePromptDate")
                         UserDefaults.standard.set(0, forKey: "lastReviewRequestDate")
+                        UserDefaults.standard.set(0, forKey: "appReviewSessionCount")
+                        #endif
                     } label: {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("⭐ Resetar Review Request")
-                                Text("Força o prompt de review aparecer na Newsletter")
+                                Text("Força o pre-prompt de avaliação aparecer de novo")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -877,12 +886,6 @@ struct SettingsView: View {
         }
         
         try? modelContext.save()
-    }
-    
-    private func requestAppReview() {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            SKStoreReviewController.requestReview(in: windowScene)
-        }
     }
 }
 

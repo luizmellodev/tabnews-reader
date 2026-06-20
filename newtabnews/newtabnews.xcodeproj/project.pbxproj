@@ -136,6 +136,7 @@
 		79C706462D9AE157005C26A7 /* NewsletterCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C706452D9AE157005C26A7 /* NewsletterCard.swift */; };
 		79C706482D9AE477005C26A7 /* SocialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C706472D9AE477005C26A7 /* SocialView.swift */; };
 		79C7064B2D9AFCE5005C26A7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C7064A2D9AFCE5005C26A7 /* OnboardingView.swift */; };
+		79A1B0022F7000010068804C /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A1B0012F7000010068804C /* SplashView.swift */; };
 		79C706512D9B0152005C26A7 /* bird-02.png in Resources */ = {isa = PBXBuildFile; fileRef = 79C7064E2D9B0152005C26A7 /* bird-02.png */; };
 		79C706522D9B0152005C26A7 /* bird-03.png in Resources */ = {isa = PBXBuildFile; fileRef = 79C7064F2D9B0152005C26A7 /* bird-03.png */; };
 		79C706532D9B0152005C26A7 /* bird-04.png in Resources */ = {isa = PBXBuildFile; fileRef = 79C706502D9B0152005C26A7 /* bird-04.png */; };
@@ -313,6 +314,7 @@
 		79C706452D9AE157005C26A7 /* NewsletterCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsletterCard.swift; sourceTree = "<group>"; };
 		79C706472D9AE477005C26A7 /* SocialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialView.swift; sourceTree = "<group>"; };
 		79C7064A2D9AFCE5005C26A7 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		79A1B0012F7000010068804C /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		79C7064D2D9B0152005C26A7 /* bird-01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bird-01.png"; sourceTree = "<group>"; };
 		79C7064E2D9B0152005C26A7 /* bird-02.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bird-02.png"; sourceTree = "<group>"; };
 		79C7064F2D9B0152005C26A7 /* bird-03.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bird-03.png"; sourceTree = "<group>"; };
@@ -608,6 +610,7 @@
 				799CC4752F489AEE0059BB51 /* Gamification */,
 				790AB0C92ECEAEE000E443E6 /* Folder */,
 				79C706492D9AFCB3005C26A7 /* Onboarding */,
+				79A1B0032F7000010068804C /* Splash */,
 				794863842B5B55E6009AA720 /* Game */,
 				795261702A7B0B63001FD010 /* Newsletter */,
 				79904A0C2A732FAE0050240C /* SettingsView */,
@@ -763,6 +766,14 @@
 				791584972EFC97F900C69745 /* OnboardingTipsView.swift */,
 			);
 			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		79A1B0032F7000010068804C /* Splash */ = {
+			isa = PBXGroup;
+			children = (
+				79A1B0012F7000010068804C /* SplashView.swift */,
+			);
+			path = Splash;
 			sourceTree = "<group>";
 		};
 		79C7064C2D9B0149005C26A7 /* bird.atlas */ = {
@@ -1026,6 +1037,7 @@
 				79E727F72EFB9DA2007BF27A /* MainTabView.swift in Sources */,
 				790AB0C82ECEAED600E443E6 /* FoldersView.swift in Sources */,
 				79C7064B2D9AFCE5005C26A7 /* OnboardingView.swift in Sources */,
+				79A1B0022F7000010068804C /* SplashView.swift in Sources */,
 				791584752EFC86B600C69745 /* PostHeaderView.swift in Sources */,
 				799049F82A72F4BC0050240C /* Extensions.swift in Sources */,
 				790AB0C12ECEAE9500E443E6 /* TextToSpeechManager.swift in Sources */,

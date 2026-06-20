@@ -145,7 +145,11 @@ extension String {
             .filter { !$0.isEmpty }
             .joined(separator: " ")
         
-        return String(flowingText.prefix(maxLength))
+        guard flowingText.count > maxLength else {
+            return flowingText
+        }
+        
+        return String(flowingText.prefix(maxLength)).trimmingCharacters(in: .whitespacesAndNewlines) + "..."
     }
 }
 

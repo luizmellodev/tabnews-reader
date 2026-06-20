@@ -20,6 +20,7 @@ struct MainTabView: View {
     @Binding var isLoadingPost: Bool
 
     @State private var searchText = ""
+    @StateObject private var reviewManager = AppReviewManager.shared
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -69,6 +70,16 @@ struct MainTabView: View {
         .environment(viewModel)
         .task {
             await newsletterVM.refreshUnreadBadge()
+        }
+        .alert("Gostando do TabNews Reader?", isPresented: $reviewManager.showPrePrompt) {
+            Button("Sim, estou gostando") {
+                reviewManager.confirmPositiveReview()
+            }
+            Button("Ainda não", role: .cancel) {
+                reviewManager.dismissPrePrompt()
+            }
+        } message: {
+            Text("Sua avaliação na App Store ajuda muito o app a crescer.")
         }
     }
 }

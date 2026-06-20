@@ -62,6 +62,7 @@ struct CardList: View {
                         .fontWeight(.light)
                         .lineSpacing(3)
                         .lineLimit(CardLayout.bodyLineLimit)
+                        .truncationMode(.tail)
                         .multilineTextAlignment(.leading)
                         .foregroundStyle(.primary)
                 } else {
