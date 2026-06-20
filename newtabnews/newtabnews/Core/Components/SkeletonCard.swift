@@ -108,7 +108,7 @@ struct SkeletonCard: View {
             RoundedRectangle(cornerRadius: 15, style: .continuous)
                 .fill(Color("CardColor"))
         }
-        .frame(height: 300)
+        .frame(height: 330)
         .onAppear {
             withAnimation(
                 .linear(duration: 1.5)

@@ -140,7 +140,12 @@ extension String {
     }
     
     func feedPreview(maxLength: Int = 200) -> String {
-        String(plainTextFromMarkdown.prefix(maxLength))
+        let flowingText = plainTextFromMarkdown
+            .components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+        
+        return String(flowingText.prefix(maxLength))
     }
 }
 

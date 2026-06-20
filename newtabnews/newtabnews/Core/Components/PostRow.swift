@@ -26,6 +26,7 @@ struct PostRow: View {
         } label: {
             CardList(post: post)
         }
+        .buttonStyle(.plain)
         .postZoomSource(id: post.zoomTransitionID, namespace: zoomNamespace)
         .contextMenu {
             Button {
