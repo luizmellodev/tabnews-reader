@@ -57,6 +57,9 @@ extension PostRequest {
             return "\(ownerUsername)/\(slug)"
         }
         if let title, !title.isEmpty { return "title:\(title)" }
-        return UUID().uuidString
+        return "fallback:\(ownerUsername ?? "")-\(slug ?? "")-\(title ?? "")"
     }
+
+    /// ID estável para animações de zoom entre feed e detalhe.
+    var zoomTransitionID: String { stableKey }
 }

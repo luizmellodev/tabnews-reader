@@ -17,23 +17,16 @@ struct PostRow: View {
     @Binding var currentTheme: Theme
     
     let post: PostRequest
+    var zoomNamespace: Namespace.ID
     @State private var showingFolderPicker = false
 
     var body: some View {
         NavigationLink {
-            if isViewInApp {
-                ListDetailView(
-                    isViewInApp: $isViewInApp,
-                    currentTheme: $currentTheme,
-                    post: post
-                )
-                .environment(viewModel)
-            } else {
-                WebContentView(content: post)
-            }
+            destinationView
         } label: {
             CardList(post: post)
         }
+        .postZoomSource(id: post.zoomTransitionID, namespace: zoomNamespace)
         .contextMenu {
             Button {
                 let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
@@ -84,6 +77,21 @@ struct PostRow: View {
                 .id(post.id ?? UUID().uuidString)
         }
         .padding(.top, 8)
+    }
+
+    @ViewBuilder
+    private var destinationView: some View {
+        if isViewInApp {
+            ListDetailView(
+                isViewInApp: $isViewInApp,
+                currentTheme: $currentTheme,
+                post: post
+            )
+            .environment(viewModel)
+            .postZoomDestination(id: post.zoomTransitionID, namespace: zoomNamespace)
+        } else {
+            WebContentView(content: post)
+        }
     }
 }
 

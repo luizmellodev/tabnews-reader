@@ -17,6 +17,7 @@ struct NewsletterView: View {
     @AppStorage("newsletterOpenCount") private var newsletterOpenCount = 0
     @AppStorage("lastReviewRequestDate") private var lastReviewRequestDate: TimeInterval = 0
     @State private var shouldShowReviewPrompt = false
+    @Namespace private var zoomNamespace
     
     var body: some View {
         NavigationStack {
@@ -44,7 +45,8 @@ struct NewsletterView: View {
                                     newsletter: newsletter,
                                     isNew: NewsletterViewModel.isCreatedToday(createdAt: newsletter.createdAt),
                                     isViewInApp: $isViewInApp,
-                                    currentTheme: $currentTheme
+                                    currentTheme: $currentTheme,
+                                    zoomNamespace: zoomNamespace
                                 )
                             }
                         }

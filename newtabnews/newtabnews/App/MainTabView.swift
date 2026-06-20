@@ -15,10 +15,17 @@ struct MainTabView: View {
     
     @Bindable var viewModel: MainViewModel
     @Bindable var newsletterVM: NewsletterViewModel
+
+    @Binding var postToOpen: PostRequest?
+    @Binding var isLoadingPost: Bool
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            MainView(isViewInApp: $isViewInApp)
+            MainView(
+                isViewInApp: $isViewInApp,
+                postToOpen: $postToOpen,
+                isLoadingPost: $isLoadingPost
+            )
                 .tabItem {
                     Label(AppTab.home.title, systemImage: AppTab.home.icon)
                 }
@@ -73,7 +80,9 @@ struct MainTabView: View {
         isViewInApp: .constant(true),
         currentTheme: .constant(.system),
         viewModel: deps.makeMainViewModel(),
-        newsletterVM: deps.makeNewsletterViewModel()
+        newsletterVM: deps.makeNewsletterViewModel(),
+        postToOpen: .constant(nil),
+        isLoadingPost: .constant(false)
     )
 }
 
@@ -84,7 +93,9 @@ struct MainTabView: View {
         isViewInApp: .constant(true),
         currentTheme: .constant(.system),
         viewModel: deps.makeMainViewModel(),
-        newsletterVM: deps.makeNewsletterViewModel()
+        newsletterVM: deps.makeNewsletterViewModel(),
+        postToOpen: .constant(nil),
+        isLoadingPost: .constant(false)
     )
 }
 

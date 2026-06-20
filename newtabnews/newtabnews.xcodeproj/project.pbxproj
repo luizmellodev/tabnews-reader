@@ -132,6 +132,7 @@
 		79C7063A2D95E766005C26A7 /* PostRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C706392D95E766005C26A7 /* PostRequest.swift */; };
 		79C7063C2D9AD132005C26A7 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C7063B2D9AD132005C26A7 /* APIError.swift */; };
 		79C7063E2D9ADBFA005C26A7 /* PostRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C7063D2D9ADBFA005C26A7 /* PostRow.swift */; };
+		79C706552D9ADBFB005C26A7 /* PostZoomTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C706542D9ADBFB005C26A7 /* PostZoomTransition.swift */; };
 		79C706402D9ADD26005C26A7 /* EmptyLikedListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C7063F2D9ADD26005C26A7 /* EmptyLikedListView.swift */; };
 		79C706462D9AE157005C26A7 /* NewsletterCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C706452D9AE157005C26A7 /* NewsletterCard.swift */; };
 		79C706482D9AE477005C26A7 /* SocialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C706472D9AE477005C26A7 /* SocialView.swift */; };
@@ -305,6 +306,7 @@
 		79C706392D95E766005C26A7 /* PostRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostRequest.swift; sourceTree = "<group>"; };
 		79C7063B2D9AD132005C26A7 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		79C7063D2D9ADBFA005C26A7 /* PostRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostRow.swift; sourceTree = "<group>"; };
+		79C706542D9ADBFB005C26A7 /* PostZoomTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostZoomTransition.swift; sourceTree = "<group>"; };
 		79C7063F2D9ADD26005C26A7 /* EmptyLikedListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyLikedListView.swift; sourceTree = "<group>"; };
 		79C706442D9ADFD3005C26A7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		79C706452D9AE157005C26A7 /* NewsletterCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsletterCard.swift; sourceTree = "<group>"; };
@@ -587,6 +589,7 @@
 				791B1EB82ED4CC7E00B9143D /* SkeletonCard.swift */,
 				790AB0D22ECEB9BE00E443E6 /* HighlightableTextView.swift */,
 				79C7063D2D9ADBFA005C26A7 /* PostRow.swift */,
+				79C706542D9ADBFB005C26A7 /* PostZoomTransition.swift */,
 				799049F52A6C990E0050240C /* CardList.swift */,
 				79E727F02EFB9CE3007BF27A /* LoadingOverlayView.swift */,
 				796D064E2F0AF3960064A2BC /* ParticleSystem.swift */,
@@ -976,6 +979,7 @@
 				7915848A2EFC89F200C69745 /* ColorExtension.swift in Sources */,
 				7915848B2EFC89F200C69745 /* EditModeToolbar.swift in Sources */,
 				79C7063E2D9ADBFA005C26A7 /* PostRow.swift in Sources */,
+				79C706552D9ADBFB005C26A7 /* PostZoomTransition.swift in Sources */,
 				79C706352D95E643005C26A7 /* Logger.swift in Sources */,
 				799049FD2A72F7BE0050240C /* ListDetailsView.swift in Sources */,
 				79E727F42EFB9D25007BF27A /* AppTab.swift in Sources */,

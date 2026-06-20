@@ -144,28 +144,15 @@ struct ContentView: View {
     // MARK: - Views
     
     private var mainContent: some View {
-        NavigationStack {
-            MainTabView(
-                selectedTab: $selectedTab,
-                isViewInApp: $isViewInApp,
-                currentTheme: $currentTheme,
-                viewModel: viewModel,
-                newsletterVM: newsletterVM
-            )
-            .navigationDestination(item: $postToOpen) { post in
-                ListDetailView(
-                    isViewInApp: $isViewInApp,
-                    currentTheme: $currentTheme,
-                    post: post
-                )
-                .environment(viewModel)
-            }
-            .overlay {
-                if isLoadingPost {
-                    LoadingOverlayView(message: "Carregando post...")
-                }
-            }
-        }
+        MainTabView(
+            selectedTab: $selectedTab,
+            isViewInApp: $isViewInApp,
+            currentTheme: $currentTheme,
+            viewModel: viewModel,
+            newsletterVM: newsletterVM,
+            postToOpen: $postToOpen,
+            isLoadingPost: $isLoadingPost
+        )
         .environment(viewModel)
         .onAppear {
             loadInitialContent()

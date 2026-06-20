@@ -14,6 +14,7 @@ struct ListView: View {
     @Binding var isViewInApp: Bool
     @Binding var currentTheme: Theme
     var posts: [PostRequest]
+    var zoomNamespace: Namespace.ID
     
     var body: some View {
         LazyVStack(spacing: 0) {
@@ -21,7 +22,8 @@ struct ListView: View {
                 PostRow(
                     isViewInApp: $isViewInApp,
                     currentTheme: $currentTheme,
-                    post: post
+                    post: post,
+                    zoomNamespace: zoomNamespace
                 )
                 .environment(viewModel)
                 .transition(.asymmetric(

@@ -13,6 +13,7 @@ struct NewsletterCard: View {
     
     @Binding var isViewInApp: Bool
     @Binding var currentTheme: Theme
+    var zoomNamespace: Namespace.ID
     
     @State private var isPressed = false
     
@@ -23,6 +24,7 @@ struct NewsletterCard: View {
                 isViewInApp: $isViewInApp,
                 currentTheme: $currentTheme
             )
+            .postZoomDestination(id: newsletter.zoomTransitionID, namespace: zoomNamespace)
         } label: {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
@@ -57,6 +59,7 @@ struct NewsletterCard: View {
                     .fill(Color("CardColor"))
             )
         }
+        .postZoomSource(id: newsletter.zoomTransitionID, namespace: zoomNamespace)
         .buttonStyle(PlainButtonStyle())
     }
     

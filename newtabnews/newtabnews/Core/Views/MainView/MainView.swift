@@ -25,6 +25,10 @@ struct MainView: View {
     @State private var showDigestSheet = false
     @State private var showDailyDigestSheet = false
     @StateObject private var dailyDigestManager = DailyDigestManager.shared
+    @Namespace private var zoomNamespace
+
+    @Binding var postToOpen: PostRequest?
+    @Binding var isLoadingPost: Bool
     
     // Verifica se é fim de semana - sábado ou domingo (ou modo debug ativado)
     private var shouldShowDigestBanner: Bool {
@@ -53,7 +57,7 @@ struct MainView: View {
     var body: some View {
         @Bindable var bindableViewModel = viewModel
         
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 if viewModel.state == .requestSucceeded || isLoadingStrategy {
                     Picker("Filtro", selection: $bindableViewModel.currentStrategy) {
@@ -115,7 +119,8 @@ struct MainView: View {
                                     searchText: $searchText,
                                     isViewInApp: $isViewInApp,
                                     currentTheme: $currentTheme,
-                                    posts: viewModel.content
+                                    posts: viewModel.content,
+                                    zoomNamespace: zoomNamespace
                                 )
                                 .environment(viewModel)
                             }
@@ -154,6 +159,20 @@ struct MainView: View {
                 }
             }
             .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Pesquisar")
+            .navigationDestination(item: $postToOpen) { post in
+                ListDetailView(
+                    isViewInApp: $isViewInApp,
+                    currentTheme: $currentTheme,
+                    post: post
+                )
+                .environment(viewModel)
+                .postZoomDestination(id: post.zoomTransitionID, namespace: zoomNamespace)
+            }
+            .overlay {
+                if isLoadingPost {
+                    LoadingOverlayView(message: "Carregando post...")
+                }
+            }
             .sheet(isPresented: $showDigestSheet) {
                 NavigationStack {
                     DigestListView()
