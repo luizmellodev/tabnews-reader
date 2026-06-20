@@ -15,6 +15,7 @@ struct CommentsView: View {
     @State private var viewModel = CommentsViewModel()
     @State private var isExpanded: Bool = false
     @State private var replyingToComment: Comment?
+    @State private var expandedThreadIDs: Set<String> = []
     @State private var showAuthSheet = false
     @StateObject private var authService = AuthService.shared
     
@@ -49,11 +50,20 @@ struct CommentsView: View {
         .task {
             await viewModel.fetchComments(user: user, slug: slug)
         }
-        .safeAreaInset(edge: .bottom) {
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             FloatingCommentInput(
                 parentId: replyingToComment?.id ?? postId,
                 replyingTo: replyingToComment?.ownerUsername,
                 onCommentPosted: {
+                    let replyTarget = replyingToComment
+                    
+                    if let replyTarget {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            expandedThreadIDs.formUnion(viewModel.threadIdsToExpand(for: replyTarget))
+                            isExpanded = true
+                        }
+                    }
+                    
                     Task {
                         await viewModel.refresh(user: user, slug: slug)
                     }
@@ -63,6 +73,7 @@ struct CommentsView: View {
                     replyingToComment = nil
                 }
             )
+            .padding(.horizontal, -20)
         }
     }
     
@@ -134,7 +145,7 @@ struct CommentsView: View {
     }
     
     private var commentsListView: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 20) {
             // Header minimalista
             HStack(spacing: 6) {
                 Text("\(viewModel.totalCommentsCount())")
@@ -167,6 +178,7 @@ struct CommentsView: View {
                         CommentRow(
                             comment: comment,
                             depth: 0,
+                            expandedThreadIDs: $expandedThreadIDs,
                             onReply: { replyComment in
                                 withAnimation {
                                     replyingToComment = replyComment
@@ -178,8 +190,7 @@ struct CommentsView: View {
                         )
                         
                         if comment.id != displayedComments.last?.id {
-                            Divider()
-                                .padding(.leading, 16)
+                            commentSeparator
                         }
                     }
                 }
@@ -249,6 +260,14 @@ struct CommentsView: View {
         .sheet(isPresented: $showAuthSheet) {
             NativeLoginView()
         }
+    }
+    
+    /// Linha fina entre comentários de primeiro nível — separa blocos sem o peso visual de um Divider padrão.
+    private var commentSeparator: some View {
+        Rectangle()
+            .fill(.separator.opacity(0.22))
+            .frame(height: 1)
+            .padding(.vertical, 14)
     }
     
     // MARK: - Actions

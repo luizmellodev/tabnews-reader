@@ -40,18 +40,15 @@ struct HybridMarkdownView: View {
         var blocks: [ContentBlock] = []
         var currentText = ""
         
-        // Primeiro, corrigir imagens quebradas em múltiplas linhas
-        let fixedMarkdown = fixMultilineImages(markdown)
+        let fixedMarkdown = normalizeContent(markdown)
         
         let lines = fixedMarkdown.components(separatedBy: "\n")
         
         for line in lines {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             
-            // Detectar imagens
             if trimmed.hasPrefix("![") {
-                // Salvar texto acumulado
-                if !currentText.isEmpty {
+                if !currentText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     blocks.append(.text(currentText))
                     currentText = ""
                 }
@@ -71,12 +68,109 @@ struct HybridMarkdownView: View {
             currentText += line
         }
         
-        // Adicionar texto restante
-        if !currentText.isEmpty {
+        if !currentText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             blocks.append(.text(currentText))
         }
         
         return blocks
+    }
+    
+    private func normalizeContent(_ text: String) -> String {
+        let withMarkdownImages = convertHTMLImagesToMarkdown(text)
+        let withoutWrappers = stripHTMLWrapperTags(withMarkdownImages)
+        return fixMultilineImages(withoutWrappers)
+    }
+    
+    private func convertHTMLImagesToMarkdown(_ text: String) -> String {
+        let pattern = #"<img\b[\s\S]*?/?>"#
+        guard let regex = try? NSRegularExpression(
+            pattern: pattern,
+            options: [.caseInsensitive]
+        ) else {
+            return text
+        }
+        
+        let nsString = text as NSString
+        let matches = regex.matches(
+            in: text,
+            range: NSRange(location: 0, length: nsString.length)
+        )
+        
+        var result = text
+        for match in matches.reversed() {
+            let tag = nsString.substring(with: match.range)
+            guard let src = extractHTMLAttribute("src", from: tag), !src.isEmpty else {
+                continue
+            }
+            
+            let alt = extractHTMLAttribute("alt", from: tag) ?? ""
+            let markdown = "![\(alt)](\(src))"
+            result = (result as NSString).replacingCharacters(in: match.range, with: markdown)
+        }
+        
+        return result
+    }
+    
+    private func extractHTMLAttribute(_ name: String, from tag: String) -> String? {
+        let patterns = [
+            "\(name)\\s*=\\s*\"([^\"]*)\"",
+            "\(name)\\s*=\\s*'([^']*)'"
+        ]
+        
+        for pattern in patterns {
+            guard let regex = try? NSRegularExpression(
+                pattern: pattern,
+                options: [.caseInsensitive]
+            ) else {
+                continue
+            }
+            
+            let nsString = tag as NSString
+            guard let match = regex.firstMatch(
+                in: tag,
+                range: NSRange(location: 0, length: nsString.length)
+            ), match.range(at: 1).location != NSNotFound else {
+                continue
+            }
+            
+            let value = nsString.substring(with: match.range(at: 1))
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            if !value.isEmpty {
+                return value
+            }
+        }
+        
+        return nil
+    }
+    
+    private func stripHTMLWrapperTags(_ text: String) -> String {
+        let patterns = [
+            #"<div[^>]*>"#,
+            #"</div>"#
+        ]
+        
+        var result = text
+        for pattern in patterns {
+            guard let regex = try? NSRegularExpression(
+                pattern: pattern,
+                options: [.caseInsensitive]
+            ) else {
+                continue
+            }
+            
+            result = regex.stringByReplacingMatches(
+                in: result,
+                range: NSRange(result.startIndex..., in: result),
+                withTemplate: ""
+            )
+        }
+        
+        return result.replacingOccurrences(
+            of: #"\n{3,}"#,
+            with: "\n\n",
+            options: .regularExpression
+        )
     }
     
     private func extractImageInfo(from line: String) -> (String, String?) {

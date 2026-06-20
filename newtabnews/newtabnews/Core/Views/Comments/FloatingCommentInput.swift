@@ -19,148 +19,119 @@ struct FloatingCommentInput: View {
     @State private var errorMessage: String?
     @State private var showLoginRequiredAlert: Bool = false
     @State private var showLoginSheet: Bool = false
-    @State private var isExpanded: Bool = false
-    @State private var showMarkdownToolbar: Bool = false
+    @State private var isEditorFocused: Bool = false
+    @State private var editorHeight: CGFloat = 38
+    @State private var pendingFormat: MarkdownFormatAction?
     
-    @FocusState private var isTextFieldFocused: Bool
+    private var canPost: Bool {
+        !commentText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isPosting
+    }
     
     var body: some View {
         VStack(spacing: 0) {
             if let errorMessage = errorMessage {
-                HStack {
+                HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
                     Text(errorMessage)
                         .font(.caption)
-                        .foregroundStyle(.red)
-                    Spacer()
-                    Button("✕") {
-                        self.errorMessage = nil
-                    }
-                    .foregroundStyle(.secondary)
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .background(Color.red.opacity(0.1))
-            }
-            
-            if let replyingTo = replyingTo {
-                HStack(spacing: 6) {
-                    Image(systemName: "arrowshape.turn.up.left.fill")
-                        .font(.caption2)
-                    Text("Respondendo @\(replyingTo)")
-                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     Spacer()
                     Button {
-                        onCancel()
+                        self.errorMessage = nil
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.caption)
+                        Image(systemName: "xmark")
+                            .font(.caption.weight(.semibold))
                             .foregroundStyle(.secondary)
                     }
                 }
-                .foregroundStyle(.blue)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(Color.blue.opacity(0.05))
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(Color.red.opacity(0.08))
             }
             
-            if showMarkdownToolbar {
-                markdownToolbar
+            if let replyingTo = replyingTo {
+                replyingBanner(username: replyingTo)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
             
-            HStack(alignment: .center, spacing: 8) {
+            HStack(alignment: .bottom, spacing: 8) {
+                ZStack(alignment: .topLeading) {
+                    if commentText.isEmpty {
+                        Text(replyingTo != nil ? "Escreva uma resposta…" : "Escreva um comentário…")
+                            .font(.body)
+                            .foregroundStyle(.tertiary)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 11)
+                    }
+                    
+                    MarkdownTextEditor(
+                        text: $commentText,
+                        isFocused: $isEditorFocused,
+                        contentHeight: $editorHeight,
+                        pendingFormat: $pendingFormat,
+                        minHeight: 38,
+                        maxHeight: 140,
+                        showsFormattingAccessory: true
+                    )
+                    .frame(height: editorHeight)
+                    .animation(.easeInOut(duration: 0.15), value: editorHeight)
+                }
+                
                 Button {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        showMarkdownToolbar.toggle()
+                    Task {
+                        await postComment()
                     }
                 } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 28))
-                        .foregroundColor(showMarkdownToolbar ? .blue : .secondary)
-                }
-                .buttonStyle(.plain)
-                
-                HStack(alignment: .center, spacing: 0) {
-                    ZStack(alignment: .topLeading) {
-                        if commentText.isEmpty {
-                            Text(replyingTo != nil ? "Resposta..." : "Comentário...")
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 10)
-                        }
-                        
-                        TextEditor(text: $commentText)
-                            .focused($isTextFieldFocused)
-                            .frame(minHeight: 36, maxHeight: isExpanded ? 120 : 36)
-                            .scrollContentBackground(.hidden)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 6)
-                            .padding(.trailing, 36)
-                            .toolbar {
-                                ToolbarItemGroup(placement: .keyboard) {
-                                    Spacer()
-                                    Button("Fechar") {
-                                        isTextFieldFocused = false
-                                    }
-                                }
-                            }
-                            .onChange(of: commentText) { _, newValue in
-                                let lineCount = newValue.components(separatedBy: "\n").count
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    isExpanded = lineCount > 1 || newValue.count > 40
-                                }
-                            }
-                            .onChange(of: isTextFieldFocused) { _, newValue in
-                                if !newValue {
-                                    withAnimation {
-                                        showMarkdownToolbar = false
-                                    }
-                                }
-                            }
-                        
-                        HStack {
-                            Spacer()
-                            Button {
-                                Task {
-                                    await postComment()
-                                }
-                            } label: {
-                                if isPosting {
-                                    ProgressView()
-                                        .tint(.white)
-                                        .frame(width: 28, height: 28)
-                                } else {
-                                    Image(systemName: "arrow.up.circle.fill")
-                                        .font(.system(size: 28))
-                                        .foregroundColor(commentText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .secondary : .blue)
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(commentText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isPosting)
-                            .padding(.trailing, 4)
-                            .padding(.top, 4)
+                    Group {
+                        if isPosting {
+                            ProgressView()
+                                .controlSize(.small)
+                                .tint(.white)
+                        } else {
+                            Image(systemName: "arrow.up")
+                                .font(.system(size: 15, weight: .bold))
                         }
                     }
-                    .background(Color(.systemGray6))
-                    .cornerRadius(18)
+                    .foregroundStyle(.white)
+                    .frame(width: 32, height: 32)
+                    .background(
+                        Circle()
+                            .fill(canPost ? Color.accentColor : Color(.systemGray4))
+                    )
                 }
+                .buttonStyle(.plain)
+                .disabled(!canPost)
+                .accessibilityLabel("Enviar comentário")
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color(.systemBackground))
+            .padding(.horizontal, 6)
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(Color(.systemGray6))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .strokeBorder(.separator.opacity(0.35), lineWidth: 0.5)
+            )
+            .padding(.horizontal, 20)
+            .padding(.top, 4)
+            .padding(.bottom, 10)
         }
-        .background(
-            VStack(spacing: 0) {
-                Divider()
-                Color(.systemBackground)
-            }
-        )
+        .background {
+            Color(.systemBackground)
+                .ignoresSafeArea()
+        }
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(.separator.opacity(0.22))
+                .frame(height: 1)
+        }
+        .animation(.easeInOut(duration: 0.2), value: replyingTo)
         .onAppear {
             if authService.isAuthenticated && replyingTo != nil {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    isTextFieldFocused = true
+                    isEditorFocused = true
                 }
             }
         }
@@ -176,7 +147,7 @@ struct FloatingCommentInput: View {
             NativeLoginView()
                 .onDisappear {
                     if authService.isAuthenticated {
-                        isTextFieldFocused = true
+                        isEditorFocused = true
                     }
                 }
         }
@@ -184,62 +155,43 @@ struct FloatingCommentInput: View {
     
     // MARK: - Subviews
     
-    private var markdownToolbar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                CompactMarkdownButton(icon: "bold") {
-                    insertMarkdown(prefix: "**", suffix: "**", placeholder: "texto")
-                }
-
-                CompactMarkdownButton(icon: "italic") {
-                    insertMarkdown(prefix: "*", suffix: "*", placeholder: "texto")
-                }
-
-                CompactMarkdownButton(icon: "link") {
-                    insertMarkdown(prefix: "[", suffix: "](url)", placeholder: "texto")
-                }
-
-                CompactMarkdownButton(icon: "chevron.left.forwardslash.chevron.right") {
-                    insertMarkdown(prefix: "`", suffix: "`", placeholder: "código")
-                }
-
-                CompactMarkdownButton(icon: "text.quote") {
-                    insertMarkdown(prefix: "> ", suffix: "", placeholder: "citação")
-                }
-
-                CompactMarkdownButton(icon: "list.bullet") {
-                    insertMarkdown(prefix: "- ", suffix: "", placeholder: "item")
-                }
+    private func replyingBanner(username: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "arrowshape.turn.up.left")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            
+            HStack(spacing: 4) {
+                Text("Respondendo")
+                    .foregroundStyle(.secondary)
+                Text("@\(username)")
+                    .fontWeight(.medium)
+                    .foregroundStyle(.primary)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .font(.subheadline)
+            
+            Spacer(minLength: 8)
+            
+            Button {
+                onCancel()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 28, height: 28)
+                    .background(
+                        Circle()
+                            .fill(Color(.systemGray5).opacity(0.8))
+                    )
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Cancelar resposta")
         }
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
-                .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(.systemGray4).opacity(0.5), lineWidth: 0.5)
-                )
-        )
-        .padding(.horizontal, 12)
-        .padding(.vertical, 4)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
     }
     
     // MARK: - Actions
-    
-    private func insertMarkdown(prefix: String, suffix: String, placeholder: String) {
-        let newText = prefix + placeholder + suffix
-        
-        if commentText.isEmpty {
-            commentText = newText
-        } else {
-            commentText += "\n" + newText
-        }
-        
-        isTextFieldFocused = true
-    }
     
     private func postComment() async {
         guard !commentText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
@@ -263,22 +215,19 @@ struct FloatingCommentInput: View {
             await MainActor.run {
                 isPosting = false
                 commentText = ""
-                isExpanded = false
-                isTextFieldFocused = false
+                editorHeight = 38
+                isEditorFocused = false
                 
                 let impact = UINotificationFeedbackGenerator()
                 impact.notificationOccurred(.success)
                 
                 GamificationManager.shared.trackCommentPosted()
-                
-                print("✅ [FloatingCommentInput] Comentário postado com sucesso!")
             }
             
             try? await Task.sleep(nanoseconds: 500_000_000)
             
             await MainActor.run {
                 onCommentPosted()
-                print("🔄 [FloatingCommentInput] Recarregando comentários...")
             }
         } catch {
             await MainActor.run {
@@ -289,32 +238,6 @@ struct FloatingCommentInput: View {
                 impact.notificationOccurred(.error)
             }
         }
-    }
-}
-
-// MARK: - Compact Markdown Button
-
-struct CompactMarkdownButton: View {
-    let icon: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(.secondary)
-                .frame(width: 44, height: 44)
-                .background(
-                    Circle()
-                        .fill(Color(.systemGray5).opacity(0.3))
-                        .overlay(
-                            Circle()
-                                .stroke(Color(.systemGray4).opacity(0.2), lineWidth: 0.5)
-                        )
-                )
-        }
-        .buttonStyle(.plain)
-        .contentShape(Circle())
     }
 }
 

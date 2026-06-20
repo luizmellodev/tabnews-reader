@@ -47,6 +47,40 @@ class CommentsViewModel {
         return countComments(in: comments)
     }
     
+    /// IDs dos comentários ancestrais (para expandir a thread até um comentário).
+    func ancestorIds(for commentId: String?) -> Set<String> {
+        guard let commentId else { return [] }
+        var ancestors: Set<String> = []
+        
+        func search(_ items: [Comment], path: [String]) -> Bool {
+            for item in items {
+                let currentPath = path + (item.id.map { [$0] } ?? [])
+                
+                if item.id == commentId {
+                    ancestors = Set(path)
+                    return true
+                }
+                
+                if let children = item.children, search(children, path: currentPath) {
+                    return true
+                }
+            }
+            return false
+        }
+        
+        search(comments, path: [])
+        return ancestors
+    }
+    
+    /// IDs que precisam estar expandidos para exibir um comentário e suas respostas.
+    func threadIdsToExpand(for comment: Comment) -> Set<String> {
+        var ids = ancestorIds(for: comment.id)
+        if let id = comment.id {
+            ids.insert(id)
+        }
+        return ids
+    }
+    
     private func countComments(in comments: [Comment]) -> Int {
         var count = comments.count
         for comment in comments {

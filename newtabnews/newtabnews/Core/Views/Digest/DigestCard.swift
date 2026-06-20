@@ -18,11 +18,16 @@ struct DigestCard: View {
             DigestDetailsView(digest: digest)
         } label: {
             VStack(alignment: .leading, spacing: 12) {
+                Text(digest.title ?? "Sem título")
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
                 HStack {
-                    Text(digest.title ?? "Sem título")
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                        .lineLimit(2)
+                    Text(isNew ? "Publicado hoje" : formatDate(digest.createdAt))
+                        .font(.caption)
+                        .foregroundStyle(.gray)
                     
                     Spacer()
                     
@@ -39,10 +44,6 @@ struct DigestCard: View {
                             )
                     }
                 }
-                
-                Text(isNew ? "Publicado hoje" : formatDate(digest.createdAt))
-                    .font(.caption)
-                    .foregroundStyle(.gray)
             }
             .padding()
             .background(

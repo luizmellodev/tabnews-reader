@@ -84,6 +84,9 @@
 		796D063E2F0AE4C50064A2BC /* CommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D063B2F0AE4C50064A2BC /* CommentsView.swift */; };
 		796D063F2F0AE4C50064A2BC /* CommentsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D063C2F0AE4C50064A2BC /* CommentsViewModel.swift */; };
 		796D06402F0AE4C50064A2BC /* CommentRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D063A2F0AE4C50064A2BC /* CommentRow.swift */; };
+		79CB0B012F2A20060064A2BC /* CommentBodyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79CB0B002F2A20060064A2BC /* CommentBodyView.swift */; };
+		79CB0B032F2A31060064A2BC /* MarkdownFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79CB0B022F2A31060064A2BC /* MarkdownFormatting.swift */; };
+		79CB0B052F2A31060064A2BC /* MarkdownTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79CB0B042F2A31060064A2BC /* MarkdownTextEditor.swift */; };
 		796D06462F0AE5B10064A2BC /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D06452F0AE5B10064A2BC /* KeychainManager.swift */; };
 		796D06472F0AE5B10064A2BC /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D06442F0AE5B10064A2BC /* AuthService.swift */; };
 		796D06492F0AE5F30064A2BC /* CommentComposeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D06482F0AE5F30064A2BC /* CommentComposeSheet.swift */; };
@@ -264,6 +267,9 @@
 		796D06302F0ADCA40064A2BC /* WidgetPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPost.swift; sourceTree = "<group>"; };
 		796D06372F0AE4390064A2BC /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		796D063A2F0AE4C50064A2BC /* CommentRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentRow.swift; sourceTree = "<group>"; };
+		79CB0B002F2A20060064A2BC /* CommentBodyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentBodyView.swift; sourceTree = "<group>"; };
+		79CB0B022F2A31060064A2BC /* MarkdownFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFormatting.swift; sourceTree = "<group>"; };
+		79CB0B042F2A31060064A2BC /* MarkdownTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownTextEditor.swift; sourceTree = "<group>"; };
 		796D063B2F0AE4C50064A2BC /* CommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsView.swift; sourceTree = "<group>"; };
 		796D063C2F0AE4C50064A2BC /* CommentsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsViewModel.swift; sourceTree = "<group>"; };
 		796D06442F0AE5B10064A2BC /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
@@ -542,6 +548,9 @@
 		796D063D2F0AE4C50064A2BC /* Comments */ = {
 			isa = PBXGroup;
 			children = (
+				79CB0B002F2A20060064A2BC /* CommentBodyView.swift */,
+				79CB0B022F2A31060064A2BC /* MarkdownFormatting.swift */,
+				79CB0B042F2A31060064A2BC /* MarkdownTextEditor.swift */,
 				796D06482F0AE5F30064A2BC /* CommentComposeSheet.swift */,
 				796D064C2F0AE8920064A2BC /* FloatingCommentInput.swift */,
 				796D063A2F0AE4C50064A2BC /* CommentRow.swift */,
@@ -1073,6 +1082,9 @@
 				799CC4672F489A6C0059BB51 /* DailyDigestManager.swift in Sources */,
 				799CC4682F489A6C0059BB51 /* GamificationManager.swift in Sources */,
 				796D06402F0AE4C50064A2BC /* CommentRow.swift in Sources */,
+				79CB0B012F2A20060064A2BC /* CommentBodyView.swift in Sources */,
+				79CB0B032F2A31060064A2BC /* MarkdownFormatting.swift in Sources */,
+				79CB0B052F2A31060064A2BC /* MarkdownTextEditor.swift in Sources */,
 				7915846F2EFC869B00C69745 /* AudioControlsView.swift in Sources */,
 				799049FF2A73068E0050240C /* DefaultViewState.swift in Sources */,
 				7982B7512F00B3CA00666726 /* DigestCard.swift in Sources */,

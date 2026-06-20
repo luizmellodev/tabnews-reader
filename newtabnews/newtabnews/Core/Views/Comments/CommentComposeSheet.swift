@@ -20,8 +20,9 @@ struct CommentComposeSheet: View {
     @State private var showLoginRequiredAlert: Bool = false
     @State private var showLoginSheet: Bool = false
     @State private var isPreviewMode: Bool = false
-    
-    @FocusState private var isTextFieldFocused: Bool
+    @State private var isEditorFocused: Bool = false
+    @State private var editorHeight: CGFloat = 150
+    @State private var pendingFormat: MarkdownFormatAction?
     
     var body: some View {
         NavigationStack {
@@ -57,18 +58,25 @@ struct CommentComposeSheet: View {
                     VStack(spacing: 0) {
                         markdownToolbar
                         
-                        TextEditor(text: $commentText)
-                            .focused($isTextFieldFocused)
-                            .padding()
-                            .frame(minHeight: 150, maxHeight: 300)
-                            .toolbar {
-                                ToolbarItemGroup(placement: .keyboard) {
-                                    Spacer()
-                                    Button("Fechar") {
-                                        isTextFieldFocused = false
-                                    }
+                        MarkdownTextEditor(
+                            text: $commentText,
+                            isFocused: $isEditorFocused,
+                            contentHeight: $editorHeight,
+                            pendingFormat: $pendingFormat,
+                            minHeight: 150,
+                            maxHeight: 300,
+                            showsFormattingAccessory: false
+                        )
+                        .frame(height: editorHeight)
+                        .padding(.horizontal, 8)
+                        .toolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                Button("Fechar") {
+                                    isEditorFocused = false
                                 }
                             }
+                        }
                             .overlay(
                                 Group {
                                     if commentText.isEmpty {
@@ -145,7 +153,7 @@ struct CommentComposeSheet: View {
             .onAppear {
                 // Se não estiver autenticado, não fazer nada (vai mostrar a view de login)
                 if authService.isAuthenticated {
-                    isTextFieldFocused = true
+                    isEditorFocused = true
                 }
             }
             .alert("Login necessário", isPresented: $showLoginRequiredAlert) {
@@ -160,7 +168,7 @@ struct CommentComposeSheet: View {
                 NativeLoginView()
                     .onDisappear {
                         if authService.isAuthenticated {
-                            isTextFieldFocused = true
+                            isEditorFocused = true
                         }
                     }
             }
@@ -179,27 +187,27 @@ struct CommentComposeSheet: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
                 MarkdownButton(icon: "bold", label: "Bold") {
-                    insertMarkdown(prefix: "**", suffix: "**", placeholder: "texto")
+                    pendingFormat = .wrap(prefix: "**", suffix: "**", placeholder: "texto")
                 }
                 
                 MarkdownButton(icon: "italic", label: "Italic") {
-                    insertMarkdown(prefix: "*", suffix: "*", placeholder: "texto")
+                    pendingFormat = .wrap(prefix: "*", suffix: "*", placeholder: "texto")
                 }
                 
                 MarkdownButton(icon: "link", label: "Link") {
-                    insertMarkdown(prefix: "[", suffix: "](url)", placeholder: "texto")
+                    pendingFormat = .wrap(prefix: "[", suffix: "](url)", placeholder: "texto")
                 }
                 
                 MarkdownButton(icon: "chevron.left.forwardslash.chevron.right", label: "Code") {
-                    insertMarkdown(prefix: "`", suffix: "`", placeholder: "código")
+                    pendingFormat = .wrap(prefix: "`", suffix: "`", placeholder: "código")
                 }
                 
                 MarkdownButton(icon: "text.quote", label: "Quote") {
-                    insertMarkdown(prefix: "> ", suffix: "", placeholder: "citação")
+                    pendingFormat = .linePrefix("> ")
                 }
                 
                 MarkdownButton(icon: "list.bullet", label: "Lista") {
-                    insertMarkdown(prefix: "- ", suffix: "", placeholder: "item")
+                    pendingFormat = .linePrefix("- ")
                 }
             }
             .padding(.horizontal)
@@ -257,7 +265,7 @@ struct CommentComposeSheet: View {
             
             await MainActor.run {
                 isPosting = false
-                isTextFieldFocused = false
+                isEditorFocused = false
                 onCommentPosted?()
                 
                 let impact = UINotificationFeedbackGenerator()
@@ -322,21 +330,6 @@ struct CommentComposeSheet: View {
                 .padding(.horizontal, 40)
             }
         }
-    }
-    
-    // MARK: - Markdown Helpers
-    
-    private func insertMarkdown(prefix: String, suffix: String, placeholder: String) {
-        let selectedRange = commentText.isEmpty ? commentText.startIndex..<commentText.endIndex : commentText.startIndex..<commentText.endIndex
-        let newText = prefix + placeholder + suffix
-        
-        if commentText.isEmpty {
-            commentText = newText
-        } else {
-            commentText += "\n" + newText
-        }
-        
-        isTextFieldFocused = true
     }
 }
 
