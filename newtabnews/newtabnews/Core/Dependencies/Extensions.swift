@@ -80,10 +80,10 @@ enum Theme: Int {
     }
 }
 
-enum ContentStrategy: String, CaseIterable {
+enum ContentStrategy: String, CaseIterable, Hashable {
     case relevant = "relevant"
     case new = "new"
-    
+
     var displayName: String {
         switch self {
         case .relevant:
@@ -92,13 +92,23 @@ enum ContentStrategy: String, CaseIterable {
             return "Recentes"
         }
     }
-    
+
     var icon: String {
         switch self {
         case .relevant:
-            return "star.fill"
+            return "flame.fill"
         case .new:
             return "clock.fill"
+        }
+    }
+}
+
+extension Array where Element == PostRequest {
+    func filtered(by query: String) -> [PostRequest] {
+        guard !query.isEmpty else { return self }
+        return filter { post in
+            guard let title = post.title else { return false }
+            return title.localizedCaseInsensitiveContains(query)
         }
     }
 }

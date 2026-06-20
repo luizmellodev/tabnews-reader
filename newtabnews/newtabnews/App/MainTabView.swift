@@ -12,58 +12,60 @@ struct MainTabView: View {
     @Binding var selectedTab: AppTab
     @Binding var isViewInApp: Bool
     @Binding var currentTheme: Theme
-    
+
     @Bindable var viewModel: MainViewModel
     @Bindable var newsletterVM: NewsletterViewModel
 
     @Binding var postToOpen: PostRequest?
     @Binding var isLoadingPost: Bool
-    
+
+    @State private var searchText = ""
+
     var body: some View {
         TabView(selection: $selectedTab) {
-            MainView(
-                isViewInApp: $isViewInApp,
-                postToOpen: $postToOpen,
-                isLoadingPost: $isLoadingPost
-            )
-                .tabItem {
-                    Label(AppTab.home.title, systemImage: AppTab.home.icon)
-                }
-                .tag(AppTab.home)
-            
-            FoldersView()
-                .tabItem {
-                    Label(AppTab.library.title, systemImage: AppTab.library.icon)
-                }
-                .badge(viewModel.readLaterList.isEmpty ? 0 : viewModel.readLaterList.count)
-                .environment(viewModel)
-                .tag(AppTab.library)
-            
-            NewsletterView(
-                isViewInApp: $isViewInApp,
-                currentTheme: $currentTheme
-            )
-                .tabItem {
-                    Label(AppTab.newsletter.title, systemImage: AppTab.newsletter.icon)
-                }
-                .badge(newsletterVM.unreadNewCount > 0 ? newsletterVM.unreadNewCount : 0)
+            Tab(AppTab.home.title, systemImage: AppTab.home.icon, value: AppTab.home) {
+                MainView(
+                    isViewInApp: $isViewInApp,
+                    postToOpen: $postToOpen,
+                    isLoadingPost: $isLoadingPost
+                )
+            }
+
+            Tab(AppTab.library.title, systemImage: AppTab.library.icon, value: AppTab.library) {
+                FoldersView()
+                    .environment(viewModel)
+            }
+            .badge(viewModel.readLaterList.isEmpty ? 0 : viewModel.readLaterList.count)
+
+            Tab(AppTab.newsletter.title, systemImage: AppTab.newsletter.icon, value: AppTab.newsletter) {
+                NewsletterView(
+                    isViewInApp: $isViewInApp,
+                    currentTheme: $currentTheme
+                )
                 .environment(newsletterVM)
                 .environment(viewModel)
-                .tag(AppTab.newsletter)
-            
-            SettingsView(
-                isViewInApp: $isViewInApp,
-                currentTheme: $currentTheme
-            )
-            .tabItem {
-                Label(AppTab.settings.title, systemImage: AppTab.settings.icon)
             }
-            .environment(viewModel)
-            .onChange(of: isViewInApp) { _, newValue in
-                viewModel.defaults.set(newValue, forKey: "viewInApp")
+            .badge(newsletterVM.unreadNewCount > 0 ? newsletterVM.unreadNewCount : 0)
+
+            Tab(AppTab.settings.title, systemImage: AppTab.settings.icon, value: AppTab.settings) {
+                SettingsView(
+                    isViewInApp: $isViewInApp,
+                    currentTheme: $currentTheme
+                )
+                .environment(viewModel)
+                .onChange(of: isViewInApp) { _, newValue in
+                    viewModel.defaults.set(newValue, forKey: "viewInApp")
+                }
             }
-            .tag(AppTab.settings)
+
+            Tab(AppTab.search.title, systemImage: AppTab.search.icon, value: AppTab.search, role: .search) {
+                SearchView(
+                    searchText: $searchText,
+                    isViewInApp: $isViewInApp
+                )
+            }
         }
+        .tabBarMinimizeBehavior(.onScrollDown)
         .environment(viewModel)
         .task {
             await newsletterVM.refreshUnreadBadge()
@@ -98,4 +100,3 @@ struct MainTabView: View {
         isLoadingPost: .constant(false)
     )
 }
-

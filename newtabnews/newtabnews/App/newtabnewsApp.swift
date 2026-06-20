@@ -104,7 +104,6 @@ struct newtabnewsApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(
-                searchText: "",
                 contentService: dependencies.contentService,
                 viewModel: dependencies.makeMainViewModel(),
                 newsletterVM: dependencies.makeNewsletterViewModel()

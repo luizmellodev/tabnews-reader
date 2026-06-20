@@ -61,13 +61,25 @@ extension MainViewModel {
     func fetchContent(with strategy: ContentStrategy) async {
         let strategyChanged = self.currentStrategy != strategy
         self.currentStrategy = strategy
-        
+
         if strategyChanged {
             self.currentPage = 1
             self.hasMorePages = true
             self.content = []
         }
-        
+
+        await fetchContent()
+        await fetchPost()
+    }
+
+    @MainActor
+    func reloadForStrategy(_ strategy: ContentStrategy) async {
+        currentStrategy = strategy
+        currentPage = 1
+        hasMorePages = true
+        content = []
+        isLoadingMore = false
+        state = .loading
         await fetchContent()
         await fetchPost()
     }

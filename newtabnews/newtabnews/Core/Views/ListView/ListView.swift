@@ -8,17 +8,16 @@
 import SwiftUI
 
 struct ListView: View {
-    
+
     @Environment(MainViewModel.self) var viewModel
-    @Binding var searchText: String
     @Binding var isViewInApp: Bool
     @Binding var currentTheme: Theme
     var posts: [PostRequest]
     var zoomNamespace: Namespace.ID
-    
+
     var body: some View {
         LazyVStack(spacing: 0) {
-            ForEach(Array(filteredPosts.enumerated()), id: \.element.id) { index, post in
+            ForEach(Array(posts.enumerated()), id: \.element.id) { index, post in
                 PostRow(
                     isViewInApp: $isViewInApp,
                     currentTheme: $currentTheme,
@@ -30,38 +29,27 @@ struct ListView: View {
                     insertion: .opacity.combined(with: .move(edge: .top)),
                     removal: .opacity
                 ))
-                .animation(.easeOut(duration: 0.3).delay(Double(index) * 0.05), value: filteredPosts.count)
+                .animation(.easeOut(duration: 0.3).delay(Double(index) * 0.05), value: posts.count)
                 .onAppear {
-                    if index == filteredPosts.count - 3 {
+                    if index == posts.count - 3 {
                         Task {
                             await viewModel.fetchNextPage()
                         }
                     }
                 }
             }
-            
+
             if viewModel.isLoadingMore {
                 LoadingMoreView()
                     .padding(.vertical, 20)
             }
-            
-            if !viewModel.hasMorePages && !filteredPosts.isEmpty {
+
+            if !viewModel.hasMorePages && !posts.isEmpty {
                 EndOfListView()
                     .padding(.vertical, 20)
             }
         }
         .padding(.horizontal, 5)
-    }
-    
-    private var filteredPosts: [PostRequest] {
-        if searchText.isEmpty {
-            return posts
-        } else {
-            return posts.filter { post in
-                guard let title = post.title else { return false }
-                return title.localizedCaseInsensitiveContains(searchText)
-            }
-        }
     }
 }
 

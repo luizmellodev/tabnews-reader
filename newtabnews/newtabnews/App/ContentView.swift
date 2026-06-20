@@ -25,7 +25,6 @@ struct ContentView: View {
     
     @State var viewModel: MainViewModel
     @State var newsletterVM: NewsletterViewModel
-    @State var searchText: String
     @State var showSnack: Bool = false
     @State var isViewInApp: Bool = true
     @State var alreadyLoaded: Bool = false
@@ -38,12 +37,10 @@ struct ContentView: View {
     @StateObject private var toastManager = ToastManager.shared
         
     init(
-        searchText: String = "",
         contentService: ContentServiceProtocol = ContentService(),
         viewModel: MainViewModel? = nil,
         newsletterVM: NewsletterViewModel? = nil
     ) {
-        self.searchText = searchText
         self.contentService = contentService
         self._viewModel = State(initialValue: viewModel ?? MainViewModel(service: contentService))
         self._newsletterVM = State(initialValue: newsletterVM ?? NewsletterViewModel(service: contentService))
