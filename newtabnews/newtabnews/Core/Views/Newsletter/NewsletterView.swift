@@ -42,7 +42,7 @@ struct NewsletterView: View {
                             ForEach(viewModel.newsletter) { newsletter in
                                 NewsletterCard(
                                     newsletter: newsletter,
-                                    isNew: isCreatedToday(createdAt: newsletter.createdAt),
+                                    isNew: NewsletterViewModel.isCreatedToday(createdAt: newsletter.createdAt),
                                     isViewInApp: $isViewInApp,
                                     currentTheme: $currentTheme
                                 )
@@ -52,7 +52,7 @@ struct NewsletterView: View {
                     }
                     .refreshable {
                         await viewModel.fetchNewsletterContent()
-                        await viewModel.fetchNewsletterPost()
+                        viewModel.markNewslettersAsSeen()
                     }
                     .padding(.top, 60)
                     
@@ -66,10 +66,12 @@ struct NewsletterView: View {
             .task {
                 if !viewModel.alreadyLoaded {
                     await viewModel.fetchNewsletterContent()
-                    await viewModel.fetchNewsletterPost()
                 }
                 
                 checkAndShowReviewPrompt()
+            }
+            .onAppear {
+                viewModel.markNewslettersAsSeen()
             }
         }
     }
@@ -107,25 +109,5 @@ struct NewsletterView: View {
                 .foregroundStyle(.gray)
         }
         .padding(.vertical)
-    }
-    
-    private func isCreatedToday(createdAt: String?) -> Bool {
-        guard let createdAtString = createdAt else {
-            return false
-        }
-        
-        let dateFormatter = ISO8601DateFormatter()
-        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        
-        guard let createdDate = dateFormatter.date(from: createdAtString) else {
-            return false
-        }
-        
-        let calendar = Calendar.current
-        let createdComponents = calendar.dateComponents([.day, .month], from: createdDate)
-        let currentComponents = calendar.dateComponents([.day, .month], from: Date())
-        
-        return createdComponents.day == currentComponents.day &&
-               createdComponents.month == currentComponents.month
     }
 }

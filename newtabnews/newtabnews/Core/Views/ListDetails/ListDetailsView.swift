@@ -19,17 +19,33 @@ struct ListDetailView: View {
     @Binding var currentTheme: Theme
     
     @State var post: PostRequest
+    var isNewsletter: Bool = false
+    
     @State private var showingTabNews = false
     @State private var showingAddNote = false
     @State private var showingHighlightSheet = false
     @State private var isHighlightMode = false
     @State private var showAudioControls = false
+    @State private var isLoadingBody = false
+    @State private var bodyLoadFailed = false
     @Query private var highlights: [Highlight]
     
     @AppStorage("showReadOnTabNewsButton") private var showReadOnTabNewsButton = false
     
+    private let contentService: ContentServiceProtocol = ContentService()
+    
     private var postHighlights: [Highlight] {
         highlights.filter { $0.postId == post.id }
+    }
+    
+    private var needsBodyLoad: Bool {
+        guard let body = post.body, !body.isEmpty else { return true }
+        return body == "Erro ao carregar conteúdo"
+    }
+    
+    private var commentUsername: String? {
+        if isNewsletter { return "NewsletterOficial" }
+        return post.ownerUsername
     }
 
     var body: some View {
@@ -42,7 +58,8 @@ struct ListDetailView: View {
                         postHighlights: postHighlights,
                         isHighlightMode: $isHighlightMode,
                         showingAddNote: $showingAddNote,
-                        showAudioControls: $showAudioControls
+                        showAudioControls: $showAudioControls,
+                        isNewsletter: isNewsletter
                     )
                     
                     // Controles de áudio (aparecem quando ativado)
@@ -77,6 +94,10 @@ struct ListDetailView: View {
         .onAppear {
             GamificationManager.shared.trackPostRead()
         }
+        .task(id: post.stableKey) {
+            guard needsBodyLoad else { return }
+            await loadPostBody()
+        }
         .onDisappear {
             ttsManager.stop()
         }
@@ -92,24 +113,51 @@ struct ListDetailView: View {
     
     private var postContent: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HybridMarkdownView(
-                markdown: post.body ?? "",
-                postId: post.id ?? "",
-                highlights: postHighlights,
-                isHighlightMode: isHighlightMode,
-                onHighlight: { text, range in
-                    saveHighlight(text: text, range: range)
-                },
-                onRemoveHighlight: { highlight in
-                    removeHighlight(highlight)
+            if isLoadingBody {
+                VStack(spacing: 12) {
+                    ProgressView()
+                    Text("Carregando conteúdo...")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-            )
-            .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+            } else if bodyLoadFailed {
+                ContentUnavailableView {
+                    Label("Não foi possível carregar", systemImage: "wifi.exclamationmark")
+                } description: {
+                    Text("Verifique sua conexão e tente novamente.")
+                } actions: {
+                    Button("Tentar novamente") {
+                        Task { await loadPostBody() }
+                    }
+                }
+                .padding(.vertical, 20)
+            } else {
+                HybridMarkdownView(
+                    markdown: post.body ?? "",
+                    postId: post.id ?? "",
+                    highlights: postHighlights,
+                    isHighlightMode: isHighlightMode,
+                    onHighlight: { text, range in
+                        saveHighlight(text: text, range: range)
+                    },
+                    onRemoveHighlight: { highlight in
+                        removeHighlight(highlight)
+                    }
+                )
+                .fixedSize(horizontal: false, vertical: true)
+            }
             
-            PostCTAView(post: post)
+            if !isLoadingBody && !bodyLoadFailed {
+                PostCTAView(post: post)
+            }
             
             // Seção de Comentários
-            if let username = post.ownerUsername, let slug = post.slug, let postId = post.id {
+            if !isLoadingBody && !bodyLoadFailed,
+               let username = commentUsername,
+               let slug = post.slug,
+               let postId = post.id {
                 Divider()
                     .padding(.vertical, 16)
                 
@@ -176,5 +224,47 @@ struct ListDetailView: View {
         impact.notificationOccurred(.warning)
         
         NotificationCenter.default.post(name: .highlightsUpdated, object: nil)
+    }
+    
+    @MainActor
+    private func loadPostBody() async {
+        guard let slug = post.slug, !slug.isEmpty else {
+            bodyLoadFailed = true
+            return
+        }
+        
+        let username: String
+        if isNewsletter {
+            username = "NewsletterOficial"
+        } else if let owner = post.ownerUsername, !owner.isEmpty {
+            username = owner
+        } else {
+            bodyLoadFailed = true
+            return
+        }
+        
+        isLoadingBody = true
+        bodyLoadFailed = false
+        
+        for attempt in 0..<3 {
+            if attempt > 0 {
+                try? await Task.sleep(nanoseconds: UInt64(attempt) * 600_000_000)
+            }
+            
+            do {
+                let response = try await contentService.getPost(user: username, slug: slug)
+                if let body = response.body, !body.isEmpty {
+                    post.body = body
+                    isLoadingBody = false
+                    bodyLoadFailed = false
+                    return
+                }
+            } catch {
+                print("Erro ao carregar post [\(slug)] tentativa \(attempt + 1): \(error)")
+            }
+        }
+        
+        isLoadingBody = false
+        bodyLoadFailed = true
     }
 }

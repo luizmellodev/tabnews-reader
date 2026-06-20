@@ -39,6 +39,7 @@ struct MainTabView: View {
                 .tabItem {
                     Label(AppTab.newsletter.title, systemImage: AppTab.newsletter.icon)
                 }
+                .badge(newsletterVM.unreadNewCount > 0 ? newsletterVM.unreadNewCount : 0)
                 .environment(newsletterVM)
                 .environment(viewModel)
                 .tag(AppTab.newsletter)
@@ -57,6 +58,9 @@ struct MainTabView: View {
             .tag(AppTab.settings)
         }
         .environment(viewModel)
+        .task {
+            await newsletterVM.refreshUnreadBadge()
+        }
     }
 }
 

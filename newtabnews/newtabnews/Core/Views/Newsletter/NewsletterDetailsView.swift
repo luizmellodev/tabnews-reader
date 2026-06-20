@@ -20,7 +20,8 @@ struct NewsletterDetailsView: View {
                 ListDetailView(
                     isViewInApp: $isViewInApp,
                     currentTheme: $currentTheme,
-                    post: post
+                    post: post,
+                    isNewsletter: true
                 )
                 .environment(viewModel)
             } else {

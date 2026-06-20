@@ -19,6 +19,8 @@ struct PostHeader: View {
     @Binding var showingAddNote: Bool
     @Binding var showAudioControls: Bool
     
+    var isNewsletter: Bool = false
+    
     @State private var isVoting: Bool = false
     @State private var hasVoted: Bool = false
     @State private var localTabcoins: Int? = nil
@@ -34,13 +36,15 @@ struct PostHeader: View {
         postHighlights: [Highlight],
         isHighlightMode: Binding<Bool>,
         showingAddNote: Binding<Bool>,
-        showAudioControls: Binding<Bool>
+        showAudioControls: Binding<Bool>,
+        isNewsletter: Bool = false
     ) {
         self.post = post
         self.postHighlights = postHighlights
         self._isHighlightMode = isHighlightMode
         self._showingAddNote = showingAddNote
         self._showAudioControls = showAudioControls
+        self.isNewsletter = isNewsletter
         
         // Verificar se já votou
         if let postId = post.id {
@@ -65,64 +69,92 @@ struct PostHeader: View {
                     .fontWeight(.bold)
                     .lineSpacing(2)
                 
-                // Metadados (autor, data, tabcoins) - tudo em uma linha
+                // Metadados
                 HStack(spacing: 6) {
-                    Text(post.ownerUsername ?? "")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    
-                    Text("•")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    
-                    Text(getFormattedDate(value: post.createdAt ?? ""))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    
-                    Text("•")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    
-                    // Tabcoins + botões de voto (inline, mas com área de toque adequada)
-                    HStack(spacing: 4) {
-                        Image(systemName: "star.fill")
-                            .font(.caption2)
-                        Text("\(displayTabcoins)")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                    }
-                    .foregroundStyle(displayTabcoins > 0 ? .orange : .secondary)
-                    
-                    // Botões de voto com área de toque adequada (44x44)
-                    if !hasVoted && !isVoting {
-                        Button {
-                            handleVote(transactionType: "credit")
-                        } label: {
-                            Image(systemName: "arrow.up.circle")
-                                .font(.body)
-                                .foregroundStyle(.secondary)
-                                .frame(width: 32, height: 32)
-                                .contentShape(Rectangle())
+                    if isNewsletter {
+                        HStack(spacing: 4) {
+                            Image(systemName: "envelope.open.fill")
+                                .font(.caption)
+                            Text("Newsletter")
+                                .font(.subheadline)
                         }
-                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
                         
-                        Button {
-                            handleVote(transactionType: "debit")
-                        } label: {
-                            Image(systemName: "arrow.down.circle")
-                                .font(.body)
+                        Text("•")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        
+                        Text(getFormattedDate(value: post.createdAt ?? ""))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        
+                        if let body = post.body, !body.isEmpty, body != "Erro ao carregar conteúdo" {
+                            Text("•")
+                                .font(.caption)
                                 .foregroundStyle(.secondary)
-                                .frame(width: 32, height: 32)
-                                .contentShape(Rectangle())
+                            
+                            Text(body.readingTimeFormatted)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
                         }
-                        .buttonStyle(.plain)
-                    } else if isVoting {
-                        ProgressView()
-                            .controlSize(.mini)
-                    } else if hasVoted {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.body)
-                            .foregroundStyle(.green)
+                    } else {
+                        Text(post.ownerUsername ?? "")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        
+                        Text("•")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        
+                        Text(getFormattedDate(value: post.createdAt ?? ""))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        
+                        Text("•")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        
+                        // Tabcoins + botões de voto (inline, mas com área de toque adequada)
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .font(.caption2)
+                            Text("\(displayTabcoins)")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        .foregroundStyle(displayTabcoins > 0 ? .orange : .secondary)
+                        
+                        // Botões de voto com área de toque adequada (44x44)
+                        if !hasVoted && !isVoting {
+                            Button {
+                                handleVote(transactionType: "credit")
+                            } label: {
+                                Image(systemName: "arrow.up.circle")
+                                    .font(.body)
+                                    .foregroundStyle(.secondary)
+                                    .frame(width: 32, height: 32)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            
+                            Button {
+                                handleVote(transactionType: "debit")
+                            } label: {
+                                Image(systemName: "arrow.down.circle")
+                                    .font(.body)
+                                    .foregroundStyle(.secondary)
+                                    .frame(width: 32, height: 32)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        } else if isVoting {
+                            ProgressView()
+                                .controlSize(.mini)
+                        } else if hasVoted {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.body)
+                                .foregroundStyle(.green)
+                        }
                     }
                 }
                 
