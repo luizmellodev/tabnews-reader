@@ -36,7 +36,6 @@ struct PostDeepLinkData {
 
 extension Notification.Name {
     static let openNewsletterTab = Notification.Name("openNewsletterTab")
-    static let openDigestTab = Notification.Name("openDigestTab")
     static let openPostFromNotification = Notification.Name("openPostFromNotification")
     static let navigateToDigest = Notification.Name("navigateToDigest")
     static let highlightsUpdated = Notification.Name("highlightsUpdated")

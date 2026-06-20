@@ -82,7 +82,7 @@ class NotificationHandler {
         print("🔥 Abrindo aba Resumo")
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            NotificationCenter.default.post(name: .openDigestTab, object: nil)
+            NotificationCenter.default.post(name: .navigateToDigest, object: nil)
         }
     }
 }
