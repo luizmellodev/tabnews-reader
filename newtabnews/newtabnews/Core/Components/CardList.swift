@@ -53,12 +53,12 @@ struct CardList: View {
             .foregroundColor(.gray)
             
             Divider()
-                .padding(.bottom, 12)
+                .padding(.bottom, 20)
             
             if let body = post.body, !body.isEmpty {
                 Text(body.feedPreview())
                     .font(.subheadline)
-                    .fontWeight(.ultraLight)
+                    .fontWeight(.light)
                     .lineSpacing(3)
                     .lineLimit(4)
                     .multilineTextAlignment(.leading)
