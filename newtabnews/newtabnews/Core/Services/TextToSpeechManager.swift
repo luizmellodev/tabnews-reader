@@ -119,77 +119,66 @@ class TextToSpeechManager: NSObject, ObservableObject {
     private func cleanMarkdown(_ text: String) -> String {
         var cleaned = text
         
-        // Remove imagens: ![alt](url) -> ""
         cleaned = cleaned.replacingOccurrences(
             of: #"!\[([^\]]*)\]\(([^\)]+)\)"#,
             with: "",
             options: .regularExpression
         )
         
-        // Remove links mas mantém o texto: [texto](url) -> texto
         cleaned = cleaned.replacingOccurrences(
             of: #"\[([^\]]+)\]\(([^\)]+)\)"#,
             with: "$1",
             options: .regularExpression
         )
         
-        // Remove URLs automáticas
         cleaned = cleaned.replacingOccurrences(
             of: #"https?://[^\s<>]+"#,
             with: "",
             options: .regularExpression
         )
         
-        // Remove bold: **texto** -> texto
         cleaned = cleaned.replacingOccurrences(
             of: #"\*\*([^*]+)\*\*"#,
             with: "$1",
             options: .regularExpression
         )
         
-        // Remove itálico: *texto* -> texto
         cleaned = cleaned.replacingOccurrences(
             of: #"(?<!\*)\*([^*]+)\*(?!\*)"#,
             with: "$1",
             options: .regularExpression
         )
         
-        // Remove headers: # Título -> Título
         cleaned = cleaned.replacingOccurrences(
-            of: #"^#{1,6}\s+"#,
+            of: #"(?m)^#{1,6}\s+"#,
             with: "",
             options: .regularExpression
         )
         
-        // Remove dividers: ---
         cleaned = cleaned.replacingOccurrences(
-            of: #"^---+\s*$"#,
+            of: #"(?m)^---+\s*$"#,
             with: "",
             options: .regularExpression
         )
         
-        // Remove listas: - item -> item
         cleaned = cleaned.replacingOccurrences(
-            of: #"^-\s+"#,
+            of: #"(?m)^-\s+"#,
             with: "",
             options: .regularExpression
         )
         
-        // Remove code inline: `código` -> código
         cleaned = cleaned.replacingOccurrences(
             of: #"`([^`]+)`"#,
             with: "$1",
             options: .regularExpression
         )
         
-        // Remove comentários HTML
         cleaned = cleaned.replacingOccurrences(
             of: #"<!--[\s\S]*?-->"#,
             with: "",
             options: .regularExpression
         )
         
-        // Remove múltiplos espaços e quebras de linha extras
         cleaned = cleaned.replacingOccurrences(
             of: #"\n{3,}"#,
             with: "\n\n",
@@ -197,7 +186,7 @@ class TextToSpeechManager: NSObject, ObservableObject {
         )
         
         cleaned = cleaned.replacingOccurrences(
-            of: #"\s{2,}"#,
+            of: #"[ \t]{2,}"#,
             with: " ",
             options: .regularExpression
         )

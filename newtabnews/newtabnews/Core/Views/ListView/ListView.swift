@@ -16,7 +16,7 @@ struct ListView: View {
     var zoomNamespace: Namespace.ID
 
     var body: some View {
-        LazyVStack(spacing: 0) {
+        LazyVStack(spacing: 12) {
             ForEach(Array(posts.enumerated()), id: \.element.id) { index, post in
                 PostRow(
                     isViewInApp: $isViewInApp,
@@ -49,7 +49,6 @@ struct ListView: View {
                     .padding(.vertical, 20)
             }
         }
-        .padding(.horizontal, 5)
     }
 }
 

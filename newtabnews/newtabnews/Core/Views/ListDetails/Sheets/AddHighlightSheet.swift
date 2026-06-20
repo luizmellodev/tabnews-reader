@@ -75,10 +75,8 @@ struct AddHighlightSheet: View {
     }
     
     private func saveHighlight() {
-        guard let postId = post.id else { return }
-        
         let highlight = Highlight(
-            postId: postId,
+            postId: post.stableKey,
             postTitle: post.title,
             highlightedText: selectedText,
             note: highlightNote.isEmpty ? nil : highlightNote,
@@ -88,6 +86,7 @@ struct AddHighlightSheet: View {
         )
         
         modelContext.insert(highlight)
+        modelContext.upsertSavedPost(from: post)
         
         let impact = UINotificationFeedbackGenerator()
         impact.notificationOccurred(.success)

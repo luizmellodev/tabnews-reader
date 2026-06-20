@@ -39,7 +39,12 @@ struct DigestListView: View {
                 }
                 
             case .requestFailed:
-                FailureView(currentTheme: .constant(.dark))
+                FailureView(currentTheme: .constant(.dark)) {
+                    Task {
+                        await digestVM.fetchDigestContent()
+                        await digestVM.fetchDigestPost()
+                    }
+                }
                 
             default:
                 Color.clear

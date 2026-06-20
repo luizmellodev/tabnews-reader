@@ -10,6 +10,7 @@ extension View {
     func postZoomSource(id: String, namespace: Namespace.ID) -> some View {
         if #available(iOS 18.0, *) {
             matchedTransitionSource(id: id, in: namespace)
+                .opacity(1.0) // Force opacity to prevent invisible cards bug
         } else {
             self
         }

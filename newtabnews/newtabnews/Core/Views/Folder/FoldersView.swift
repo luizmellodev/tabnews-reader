@@ -614,6 +614,12 @@ struct FoldersView: View {
         if let savedPost = savedPosts.first(where: { $0.id == id }) {
             return savedPost.toPostRequest()
         }
+        if let highlight = highlights.first(where: { $0.postId == id }) {
+            return PostRequest.fromLibraryReference(id: id, title: highlight.postTitle)
+        }
+        if let note = notes.first(where: { $0.postId == id }) {
+            return PostRequest.fromLibraryReference(id: id, title: note.postTitle)
+        }
         return nil
     }
     
@@ -638,9 +644,9 @@ struct FoldersView: View {
     }
     
     private func removePostFromFolder(_ post: PostRequest, folder: Folder) {
-        guard let postId = post.id else { return }
+        let postId = post.stableKey
         withAnimation {
-            folder.postIds.removeAll { $0 == postId }
+            folder.postIds.removeAll { $0 == postId || $0 == post.id }
         }
     }
     

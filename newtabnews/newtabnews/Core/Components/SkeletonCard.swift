@@ -109,7 +109,6 @@ struct SkeletonCard: View {
                 .fill(Color("CardColor"))
         }
         .frame(height: 300)
-        .padding(.horizontal)
         .onAppear {
             withAnimation(
                 .linear(duration: 1.5)
@@ -125,4 +124,3 @@ struct SkeletonCard: View {
     SkeletonCard()
         .preferredColorScheme(.dark)
 }
-

@@ -162,10 +162,12 @@ struct ContentView: View {
         viewModel.getLikedContent()
         
         if !alreadyLoaded {
+            // Carrega cache silenciosamente (sem mostrar skeleton)
             viewModel.loadCachedContent()
             
             Task {
-                await viewModel.fetchContent()
+                // Busca conteúdo fresco (com skeleton se não tiver cache)
+                await viewModel.fetchContent(showLoading: viewModel.content.isEmpty)
                 await viewModel.fetchPost()
                 alreadyLoaded = true
             }

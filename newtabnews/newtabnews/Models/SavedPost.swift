@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftData
 
 @Model
 final class SavedPost {
@@ -77,6 +78,87 @@ final class SavedPost {
             tabcoinsDebit: tabcoinsDebit,
             childrenDeepCount: childrenDeepCount
         )
+    }
+    
+    func update(from post: PostRequest) {
+        slug = post.slug
+        title = post.title
+        if let body = post.body, !body.isEmpty {
+            self.body = body
+        }
+        ownerUsername = post.ownerUsername
+        ownerId = post.ownerId
+        createdAt = post.createdAt
+        tabcoins = post.tabcoins
+    }
+}
+
+extension PostRequest {
+    static func fromLibraryReference(id: String, title: String?) -> PostRequest {
+        if id.contains("/") {
+            let parts = id.split(separator: "/", maxSplits: 1)
+            let owner = String(parts[0])
+            let slug = parts.count > 1 ? String(parts[1]) : nil
+            
+            return PostRequest(
+                id: nil,
+                ownerId: nil,
+                parentId: nil,
+                slug: slug,
+                title: title,
+                body: nil,
+                status: nil,
+                type: nil,
+                sourceUrl: nil,
+                createdAt: nil,
+                updatedAt: nil,
+                publishedAt: nil,
+                deletedAt: nil,
+                ownerUsername: owner,
+                tabcoins: nil,
+                tabcoinsCredit: nil,
+                tabcoinsDebit: nil,
+                childrenDeepCount: nil
+            )
+        }
+        
+        return PostRequest(
+            id: id,
+            ownerId: nil,
+            parentId: nil,
+            slug: nil,
+            title: title,
+            body: nil,
+            status: nil,
+            type: nil,
+            sourceUrl: nil,
+            createdAt: nil,
+            updatedAt: nil,
+            publishedAt: nil,
+            deletedAt: nil,
+            ownerUsername: nil,
+            tabcoins: nil,
+            tabcoinsCredit: nil,
+            tabcoinsDebit: nil,
+            childrenDeepCount: nil
+        )
+    }
+}
+
+extension ModelContext {
+    func upsertSavedPost(from post: PostRequest) {
+        let key = post.stableKey
+        let descriptor = FetchDescriptor<SavedPost>(
+            predicate: #Predicate { $0.id == key }
+        )
+        
+        if let existing = try? fetch(descriptor).first {
+            existing.update(from: post)
+        } else {
+            insert(SavedPost(from: post))
+        }
+        
+        try? save()
     }
 }
 

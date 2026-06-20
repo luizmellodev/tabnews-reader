@@ -17,7 +17,7 @@ struct PostCTAView: View {
     @State private var showingFolderPicker = false
     
     private var isLiked: Bool {
-        viewModel.likedList.contains(where: { $0.id == post.id })
+        viewModel.likedList.contains { $0.stableKey == post.stableKey }
     }
     
     private var isReadLater: Bool {
@@ -39,7 +39,7 @@ struct PostCTAView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 
-                Link(destination: URL(string: "https://www.tabnews.com.br/\(post.ownerUsername ?? "")/\(post.slug ?? "")")!) {
+                Link(destination: URL(string: tabNewsURL)!) {
                     HStack(spacing: 4) {
                         Text("Dê upvote no TabNews")
                             .font(.subheadline)
@@ -118,8 +118,14 @@ struct PostCTAView: View {
         .padding(.vertical, 12)
         .sheet(isPresented: $showingFolderPicker) {
             FolderPickerSheet(post: post, folders: folders, modelContext: modelContext)
-                .id(post.id ?? UUID().uuidString)
+                .id(post.stableKey)
         }
+    }
+    
+    private var tabNewsURL: String {
+        let username = post.ownerUsername ?? "NewsletterOficial"
+        let slug = post.slug ?? ""
+        return "https://www.tabnews.com.br/\(username)/\(slug)"
     }
 }
 

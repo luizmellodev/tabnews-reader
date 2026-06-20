@@ -82,6 +82,7 @@ struct MainView: View {
                     }
 
                     feedContent
+                        .padding(.horizontal)
                         .padding(.top, 5)
                 }
             }
@@ -165,8 +166,12 @@ struct MainView: View {
             .id(viewModel.currentStrategy)
 
         case .requestFailed:
-            FailureView(currentTheme: $currentTheme)
-                .transition(.opacity)
+            FailureView(currentTheme: $currentTheme) {
+                Task {
+                    await viewModel.resetPagination()
+                }
+            }
+            .transition(.opacity)
 
         default:
             SkeletonListView()

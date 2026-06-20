@@ -49,15 +49,14 @@ struct AddNoteSheet: View {
     }
     
     private func saveNote() {
-        guard let postId = post.id else { return }
-        
         let note = Note(
-            postId: postId,
+            postId: post.stableKey,
             postTitle: post.title,
             content: noteText
         )
         
         modelContext.insert(note)
+        modelContext.upsertSavedPost(from: post)
         
         let impact = UINotificationFeedbackGenerator()
         impact.notificationOccurred(.success)

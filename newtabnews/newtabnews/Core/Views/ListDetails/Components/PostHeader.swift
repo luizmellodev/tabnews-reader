@@ -57,7 +57,7 @@ struct PostHeader: View {
     }
     
     private var isLiked: Bool {
-        viewModel.likedList.contains(where: { $0.title == post.title })
+        viewModel.likedList.contains { $0.stableKey == post.stableKey }
     }
     
     var body: some View {

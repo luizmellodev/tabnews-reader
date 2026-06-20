@@ -13,7 +13,7 @@ struct CardList: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading) {
-                Text(post.title ?? "Ops")
+                Text(post.title ?? "Ops, não há título para este post")
                     .multilineTextAlignment(.leading)
                     .font(.title3)
                     .fontWeight(.medium)
@@ -21,13 +21,13 @@ struct CardList: View {
                     .foregroundColor(.primary)
                     .padding(.bottom, 8)
                     .padding(.top, 20)
+                
                 HStack {
                     Text(post.ownerUsername ?? "luizmellodev")
                         .font(.footnote)
                     
                     Spacer()
                     
-                    // Tempo de leitura
                     if let body = post.body {
                         HStack(spacing: 4) {
                             Image(systemName: "clock")
@@ -45,9 +45,10 @@ struct CardList: View {
                 .foregroundColor(.gray)
                 
                 Divider()
+                .padding(.bottom, 10)
                 
-                if let body = post.body {
-                    Text(String(body.prefix(200)))
+                if let body = post.body, !body.isEmpty {
+                    Text(body.feedPreview())
                         .fontWeight(.regular)
                         .font(.subheadline)
                         .lineSpacing(4)
@@ -67,6 +68,7 @@ struct CardList: View {
                 }
                 .padding(.bottom, 10)
             }
+            
             if post.tabcoins ?? 5 >= 15 {
                 VStack {
                     HStack {
@@ -95,8 +97,6 @@ struct CardList: View {
                 .shadow(color: (post.tabcoins ?? 5 >= 10) ? .green.opacity(0.5) : .clear, radius: (post.tabcoins ?? 5 >= 10) ? 1 : 0)
         }
         .frame(height: 300)
-        .padding(.horizontal)
-        // Acessibilidade
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityText)
         .accessibilityHint("Toque duas vezes para ler o post completo")

@@ -109,7 +109,7 @@ struct PostWithHighlightsView: View {
                         
                         HybridMarkdownView(
                             markdown: post.body ?? "Sem conteúdo",
-                            postId: post.id ?? "",
+                            postId: post.stableKey,
                             highlights: highlights,
                             isHighlightMode: false,
                             onHighlight: { _, _ in },
@@ -136,7 +136,7 @@ struct PostWithHighlightsView: View {
     }
     
     private var postNotes: [Note] {
-        notes.filter { $0.postId == post.id }
+        notes.filter { $0.postId == post.stableKey }
     }
 }
 

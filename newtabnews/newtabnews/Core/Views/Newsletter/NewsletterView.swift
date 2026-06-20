@@ -59,7 +59,11 @@ struct NewsletterView: View {
                     .padding(.top, 60)
                     
                 case .requestFailed:
-                    FailureView(currentTheme: .constant(.dark))
+                    FailureView(currentTheme: .constant(.dark)) {
+                        Task {
+                            await viewModel.fetchNewsletterContent()
+                        }
+                    }
                     
                 default:
                     Color.clear

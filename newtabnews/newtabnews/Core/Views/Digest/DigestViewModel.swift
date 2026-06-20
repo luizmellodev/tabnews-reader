@@ -36,6 +36,8 @@ class DigestViewModel: ObservableObject {
     @MainActor
     func fetchDigestPost() async {
         for index in digests.indices {
+            guard digests[index].body?.isEmpty != false else { continue }
+
             do {
                 let response = try await service.getPost(
                     user: digests[index].ownerUsername ?? "erro",
@@ -43,10 +45,7 @@ class DigestViewModel: ObservableObject {
                 )
                 digests[index].body = response.body
             } catch {
-                // Não mudar o estado geral por erro individual
-                // Apenas logar o erro e continuar com as próximas
                 print("Erro ao buscar digest [\(digests[index].slug ?? "unknown")]: \(error)")
-                // Marcar o body como erro para este item específico
                 digests[index].body = "Erro ao carregar conteúdo"
             }
         }

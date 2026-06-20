@@ -36,8 +36,11 @@ class MainViewModel {
 extension MainViewModel {
     
     @MainActor
-    func fetchContent() async {
-        self.state = .loading
+    func fetchContent(showLoading: Bool? = nil) async {
+        let shouldShowLoading = showLoading ?? content.isEmpty
+        if shouldShowLoading {
+            self.state = .loading
+        }
         self.currentPage = 1
         self.hasMorePages = true
         
@@ -48,11 +51,14 @@ extension MainViewModel {
                 strategy: currentStrategy.rawValue
             )
             
-            self.content = newPosts
+            let previousContent = self.content
+            self.content = mergePostsPreservingBodies(newPosts, existing: previousContent)
             self.hasMorePages = newPosts.count == postsPerPage
             self.state = .requestSucceeded
         } catch {
-            self.state = .requestFailed
+            if content.isEmpty {
+                self.state = .requestFailed
+            }
             print(error)
         }
     }
@@ -87,6 +93,8 @@ extension MainViewModel {
     @MainActor
     func fetchPost() async {
         for index in content.indices {
+            guard content[index].body?.isEmpty != false else { continue }
+
             do {
                 let response = try await service.getPost(
                     user: content[index].ownerUsername ?? "erro",
@@ -94,8 +102,7 @@ extension MainViewModel {
                 )
                 content[index] = response
             } catch {
-                self.state = .requestFailed
-                print(error)
+                print("Erro ao buscar post [\(content[index].slug ?? "unknown")]: \(error)")
             }
         }
         
@@ -110,6 +117,23 @@ extension MainViewModel {
         }
         
         NotificationCenter.default.post(name: .postsLoaded, object: nil)
+    }
+    
+    private func mergePostsPreservingBodies(_ newPosts: [PostRequest], existing: [PostRequest]) -> [PostRequest] {
+        let existingByKey = Dictionary(uniqueKeysWithValues: existing.map { ($0.stableKey, $0) })
+        
+        return newPosts.map { newPost in
+            guard let existingPost = existingByKey[newPost.stableKey],
+                  let existingBody = existingPost.body,
+                  !existingBody.isEmpty,
+                  newPost.body?.isEmpty != false else {
+                return newPost
+            }
+            
+            var merged = newPost
+            merged.body = existingBody
+            return merged
+        }
     }
     
     @MainActor

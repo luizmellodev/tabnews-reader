@@ -35,7 +35,7 @@ struct ListDetailView: View {
     private let contentService: ContentServiceProtocol = ContentService()
     
     private var postHighlights: [Highlight] {
-        highlights.filter { $0.postId == post.id }
+        highlights.filter { $0.postId == post.stableKey }
     }
     
     private var needsBodyLoad: Bool {
@@ -136,7 +136,7 @@ struct ListDetailView: View {
             } else {
                 HybridMarkdownView(
                     markdown: post.body ?? "",
-                    postId: post.id ?? "",
+                    postId: post.stableKey,
                     highlights: postHighlights,
                     isHighlightMode: isHighlightMode,
                     onHighlight: { text, range in
@@ -195,10 +195,8 @@ struct ListDetailView: View {
     // MARK: - Actions
     
     private func saveHighlight(text: String, range: NSRange) {
-        guard let postId = post.id else { return }
-        
         let highlight = Highlight(
-            postId: postId,
+            postId: post.stableKey,
             postTitle: post.title,
             highlightedText: text,
             note: nil,
@@ -208,6 +206,7 @@ struct ListDetailView: View {
         )
         
         modelContext.insert(highlight)
+        modelContext.upsertSavedPost(from: post)
         
         let impact = UINotificationFeedbackGenerator()
         impact.notificationOccurred(.success)
@@ -254,7 +253,7 @@ struct ListDetailView: View {
             do {
                 let response = try await contentService.getPost(user: username, slug: slug)
                 if let body = response.body, !body.isEmpty {
-                    post.body = body
+                    post = response
                     isLoadingBody = false
                     bodyLoadFailed = false
                     return

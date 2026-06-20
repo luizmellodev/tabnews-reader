@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct NewsletterCard: View {
+    @Environment(MainViewModel.self) private var viewModel
+    
     let newsletter: PostRequest
     let isNew: Bool
     
@@ -24,6 +26,7 @@ struct NewsletterCard: View {
                 isViewInApp: $isViewInApp,
                 currentTheme: $currentTheme
             )
+            .environment(viewModel)
             .postZoomDestination(id: newsletter.zoomTransitionID, namespace: zoomNamespace)
         } label: {
             VStack(alignment: .leading, spacing: 12) {
@@ -49,7 +52,7 @@ struct NewsletterCard: View {
                     }
                 }
                 
-                Text(isNew ? "Publicado hoje" : formatDate(newsletter.createdAt))
+                Text(getFormattedDate(value: newsletter.createdAt ?? ""))
                         .font(.caption)
                         .foregroundStyle(.gray)
             }
@@ -61,23 +64,5 @@ struct NewsletterCard: View {
         }
         .postZoomSource(id: newsletter.zoomTransitionID, namespace: zoomNamespace)
         .buttonStyle(PlainButtonStyle())
-    }
-    
-    private func formatDate(_ dateString: String?) -> String {
-        guard let dateString = dateString else {
-            return "Data indisponível"
-        }
-        
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        
-        guard let date = formatter.date(from: dateString) else {
-            return "Data indisponível"
-        }
-        
-        let output = DateFormatter()
-        output.locale = Locale(identifier: "pt_BR")
-        output.dateStyle = .long
-        return output.string(from: date)
     }
 }
