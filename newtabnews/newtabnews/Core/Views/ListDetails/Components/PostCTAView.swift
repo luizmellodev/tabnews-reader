@@ -20,6 +20,10 @@ struct PostCTAView: View {
         viewModel.likedList.contains(where: { $0.id == post.id })
     }
     
+    private var isReadLater: Bool {
+        viewModel.isReadLater(post)
+    }
+    
     var body: some View {
         VStack(spacing: 16) {
             Divider()
@@ -48,14 +52,35 @@ struct PostCTAView: View {
             
             // Botões minimalistas (inline)
             HStack(spacing: 12) {
-                // Salvar
+                // Ler depois
+                Button {
+                    let impact = UIImpactFeedbackGenerator(style: .medium)
+                    impact.impactOccurred()
+                    withAnimation(.spring(response: 0.3)) {
+                        ReadLaterActions.toggle(post: post, viewModel: viewModel)
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: isReadLater ? "bookmark.fill" : "bookmark")
+                            .font(.subheadline)
+                        Text(isReadLater ? "Salvo" : "Ler depois")
+                            .font(.subheadline)
+                    }
+                    .foregroundStyle(isReadLater ? .blue : .primary)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color(uiColor: .secondarySystemBackground))
+                    .cornerRadius(8)
+                }
+                
+                // Salvar em pasta
                 Button {
                     showingFolderPicker = true
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "folder.badge.plus")
                             .font(.subheadline)
-                        Text("Salvar")
+                        Text("Pasta")
                             .font(.subheadline)
                     }
                     .foregroundStyle(.primary)

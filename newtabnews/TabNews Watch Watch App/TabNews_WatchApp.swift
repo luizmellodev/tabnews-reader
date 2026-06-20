@@ -11,9 +11,9 @@ import SwiftUI
 struct TabNews_Watch_Watch_AppApp: App {
     
     init() {
-        // Ativar WatchSync para receber dados do iPhone
         _ = WatchSyncManager.shared
-        print("⌚ App iniciado, WatchSync ativo")
+        WatchNotificationManager.shared.setup()
+        print("⌚ App iniciado, WatchSync e notificações ativos")
     }
     
     var body: some Scene {

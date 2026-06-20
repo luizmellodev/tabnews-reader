@@ -53,6 +53,19 @@ struct PostRow: View {
             .accessibilityLabel(viewModel.likedList.contains(where: { $0.title == post.title }) ? "Remover dos curtidos" : "Adicionar aos curtidos")
             
             Button {
+                let impact = UIImpactFeedbackGenerator(style: .medium)
+                impact.impactOccurred()
+                withAnimation(.spring(response: 0.3)) {
+                    ReadLaterActions.toggle(post: post, viewModel: viewModel)
+                }
+            } label: {
+                Label(
+                    viewModel.isReadLater(post) ? "Remover de Ler Depois" : "Ler Depois",
+                    systemImage: viewModel.isReadLater(post) ? "bookmark.slash" : "bookmark"
+                )
+            }
+            
+            Button {
                 TextToSpeechManager.shared.speak(text: post.body ?? "", title: post.title)
             } label: {
                 Label("Ouvir Post", systemImage: "speaker.wave.2")

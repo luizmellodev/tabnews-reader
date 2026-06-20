@@ -7,6 +7,9 @@
 
 import Foundation
 import WatchConnectivity
+#if os(iOS)
+import UIKit
+#endif
 
 class WatchSyncManager: NSObject {
     static let shared = WatchSyncManager()
@@ -83,6 +86,49 @@ class WatchSyncManager: NSObject {
         try? session.updateApplicationContext(message)
     }
     
+    func forwardNotificationToWatch(userInfo: [AnyHashable: Any]) {
+        guard shouldForwardNotificationToWatch() else { return }
+        
+        guard let session = session,
+              session.activationState == .activated,
+              session.isPaired,
+              session.isWatchAppInstalled else {
+            return
+        }
+        
+        let payload = NotificationPayloadParser.parse(userInfo)
+        guard payload.hasContent else { return }
+        
+        var message: [String: Any] = [
+            "notificationForward": true,
+            "title": payload.title,
+            "body": payload.body,
+            "id": payload.stableId
+        ]
+        
+        if let type = payload.type { message["type"] = type }
+        if let owner = payload.owner { message["owner"] = owner }
+        if let slug = payload.slug { message["slug"] = slug }
+        
+        if session.isReachable {
+            session.sendMessage(message, replyHandler: nil) { _ in
+                session.transferUserInfo(message)
+            }
+        } else {
+            session.transferUserInfo(message)
+        }
+    }
+    
+    private func shouldForwardNotificationToWatch() -> Bool {
+        #if os(iOS)
+        // Quando o iPhone está em uso, a Apple não espelha pro Watch — encaminhamos manualmente.
+        // Quando bloqueado/em background, o espelhamento nativo cuida disso.
+        return UIApplication.shared.applicationState == .active
+        #else
+        return false
+        #endif
+    }
+    
     #endif
     
     // MARK: - Helper
@@ -122,6 +168,8 @@ extension WatchSyncManager: WCSessionDelegate {
     
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
         #if os(watchOS)
+        handleWatchNotificationForward(applicationContext)
+        
         if let postsJSON = applicationContext["posts"] as? String,
            let postsData = postsJSON.data(using: .utf8) {
             UserDefaults.standard.set(postsData, forKey: "WatchPosts")
@@ -152,6 +200,31 @@ extension WatchSyncManager: WCSessionDelegate {
         }
         #endif
     }
+    
+    #if os(watchOS)
+    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        handleWatchNotificationForward(message)
+    }
+    
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
+        handleWatchNotificationForward(userInfo)
+    }
+    
+    private func handleWatchNotificationForward(_ data: [String: Any]) {
+        guard data["notificationForward"] as? Bool == true else { return }
+        
+        let payload = ParsedNotificationPayload(
+            title: data["title"] as? String ?? "TabNews",
+            body: data["body"] as? String ?? "",
+            type: data["type"] as? String,
+            owner: data["owner"] as? String,
+            slug: data["slug"] as? String,
+            stableId: data["id"] as? String ?? UUID().uuidString
+        )
+        
+        WatchNotificationManager.shared.displayNotification(from: payload)
+    }
+    #endif
     
     #if !os(watchOS)
     func sessionDidBecomeInactive(_ session: WCSession) {}

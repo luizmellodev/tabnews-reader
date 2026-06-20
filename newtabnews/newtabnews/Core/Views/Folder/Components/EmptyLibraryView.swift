@@ -23,7 +23,7 @@ struct EmptyLibraryView: View {
                     .font(.title2)
                     .fontWeight(.bold)
                 
-                Text("Curta posts, crie destaques ou organize em pastas")
+                Text("Curta posts, salve para ler depois ou organize em pastas")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

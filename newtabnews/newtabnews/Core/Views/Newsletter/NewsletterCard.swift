@@ -11,11 +11,18 @@ struct NewsletterCard: View {
     let newsletter: PostRequest
     let isNew: Bool
     
+    @Binding var isViewInApp: Bool
+    @Binding var currentTheme: Theme
+    
     @State private var isPressed = false
     
     var body: some View {
         NavigationLink {
-            NewsletterDetailsView(nw: newsletter)
+            NewsletterDetailsView(
+                nw: newsletter,
+                isViewInApp: $isViewInApp,
+                currentTheme: $currentTheme
+            )
         } label: {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {

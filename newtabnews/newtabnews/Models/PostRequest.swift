@@ -48,3 +48,15 @@ struct PostRequest: Codable, Identifiable, Hashable {
         case childrenDeepCount = "children_deep_count"
     }
 }
+
+extension PostRequest {
+    /// Identificador estável para persistência local quando `id` da API não está disponível.
+    var stableKey: String {
+        if let id, !id.isEmpty { return id }
+        if let ownerUsername, let slug, !slug.isEmpty {
+            return "\(ownerUsername)/\(slug)"
+        }
+        if let title, !title.isEmpty { return "title:\(title)" }
+        return UUID().uuidString
+    }
+}

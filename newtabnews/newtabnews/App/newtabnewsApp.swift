@@ -36,6 +36,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                      didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("❌ Falha ao registrar para notificações: \(error.localizedDescription)")
     }
+    
+    func application(_ application: UIApplication,
+                     didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        WatchSyncManager.shared.forwardNotificationToWatch(userInfo: userInfo)
+        completionHandler(.noData)
+    }
 }
 
 // MARK: - MessagingDelegate
@@ -58,6 +65,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        WatchSyncManager.shared.forwardNotificationToWatch(userInfo: notification.request.content.userInfo)
         completionHandler([.banner, .sound, .badge])
     }
     

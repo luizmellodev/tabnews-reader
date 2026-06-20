@@ -13,6 +13,7 @@ struct NewsletterView: View {
     
     @EnvironmentObject var viewModel: NewsletterViewModel
     @Binding var isViewInApp: Bool
+    @Binding var currentTheme: Theme
     @AppStorage("newsletterOpenCount") private var newsletterOpenCount = 0
     @AppStorage("lastReviewRequestDate") private var lastReviewRequestDate: TimeInterval = 0
     @State private var shouldShowReviewPrompt = false
@@ -39,7 +40,12 @@ struct NewsletterView: View {
                             headerView
                             
                             ForEach(viewModel.newsletter) { newsletter in
-                                NewsletterCard(newsletter: newsletter, isNew: isCreatedToday(createdAt: newsletter.createdAt))
+                                NewsletterCard(
+                                    newsletter: newsletter,
+                                    isNew: isCreatedToday(createdAt: newsletter.createdAt),
+                                    isViewInApp: $isViewInApp,
+                                    currentTheme: $currentTheme
+                                )
                             }
                         }
                         .padding()

@@ -29,9 +29,11 @@ final class SavedPost {
     var tabcoinsDebit: Int?
     var childrenDeepCount: Int?
     var savedDate: Date
+    var isReadLater: Bool
+    var readLaterDate: Date?
     
     init(from post: PostRequest) {
-        self.id = post.id ?? UUID().uuidString
+        self.id = post.stableKey
         self.ownerId = post.ownerId
         self.parentId = post.parentId
         self.slug = post.slug
@@ -50,6 +52,8 @@ final class SavedPost {
         self.tabcoinsDebit = post.tabcoinsDebit
         self.childrenDeepCount = post.childrenDeepCount
         self.savedDate = Date()
+        self.isReadLater = false
+        self.readLaterDate = nil
     }
     
     func toPostRequest() -> PostRequest {

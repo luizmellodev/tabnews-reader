@@ -28,14 +28,19 @@ struct MainTabView: View {
                 .tabItem {
                     Label(AppTab.library.title, systemImage: AppTab.library.icon)
                 }
+                .badge(viewModel.readLaterList.isEmpty ? 0 : viewModel.readLaterList.count)
                 .environment(viewModel)
                 .tag(AppTab.library)
             
-            NewsletterView(isViewInApp: $isViewInApp)
+            NewsletterView(
+                isViewInApp: $isViewInApp,
+                currentTheme: $currentTheme
+            )
                 .tabItem {
                     Label(AppTab.newsletter.title, systemImage: AppTab.newsletter.icon)
                 }
                 .environment(newsletterVM)
+                .environment(viewModel)
                 .tag(AppTab.newsletter)
             
             SettingsView(

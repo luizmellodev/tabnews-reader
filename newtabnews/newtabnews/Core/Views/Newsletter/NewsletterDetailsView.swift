@@ -5,29 +5,29 @@
 //  Created by Luiz Mello on 11/03/25.
 //
 
-
 import SwiftUI
 
 struct NewsletterDetailsView: View {
     let nw: PostRequest?
+    @Binding var isViewInApp: Bool
+    @Binding var currentTheme: Theme
+    
+    @Environment(MainViewModel.self) private var viewModel
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(nw?.title ?? "Sem título (agora leia aqui)")
-                    .font(.title)
-                    .bold()
-                
-                if let content = nw {
-                    Text(content.body ?? "Ops, problema pra pegar esse conteúdo")
-                        .font(.body)
-                        .lineSpacing(5)
-                } else {
-                    ProgressView()
-                }
+        Group {
+            if let post = nw {
+                ListDetailView(
+                    isViewInApp: $isViewInApp,
+                    currentTheme: $currentTheme,
+                    post: post
+                )
+                .environment(viewModel)
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .padding()
         }
-        .navigationTitle("Newsletter")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

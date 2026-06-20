@@ -18,6 +18,7 @@ struct FoldersView: View {
     
     // Usar String IDs para pastas especiais (mais seguro que UUID)
     private enum SpecialFolder: String {
+        case readLater = "special_read_later"
         case liked = "special_liked"
         case highlights = "special_highlights"
         case notes = "special_notes"
@@ -49,13 +50,14 @@ struct FoldersView: View {
     var body: some View {
         NavigationStack {
             Group {
-            if folders.isEmpty && highlights.isEmpty && notes.isEmpty && uniqueLikedPosts.isEmpty {
+            if folders.isEmpty && highlights.isEmpty && notes.isEmpty && uniqueLikedPosts.isEmpty && viewModel.readLaterList.isEmpty {
                 emptyState
             } else {
                     List {
                         if shouldShowDigestBanner {
                             digestSection
                         }
+                        readLaterSection
                         likedPostsSection
                         highlightsSection
                         notesSection
@@ -103,6 +105,15 @@ struct FoldersView: View {
             }
             .onAppear {
                 viewModel.getLikedContent()
+                viewModel.getReadLaterContent()
+                if !viewModel.readLaterList.isEmpty {
+                    expandedFolders.insert(SpecialFolder.readLater.rawValue)
+                }
+            }
+            .onChange(of: viewModel.readLaterList.count) { _, count in
+                if count > 0 {
+                    expandedFolders.insert(SpecialFolder.readLater.rawValue)
+                }
             }
             .fullScreenCover(isPresented: $showingGame) {
                 FlappyBirdGame(showCloseButton: true)
@@ -162,6 +173,58 @@ struct FoldersView: View {
             }
         } header: {
             Label("Conteúdo Especial", systemImage: "star.fill")
+        }
+    }
+    
+    @ViewBuilder
+    private var readLaterSection: some View {
+        if !viewModel.readLaterList.isEmpty {
+            Section {
+                SpecialFolderRow(
+                    name: "Ler Depois",
+                    icon: "bookmark.fill",
+                    color: "#007AFF",
+                    count: viewModel.readLaterList.count,
+                    isExpanded: expandedFolders.contains(SpecialFolder.readLater.rawValue),
+                    onToggle: {
+                        toggleSpecialFolder(.readLater)
+                    }
+                )
+                .contextMenu {
+                    Button(role: .destructive) {
+                        clearAllReadLater()
+                    } label: {
+                        Label("Limpar Ler Depois", systemImage: "bookmark.slash")
+                    }
+                }
+                
+                if expandedFolders.contains(SpecialFolder.readLater.rawValue) {
+                    ForEach(viewModel.readLaterList) { post in
+                        PostFileRow(
+                            post: post,
+                            onTap: {
+                                selectedPost = post
+                            }
+                        )
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                viewModel.removeFromReadLater(content: post)
+                            } label: {
+                                Label("Remover", systemImage: "bookmark.slash")
+                            }
+                        }
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                viewModel.removeFromReadLater(content: post)
+                            } label: {
+                                Label("Remover de Ler Depois", systemImage: "bookmark.slash")
+                            }
+                        }
+                    }
+                }
+            } header: {
+                Label("Para Ler", systemImage: "bookmark.fill")
+            }
         }
     }
     
@@ -539,10 +602,13 @@ struct FoldersView: View {
     }
     
     private func getPost(byId id: String) -> PostRequest? {
-        if let post = viewModel.likedList.first(where: { $0.id == id }) {
+        if let post = viewModel.readLaterList.first(where: { $0.id == id || $0.stableKey == id }) {
             return post
         }
-        if let post = viewModel.content.first(where: { $0.id == id }) {
+        if let post = viewModel.likedList.first(where: { $0.id == id || $0.stableKey == id }) {
+            return post
+        }
+        if let post = viewModel.content.first(where: { $0.id == id || $0.stableKey == id }) {
             return post
         }
         if let savedPost = savedPosts.first(where: { $0.id == id }) {
@@ -599,6 +665,12 @@ struct FoldersView: View {
     private func clearAllLiked() {
         withAnimation {
             viewModel.clearAllLikedContent()
+        }
+    }
+    
+    private func clearAllReadLater() {
+        withAnimation {
+            viewModel.clearAllReadLater()
         }
     }
     

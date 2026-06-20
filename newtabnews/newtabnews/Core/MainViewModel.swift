@@ -13,6 +13,7 @@ class MainViewModel {
     
     private let service: ContentServiceProtocol
     var likedList: [PostRequest] = []
+    var readLaterList: [PostRequest] = []
     var content: [PostRequest] = []
     var state: DefaultViewState = .loading
     var currentStrategy: ContentStrategy = .relevant
@@ -27,6 +28,7 @@ class MainViewModel {
     
     init(service: ContentServiceProtocol = ContentService()) {
         self.service = service
+        getReadLaterContent()
     }
 }
 
@@ -237,6 +239,7 @@ extension MainViewModel {
 extension Notification.Name {
     static let postsLoaded = Notification.Name("postsLoaded")
     static let likedListUpdated = Notification.Name("likedListUpdated")
+    static let readLaterListUpdated = Notification.Name("readLaterListUpdated")
 }
 
 // MARK: - UserDefaults
@@ -271,16 +274,7 @@ extension MainViewModel {
     }
     
     private func isSamePost(_ post1: PostRequest, _ post2: PostRequest) -> Bool {
-        if let id1 = post1.id, let id2 = post2.id, !id1.isEmpty, !id2.isEmpty {
-            return id1 == id2
-        }
-        
-        if let title1 = post1.title, let title2 = post2.title,
-           let owner1 = post1.ownerUsername, let owner2 = post2.ownerUsername {
-            return title1 == title2 && owner1 == owner2
-        }
-        
-        return post1.title == post2.title
+        post1.stableKey == post2.stableKey
     }
     
     private func saveLikedContent() {
@@ -306,7 +300,7 @@ extension MainViewModel {
     private func removeDuplicates(from posts: [PostRequest]) -> [PostRequest] {
         var seen: Set<String> = []
         return posts.filter { post in
-            let identifier = post.id ?? post.title ?? UUID().uuidString
+            let identifier = post.stableKey
             if seen.contains(identifier) {
                 return false
             }
@@ -315,4 +309,61 @@ extension MainViewModel {
         }
     }
     
+}
+
+// MARK: - Read Later
+
+enum ReadLaterResult {
+    case added
+    case removed
+}
+
+extension MainViewModel {
+    func isReadLater(_ post: PostRequest) -> Bool {
+        readLaterList.contains { isSamePost($0, post) }
+    }
+    
+    @discardableResult
+    func toggleReadLater(content: PostRequest) -> ReadLaterResult {
+        if isReadLater(content) {
+            removeFromReadLater(content: content)
+            return .removed
+        } else {
+            addToReadLater(content: content)
+            return .added
+        }
+    }
+    
+    func addToReadLater(content: PostRequest) {
+        guard !isReadLater(content) else { return }
+        readLaterList.insert(content, at: 0)
+        saveReadLaterContent()
+    }
+    
+    func removeFromReadLater(content: PostRequest) {
+        readLaterList.removeAll { isSamePost($0, content) }
+        saveReadLaterContent()
+    }
+    
+    func clearAllReadLater() {
+        readLaterList = []
+        saveReadLaterContent()
+    }
+    
+    func getReadLaterContent() {
+        if let data = defaults.object(forKey: "ReadLaterContent") as? Data {
+            let decoder = JSONDecoder()
+            if let loaded = try? decoder.decode([PostRequest].self, from: data) {
+                readLaterList = removeDuplicates(from: loaded)
+            }
+        }
+    }
+    
+    private func saveReadLaterContent() {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(readLaterList) {
+            defaults.set(encoded, forKey: "ReadLaterContent")
+        }
+        NotificationCenter.default.post(name: .readLaterListUpdated, object: nil)
+    }
 }

@@ -67,6 +67,8 @@
 		79259E8C2EFB82FB004BC057 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 79259E8B2EFB82FB004BC057 /* GoogleService-Info.plist */; };
 		79259E8D2EFB83BD004BC057 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 79259E8B2EFB82FB004BC057 /* GoogleService-Info.plist */; };
 		794863862B5B55ED009AA720 /* GameController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794863852B5B55ED009AA720 /* GameController.swift */; };
+		794C1A212FE723A00058C778 /* NotificationPayloadParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794C1A202FE723A00058C778 /* NotificationPayloadParser.swift */; };
+		794C1A222FE723A00058C778 /* NotificationPayloadParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794C1A202FE723A00058C778 /* NotificationPayloadParser.swift */; };
 		795261722A7B0B6D001FD010 /* NewsletterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795261712A7B0B6D001FD010 /* NewsletterView.swift */; };
 		796D05B22F0AC28C0064A2BC /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796D05B12F0AC28C0064A2BC /* WidgetKit.framework */; };
 		796D05B42F0AC28C0064A2BC /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796D05B32F0AC28C0064A2BC /* SwiftUI.framework */; };
@@ -248,6 +250,7 @@
 		79259D2E2EFB81FE004BC057 /* FirebasePushNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebasePushNotificationService.swift; sourceTree = "<group>"; };
 		79259E8B2EFB82FB004BC057 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		794863852B5B55ED009AA720 /* GameController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameController.swift; sourceTree = "<group>"; };
+		794C1A202FE723A00058C778 /* NotificationPayloadParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPayloadParser.swift; sourceTree = "<group>"; };
 		795261712A7B0B6D001FD010 /* NewsletterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsletterView.swift; sourceTree = "<group>"; };
 		796D05AF2F0AC28C0064A2BC /* TabNewsWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TabNewsWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		796D05B12F0AC28C0064A2BC /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -709,6 +712,7 @@
 				79E727F82EFB9E27007BF27A /* MockContentService.swift */,
 				79259D2E2EFB81FE004BC057 /* FirebasePushNotificationService.swift */,
 				796D06442F0AE5B10064A2BC /* AuthService.swift */,
+				794C1A202FE723A00058C778 /* NotificationPayloadParser.swift */,
 				799CC4632F489A6C0059BB51 /* DailyDigestManager.swift */,
 				799CC4642F489A6C0059BB51 /* GamificationManager.swift */,
 				796D06452F0AE5B10064A2BC /* KeychainManager.swift */,
@@ -939,6 +943,7 @@
 				790AB1172ECF69A800E443E6 /* TextToSpeechManager.swift in Sources */,
 				796D06392F0AE4760064A2BC /* Comment.swift in Sources */,
 				790AB1092ECF68D600E443E6 /* NetworkManagerProtocol.swift in Sources */,
+				794C1A212FE723A00058C778 /* NotificationPayloadParser.swift in Sources */,
 				790AB10A2ECF68E100E443E6 /* NetworkError.swift in Sources */,
 				790AB0EB2ECF673B00E443E6 /* Note.swift in Sources */,
 			);
@@ -980,6 +985,7 @@
 				79D7E37A2D81266A00391C82 /* NewsletterViewModel.swift in Sources */,
 				79E727FC2EFB9E76007BF27A /* AppDependencies.swift in Sources */,
 				791584712EFC86A700C69745 /* HighlightModeIndicator.swift in Sources */,
+				794C1A222FE723A00058C778 /* NotificationPayloadParser.swift in Sources */,
 				79E727F92EFB9E27007BF27A /* MockContentService.swift in Sources */,
 				790AB11D2ECF811F00E443E6 /* WatchSyncManager.swift in Sources */,
 				796D05DB2F0AC5610064A2BC /* WidgetSyncManager.swift in Sources */,

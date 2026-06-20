@@ -35,6 +35,7 @@ struct ContentView: View {
     @State var showTipsOnboarding: Bool = false
     @State var showDigestSheet: Bool = false
     @StateObject private var gamificationManager = GamificationManager.shared
+    @StateObject private var toastManager = ToastManager.shared
         
     init(
         searchText: String = "",
@@ -74,8 +75,15 @@ struct ContentView: View {
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 Spacer()
+                
+                if let toast = toastManager.currentToast {
+                    ToastBanner(message: toast)
+                        .padding(.bottom, 90)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
             }
             .animation(.spring(), value: gamificationManager.showBadgeUnlocked)
+            .animation(.spring(), value: toastManager.currentToast)
         }
         .preferredColorScheme(currentTheme.colorScheme)
         .sheet(isPresented: $showDigestSheet) {
