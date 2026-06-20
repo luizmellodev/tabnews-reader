@@ -36,7 +36,7 @@ struct CardList: View {
                 
                 Spacer()
                 
-                if let body = post.body {
+                if post.hasLoadedBody, let body = post.body {
                     HStack(spacing: 4) {
                         Image(systemName: "clock")
                             .font(.caption)
@@ -53,18 +53,22 @@ struct CardList: View {
             .foregroundColor(.gray)
             
             Divider()
-                .padding(.bottom, 20)
+                .padding(.bottom, 15)
             
-            if let body = post.body, !body.isEmpty {
-                Text(body.feedPreview())
-                    .font(.subheadline)
-                    .fontWeight(.light)
-                    .lineSpacing(3)
-                    .lineLimit(4)
-                    .multilineTextAlignment(.leading)
-                    .foregroundStyle(.primary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            Group {
+                if post.hasLoadedBody, let body = post.body {
+                    Text(body.feedPreview())
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                        .lineSpacing(3)
+                        .lineLimit(CardLayout.bodyLineLimit)
+                        .multilineTextAlignment(.leading)
+                        .foregroundStyle(.primary)
+                } else {
+                    CardBodySkeleton()
+                }
             }
+            .frame(maxWidth: .infinity, minHeight: CardLayout.bodyPreviewMinHeight, alignment: .topLeading)
             
             Spacer(minLength: 8)
             
@@ -85,7 +89,7 @@ struct CardList: View {
             RoundedRectangle(cornerRadius: 15, style: .continuous)
                 .fill(Color("CardColor"))
         }
-        .frame(height: 330)
+        .frame(height: CardLayout.cardHeight)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityText)
         .accessibilityHint("Toque duas vezes para ler o post completo")

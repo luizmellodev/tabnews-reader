@@ -62,4 +62,10 @@ extension PostRequest {
 
     /// ID estável para animações de zoom entre feed e detalhe.
     var zoomTransitionID: String { stableKey }
+
+    /// Body ainda não veio do fetch individual (`fetchPost`).
+    var hasLoadedBody: Bool {
+        guard let body, !body.isEmpty else { return false }
+        return body != "Erro ao carregar conteúdo"
+    }
 }

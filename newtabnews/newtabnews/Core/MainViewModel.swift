@@ -75,7 +75,7 @@ extension MainViewModel {
         }
 
         await fetchContent()
-        await fetchPost(forceRefresh: strategyChanged)
+        await fetchPost()
     }
 
     @MainActor
@@ -87,15 +87,13 @@ extension MainViewModel {
         isLoadingMore = false
         state = .loading
         await fetchContent()
-        await fetchPost(forceRefresh: true)
+        await fetchPost()
     }
     
     @MainActor
-    func fetchPost(forceRefresh: Bool = false) async {
+    func fetchPost() async {
         for index in content.indices {
-            if !forceRefresh && hasUsableBody(content[index].body) {
-                continue
-            }
+            guard content[index].body?.isEmpty != false else { continue }
 
             do {
                 let response = try await service.getPost(
@@ -125,33 +123,17 @@ extension MainViewModel {
         let existingByKey = Dictionary(uniqueKeysWithValues: existing.map { ($0.stableKey, $0) })
         
         return newPosts.map { newPost in
-            if hasUsableBody(newPost.body) {
+            guard let existingPost = existingByKey[newPost.stableKey],
+                  let existingBody = existingPost.body,
+                  !existingBody.isEmpty,
+                  newPost.body?.isEmpty != false else {
                 return newPost
             }
             
-            if let existingPost = existingByKey[newPost.stableKey],
-               let existingBody = existingPost.body,
-               hasUsableBody(existingBody) {
-                var merged = newPost
-                merged.body = existingBody
-                return merged
-            }
-            
-            var sanitized = newPost
-            if !hasUsableBody(sanitized.body) {
-                sanitized.body = nil
-            }
-            return sanitized
+            var merged = newPost
+            merged.body = existingBody
+            return merged
         }
-    }
-    
-    private func hasUsableBody(_ body: String?) -> Bool {
-        guard let body, !body.isEmpty else { return false }
-        return !isBodyLikelyCorrupted(body)
-    }
-    
-    private func isBodyLikelyCorrupted(_ body: String) -> Bool {
-        body.contains("Ã") || body.contains("Æ") || body.contains("â€")
     }
     
     @MainActor
@@ -227,7 +209,7 @@ extension MainViewModel {
         content = []
         clearOldCache()
         await fetchContent()
-        await fetchPost(forceRefresh: true)
+        await fetchPost()
     }
     
     @MainActor
