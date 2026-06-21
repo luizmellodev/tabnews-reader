@@ -35,28 +35,47 @@ struct RestGameLeaderboardsSheet: View {
                         }
 
                         Section("Conquistas") {
-                            Button {
-                                gameCenter.showAchievements()
-                            } label: {
+                            if GameCenterManager.achievementsEnabled {
+                                Button {
+                                    gameCenter.showAchievements()
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: "trophy.fill")
+                                            .font(.title3)
+                                            .foregroundStyle(.yellow)
+                                            .frame(width: 32)
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text("DevWordle & DevLeet")
+                                                .foregroundStyle(.primary)
+                                            Text("\(RestGameAchievement.allCases.count) conquistas disponíveis")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+
+                                        Spacer()
+
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundStyle(.tertiary)
+                                    }
+                                }
+                            } else {
                                 HStack(spacing: 12) {
                                     Image(systemName: "trophy.fill")
                                         .font(.title3)
-                                        .foregroundStyle(.yellow)
+                                        .foregroundStyle(.secondary)
                                         .frame(width: 32)
 
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text("DevWordle & DevLeet")
-                                            .foregroundStyle(.primary)
-                                        Text("\(RestGameAchievement.allCases.count) conquistas disponíveis")
-                                            .font(.caption)
                                             .foregroundStyle(.secondary)
+                                        Text("Em breve")
+                                            .font(.caption)
+                                            .foregroundStyle(.tertiary)
                                     }
 
                                     Spacer()
-
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(.tertiary)
                                 }
                             }
                         }

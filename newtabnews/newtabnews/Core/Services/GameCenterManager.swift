@@ -108,11 +108,20 @@ enum RestGameLeaderboard: String, CaseIterable, Identifiable {
         case .soundMatch: return "waveform"
         }
     }
+
+    var preferredTimeScope: GKLeaderboard.TimeScope {
+        switch self {
+        case .devWordle: return .week
+        case .devSpot, .colorMatch, .soundMatch: return .allTime
+        }
+    }
 }
 
 @MainActor
 final class GameCenterManager: ObservableObject {
     static let shared = GameCenterManager()
+    /// Flip to `true` after achievements are configured in App Store Connect.
+    static let achievementsEnabled = false
 
     @Published private(set) var isAuthenticated = false
     @Published private(set) var authenticationError: String?
@@ -133,15 +142,12 @@ final class GameCenterManager: ObservableObject {
 
                 self.isAuthenticated = GKLocalPlayer.local.isAuthenticated
                 self.authenticationError = self.isAuthenticated ? nil : error?.localizedDescription
-
-                if self.isAuthenticated {
-                    self.syncRestGameAchievements(from: GamificationManager.shared.stats)
-                }
             }
         }
     }
 
     func syncRestGameAchievements(from stats: GamificationStats) {
+        guard Self.achievementsEnabled else { return }
         guard GKLocalPlayer.local.isAuthenticated else { return }
 
         let achievements = RestGameAchievement.allCases.compactMap { type -> GKAchievement? in
@@ -198,11 +204,12 @@ final class GameCenterManager: ObservableObject {
         GKAccessPoint.shared.trigger(
             leaderboardID: leaderboard.rawValue,
             playerScope: .global,
-            timeScope: .allTime
+            timeScope: leaderboard.preferredTimeScope
         ) { }
     }
 
     func showAchievements() {
+        guard Self.achievementsEnabled else { return }
         guard GKLocalPlayer.local.isAuthenticated else { return }
         GKAccessPoint.shared.trigger(state: .achievements) { }
     }
