@@ -191,7 +191,7 @@ struct SettingsView: View {
                     HStack {
                         Text("Versão")
                         Spacer()
-                        Text("2.0")
+                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
                             .foregroundStyle(.secondary)
                     }
                 } header: {
