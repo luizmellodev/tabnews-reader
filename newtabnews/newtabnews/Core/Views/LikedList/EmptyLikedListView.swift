@@ -9,6 +9,7 @@ import SwiftUI
 
 struct EmptyLikedListView: View {
     @State private var isAnimating = false
+    @State private var showingRestGames = false
     
     var body: some View {
         ZStack {
@@ -56,8 +57,8 @@ struct EmptyLikedListView: View {
                         .offset(y: isAnimating ? 0 : 20)
                 }
                 
-                NavigationLink {
-                    RestGamesHubView()
+                Button {
+                    showingRestGames = true
                 } label: {
                     HStack {
                         Image(systemName: "gamecontroller.fill")
@@ -87,6 +88,9 @@ struct EmptyLikedListView: View {
             withAnimation {
                 isAnimating = true
             }
+        }
+        .fullScreenCover(isPresented: $showingRestGames) {
+            RestGamesHubView(onClose: { showingRestGames = false })
         }
     }
 }

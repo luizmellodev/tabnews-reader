@@ -114,6 +114,10 @@ final class RestGameSession {
             ToneGenerator.shared.sustain(frequency: targetFrequency)
         }
 
+        let totalSeconds = Int(RestGameScoring.memorizeDuration)
+        var announcedSecond = Int(ceil(memorizeTimeRemaining))
+        RestFeedbackManager.shared.countdownTick(second: announcedSecond, total: totalSeconds)
+
         memorizeTask = Task { [weak self] in
             guard let self else { return }
             let steps = Int(RestGameScoring.memorizeDuration * 10)
@@ -122,9 +126,18 @@ final class RestGameSession {
                 try? await Task.sleep(for: .milliseconds(100))
                 if Task.isCancelled { return }
                 memorizeTimeRemaining = max(0, RestGameScoring.memorizeDuration - (Double(step) / 10))
+
+                let second = Int(ceil(memorizeTimeRemaining))
+                if second != announcedSecond {
+                    announcedSecond = second
+                    if second > 0 {
+                        RestFeedbackManager.shared.countdownTick(second: second, total: totalSeconds)
+                    }
+                }
             }
 
             if Task.isCancelled { return }
+            RestFeedbackManager.shared.countdownFinish()
             ToneGenerator.shared.stop()
             withPhaseTransition(to: .recreating)
 

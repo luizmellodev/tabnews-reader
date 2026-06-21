@@ -357,21 +357,22 @@ struct HSLColorPickerView: View {
                 verticalSlider(
                     value: $color.saturation,
                     range: 0...100,
-                    gradient: saturationGradient,
-                    tickThreshold: 8
+                    gradient: saturationGradient
                 )
 
                 verticalSlider(
                     value: $color.lightness,
                     range: 0...100,
-                    gradient: lightnessGradient,
-                    tickThreshold: 8
+                    gradient: lightnessGradient
                 )
 
                 Spacer()
             }
             .padding(.leading, 16)
             .padding(.vertical, 80)
+        }
+        .onAppear {
+            ToneGenerator.shared.configureSessionIfNeeded()
         }
     }
 
@@ -413,8 +414,7 @@ struct HSLColorPickerView: View {
                             binding: value,
                             range: 0...360,
                             locationY: gesture.location.y,
-                            height: geo.size.height,
-                            tickThreshold: 24
+                            height: geo.size.height
                         )
                     }
             )
@@ -425,8 +425,7 @@ struct HSLColorPickerView: View {
     private func verticalSlider(
         value: Binding<Double>,
         range: ClosedRange<Double>,
-        gradient: LinearGradient,
-        tickThreshold: Double
+        gradient: LinearGradient
     ) -> some View {
         GeometryReader { geo in
             let span = range.upperBound - range.lowerBound
@@ -453,8 +452,7 @@ struct HSLColorPickerView: View {
                             binding: value,
                             range: range,
                             locationY: gesture.location.y,
-                            height: geo.size.height,
-                            tickThreshold: tickThreshold
+                            height: geo.size.height
                         )
                     }
             )
@@ -470,18 +468,17 @@ struct HSLColorPickerView: View {
         binding: Binding<Double>,
         range: ClosedRange<Double>,
         locationY: CGFloat,
-        height: CGFloat,
-        tickThreshold: Double
+        height: CGFloat
     ) {
         let clampedY = max(0, min(height, locationY))
         let inverted = 1 - (clampedY / height)
-        let newValue = range.lowerBound + inverted * (range.upperBound - range.lowerBound)
-        let previous = binding.wrappedValue
-        binding.wrappedValue = newValue
+        binding.wrappedValue = range.lowerBound + inverted * (range.upperBound - range.lowerBound)
 
-        if abs(newValue - previous) >= tickThreshold {
-            RestFeedbackManager.shared.sliderTick()
-        }
+        RestFeedbackManager.shared.colorAdjust(
+            hue: color.hue,
+            saturation: color.saturation,
+            lightness: color.lightness
+        )
     }
 
     private var saturationGradient: LinearGradient {

@@ -116,7 +116,7 @@ struct FoldersView: View {
                 }
             }
             .fullScreenCover(isPresented: $showingGame) {
-                RestGamesHubView()
+                RestGamesHubView(onClose: { showingGame = false })
             }
             .overlay(alignment: .bottomTrailing) {
                 if !folders.isEmpty {

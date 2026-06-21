@@ -14,6 +14,11 @@ final class ToneGenerator {
     private var sourceNode: AVAudioSourceNode?
     private var isConfigured = false
     private var isRunning = false
+    private var isSustainMode = false
+    private var briefToneWorkItem: DispatchWorkItem?
+
+    var isSustaining: Bool { isSustainMode }
+
     private let sampleRate: Double = 44_100
 
     private init() {}
@@ -33,12 +38,42 @@ final class ToneGenerator {
     /// Continuous tone for Sound Match (memorize + recreate). Only updates frequency in place.
     func sustain(frequency: Double, volume: Float = 0.25) {
         configureSessionIfNeeded()
+        briefToneWorkItem?.cancel()
+        isSustainMode = true
         state.frequency = max(20, frequency)
         state.volume = volume
         startEngineIfNeeded()
     }
 
+    /// Short tone for color slider ticks and countdown — does not interrupt sustain mode.
+    func playBriefTone(frequency: Double, duration: TimeInterval = 0.055, volume: Float = 0.18) {
+        configureSessionIfNeeded()
+        briefToneWorkItem?.cancel()
+
+        if isSustainMode {
+            state.frequency = max(20, frequency)
+            return
+        }
+
+        state.frequency = max(20, frequency)
+        state.volume = volume
+        startEngineIfNeeded()
+
+        let work = DispatchWorkItem { [weak self] in
+            guard let self, !self.isSustainMode else { return }
+            self.stopEngineOnly()
+        }
+        briefToneWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration, execute: work)
+    }
+
     func stop() {
+        briefToneWorkItem?.cancel()
+        isSustainMode = false
+        stopEngineOnly()
+    }
+
+    private func stopEngineOnly() {
         guard isRunning else { return }
         engine.stop()
         isRunning = false

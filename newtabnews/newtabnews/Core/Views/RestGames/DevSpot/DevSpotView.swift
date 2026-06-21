@@ -4,6 +4,7 @@ struct DevSpotView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel = DevSpotViewModel()
     @State private var hasStarted = false
+    @State private var showOnboarding = !RestGameOnboarding.hasSeen(.devSpot)
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -20,17 +21,26 @@ struct DevSpotView: View {
                     totalRounds: viewModel.totalRounds,
                     bestStreak: viewModel.bestStreak,
                     roundResults: viewModel.roundResults,
-                    onPlayAgain: { viewModel.startGame() },
+                    onPlayAgain: {
+                        hasStarted = false
+                        startIfReady()
+                    },
                     onClose: { dismiss() }
                 )
+            }
+
+            if showOnboarding {
+                RestGameOnboardingOverlay.devSpot {
+                    RestGameOnboarding.markSeen(.devSpot)
+                    showOnboarding = false
+                    startIfReady()
+                }
             }
         }
         .animation(RestGameTheme.spring, value: viewModel.phase)
         .onAppear {
             RestFeedbackManager.shared.prepare()
-            guard !hasStarted else { return }
-            hasStarted = true
-            viewModel.startGame()
+            startIfReady()
         }
         .task(id: revealTaskID) {
             guard viewModel.phase == .revealing else { return }
@@ -41,6 +51,12 @@ struct DevSpotView: View {
 
     private var revealTaskID: String {
         viewModel.phase == .revealing ? "\(viewModel.currentRound)-reveal" : "idle"
+    }
+
+    private func startIfReady() {
+        guard !showOnboarding, !hasStarted else { return }
+        hasStarted = true
+        viewModel.startGame()
     }
 
     @ViewBuilder

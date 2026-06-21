@@ -4,9 +4,12 @@ struct RestGamePlayView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var session: RestGameSession
     @State private var hasStarted = false
+    @State private var showOnboarding: Bool
 
     init(gameType: RestGameType) {
         _session = State(initialValue: RestGameSession(gameType: gameType))
+        let onboardingID: RestGameOnboardingID = gameType == .color ? .colorMatch : .soundMatch
+        _showOnboarding = State(initialValue: !RestGameOnboarding.hasSeen(onboardingID))
     }
 
     var body: some View {
@@ -33,13 +36,15 @@ struct RestGamePlayView: View {
             }
 
             gameChrome
+
+            if showOnboarding {
+                onboardingOverlay
+            }
         }
         .animation(RestGameTheme.spring, value: session.phase)
         .onAppear {
             RestFeedbackManager.shared.prepare()
-            guard !hasStarted else { return }
-            hasStarted = true
-            session.startGame()
+            startIfReady()
         }
         .onDisappear {
             session.cleanup()
@@ -47,9 +52,36 @@ struct RestGamePlayView: View {
     }
 
     @ViewBuilder
+    private var onboardingOverlay: some View {
+        switch session.gameType {
+        case .color:
+            RestGameOnboardingOverlay.colorMatch {
+                dismissOnboarding()
+            }
+        case .sound:
+            RestGameOnboardingOverlay.soundMatch {
+                dismissOnboarding()
+            }
+        }
+    }
+
+    private func dismissOnboarding() {
+        let id: RestGameOnboardingID = session.gameType == .color ? .colorMatch : .soundMatch
+        RestGameOnboarding.markSeen(id)
+        showOnboarding = false
+        startIfReady()
+    }
+
+    private func startIfReady() {
+        guard !showOnboarding, !hasStarted else { return }
+        hasStarted = true
+        session.startGame()
+    }
+
+    @ViewBuilder
     private var gameChrome: some View {
         VStack {
-            if session.phase != .finalResults {
+            if session.phase != .finalResults && !showOnboarding {
                 HStack {
                     RoundIndicatorView(
                         currentRound: session.currentRound,
@@ -66,7 +98,7 @@ struct RestGamePlayView: View {
 
             Spacer()
 
-            if session.phase == .recreating {
+            if session.phase == .recreating && !showOnboarding {
                 HStack {
                     Spacer()
                     RestGameConfirmFAB {
@@ -94,13 +126,23 @@ struct RestGamePlayView: View {
         case .finalResults:
             FinalResultsView(
                 scores: session.roundScores,
-                onPlayAgain: { session.playAgain() },
+                onPlayAgain: {
+                    hasStarted = false
+                    showOnboarding = false
+                    startIfReadyAfterReplay()
+                },
                 onClose: {
                     session.cleanup()
                     dismiss()
                 }
             )
         }
+    }
+
+    private func startIfReadyAfterReplay() {
+        guard !hasStarted else { return }
+        hasStarted = true
+        session.playAgain()
     }
 }
 

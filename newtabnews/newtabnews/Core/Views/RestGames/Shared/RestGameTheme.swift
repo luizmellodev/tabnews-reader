@@ -153,22 +153,27 @@ struct MemorizeCountdownRing: View {
         1 - (timeRemaining / total)
     }
 
+    private var displayedSecond: Int {
+        max(0, Int(ceil(timeRemaining)))
+    }
+
     var body: some View {
         ZStack {
             Circle()
                 .stroke((lightStyle ? Color.black : Color.white).opacity(0.15), lineWidth: 5)
-                .frame(width: 64, height: 64)
+                .frame(width: 88, height: 88)
 
             Circle()
                 .trim(from: 0, to: progress)
                 .stroke(lightStyle ? Color.black.opacity(0.7) : Color.white, style: StrokeStyle(lineWidth: 5, lineCap: .round))
-                .frame(width: 64, height: 64)
+                .frame(width: 88, height: 88)
                 .rotationEffect(.degrees(-90))
                 .animation(.linear(duration: 0.1), value: progress)
 
-            Text(String(format: "%.0f", ceil(timeRemaining)))
-                .font(.title3.monospacedDigit().weight(.bold))
+            Text("\(displayedSecond)")
+                .font(.system(size: 36, weight: .bold, design: .rounded))
                 .foregroundStyle(lightStyle ? .black.opacity(0.75) : .white)
+                .monospacedDigit()
                 .contentTransition(.numericText())
         }
     }

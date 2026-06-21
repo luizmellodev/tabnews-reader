@@ -182,3 +182,141 @@ struct FinalResultsView: View {
         }
     }
 }
+
+// MARK: - Onboarding
+
+enum RestGameOnboardingID: String {
+    case colorMatch
+    case soundMatch
+    case devWordle
+    case devSpot
+}
+
+enum RestGameOnboarding {
+    private static func key(for id: RestGameOnboardingID) -> String {
+        "restGameOnboardingSeen_\(id.rawValue)"
+    }
+
+    static func hasSeen(_ id: RestGameOnboardingID) -> Bool {
+        UserDefaults.standard.bool(forKey: key(for: id))
+    }
+
+    static func markSeen(_ id: RestGameOnboardingID) {
+        UserDefaults.standard.set(true, forKey: key(for: id))
+    }
+}
+
+struct RestGameOnboardingOverlay: View {
+    let title: String
+    let icon: String
+    let accent: Color
+    let steps: [String]
+    let onPlay: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.72)
+                .ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                Image(systemName: icon)
+                    .font(.system(size: 44))
+                    .foregroundStyle(accent)
+                    .frame(width: 88, height: 88)
+                    .background(accent.opacity(0.15), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+
+                VStack(spacing: 8) {
+                    Text(title)
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(.white)
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
+                            HStack(alignment: .top, spacing: 12) {
+                                Text("\(index + 1)")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(accent)
+                                    .frame(width: 22, height: 22)
+                                    .background(accent.opacity(0.15), in: Circle())
+
+                                Text(step)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.white.opacity(0.82))
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 8)
+                }
+
+                RestGamePrimaryButton(title: "Jogar", action: onPlay)
+            }
+            .padding(28)
+            .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .stroke(.white.opacity(0.12), lineWidth: 1)
+            }
+            .padding(.horizontal, 24)
+        }
+    }
+}
+
+extension RestGameOnboardingOverlay {
+    static func colorMatch(onPlay: @escaping () -> Void) -> RestGameOnboardingOverlay {
+        RestGameOnboardingOverlay(
+            title: "Color Match",
+            icon: "paintpalette.fill",
+            accent: .pink,
+            steps: [
+                "Memorize a cor por 5 segundos — preste atenção no tom.",
+                "Recrie a cor com os sliders à esquerda.",
+                "Toque ✓ quando achar que acertou. São 5 rounds."
+            ],
+            onPlay: onPlay
+        )
+    }
+
+    static func soundMatch(onPlay: @escaping () -> Void) -> RestGameOnboardingOverlay {
+        RestGameOnboardingOverlay(
+            title: "Sound Match",
+            icon: "waveform",
+            accent: .cyan,
+            steps: [
+                "Ouça o som por 5 segundos — grave o pitch na cabeça.",
+                "Arraste ↑↓ na onda para recriar a frequência.",
+                "Toque ✓ para confirmar. São 5 rounds."
+            ],
+            onPlay: onPlay
+        )
+    }
+
+    static func devWordle(onPlay: @escaping () -> Void) -> RestGameOnboardingOverlay {
+        RestGameOnboardingOverlay(
+            title: "DevWordle",
+            icon: "character.textbox",
+            accent: .green,
+            steps: [
+                "Adivinhe o termo dev de 5 letras.",
+                "Verde = certo · Amarelo = existe · Cinza = não existe.",
+                "Você tem 6 tentativas. Um puzzle novo por dia."
+            ],
+            onPlay: onPlay
+        )
+    }
+
+    static func devSpot(onPlay: @escaping () -> Void) -> RestGameOnboardingOverlay {
+        RestGameOnboardingOverlay(
+            title: "DevSpot",
+            icon: "brain.head.profile",
+            accent: .mint,
+            steps: [
+                "Dois termos aparecem — só um é de dev.",
+                "Toque no termo certo o mais rápido que puder.",
+                "São 10 rounds. Quanto mais acertos seguidos, melhor."
+            ],
+            onPlay: onPlay
+        )
+    }
+}

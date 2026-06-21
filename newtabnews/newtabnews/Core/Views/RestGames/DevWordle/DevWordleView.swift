@@ -3,6 +3,7 @@ import SwiftUI
 struct DevWordleView: View {
     @State private var viewModel = DevWordleViewModel()
     @State private var showResultSheet = false
+    @State private var showOnboarding = !RestGameOnboarding.hasSeen(.devWordle)
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -36,6 +37,13 @@ struct DevWordleView: View {
                 .padding(.bottom, 12)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            if showOnboarding {
+                RestGameOnboardingOverlay.devWordle {
+                    RestGameOnboarding.markSeen(.devWordle)
+                    showOnboarding = false
+                }
+            }
         }
         .onAppear {
             RestFeedbackManager.shared.prepare()

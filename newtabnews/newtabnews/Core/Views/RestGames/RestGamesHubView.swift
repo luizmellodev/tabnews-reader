@@ -8,6 +8,7 @@ private enum HubDestination: Hashable {
 
 struct RestGamesHubView: View {
     @Environment(\.dismiss) private var dismiss
+    var onClose: (() -> Void)? = nil
     @State private var destination: HubDestination?
     @State private var dailySummary = DevWordleViewModel.todaySummary()
 
@@ -25,7 +26,7 @@ struct RestGamesHubView: View {
                                 .font(.system(size: 34, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
                         }
-                        .padding(.top, 16)
+                        .padding(.top, 8)
 
                         VStack(alignment: .leading, spacing: 14) {
                             sectionTitle("Hoje")
@@ -77,25 +78,16 @@ struct RestGamesHubView: View {
                     .padding(.bottom, 32)
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if destination == nil {
-                        Button {
-                            RestFeedbackManager.shared.tap()
-                            dismiss()
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.body.weight(.semibold))
-                                .foregroundStyle(.white.opacity(0.9))
-                                .frame(width: 32, height: 32)
-                                .background(.white.opacity(0.12), in: Circle())
-                        }
-                        .accessibilityLabel("Fechar")
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if destination == nil {
+                    HStack {
+                        Spacer()
+                        closeButton
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 8)
                 }
             }
-            .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(item: $destination) { item in
                 switch item {
                 case .devWordle:
@@ -116,6 +108,29 @@ struct RestGamesHubView: View {
             RestFeedbackManager.shared.prepare()
             dailySummary = DevWordleViewModel.todaySummary()
         }
+    }
+
+    private var closeButton: some View {
+        Button {
+            RestFeedbackManager.shared.tap()
+            closeHub()
+        } label: {
+            Image(systemName: "xmark")
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(width: 40, height: 40)
+                .background(.ultraThinMaterial, in: Circle())
+                .overlay {
+                    Circle()
+                        .stroke(.white.opacity(0.22), lineWidth: 1)
+                }
+        }
+        .accessibilityLabel("Fechar")
+    }
+
+    private func closeHub() {
+        onClose?()
+        dismiss()
     }
 
     private func sectionTitle(_ title: String) -> some View {
