@@ -118,8 +118,13 @@ struct RestGamePlayView: View {
             EmptyView()
         case .scoreReveal:
             ScoreRevealView(
+                gameType: session.gameType,
                 score: session.lastRoundScore,
-                round: session.currentRound
+                round: session.currentRound,
+                targetColor: session.targetColor,
+                guessColor: session.guessColor,
+                targetFrequency: session.targetFrequency,
+                guessFrequency: session.guessFrequency
             ) {
                 session.advanceAfterScoreReveal()
             }

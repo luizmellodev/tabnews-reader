@@ -15,6 +15,9 @@
 		BA4055F3DBCE4BE48E4403C1 /* DevSpotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD40B937DA164E089409B358 /* DevSpotView.swift */; };
 		F1AD9D04C2204BE58A554E67 /* DevSpotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D183E25BBA7467DB659C974 /* DevSpotViewModel.swift */; };
 		C75A5F815869469288FE91B7 /* DevSpotEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C0EBF0FC18475F962933FF /* DevSpotEngine.swift */; };
+		D4E5F6012F8000010068804C /* DevLeetEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6022F8000010068804C /* DevLeetEngine.swift */; };
+		D4E5F6032F8000010068804C /* DevLeetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6042F8000010068804C /* DevLeetView.swift */; };
+		D4E5F6052F8000010068804C /* dev_leet_problems.json in Resources */ = {isa = PBXBuildFile; fileRef = D4E5F6062F8000010068804C /* dev_leet_problems.json */; };
 		449AA869DB8647A7AA74E861 /* dev_spot_words.json in Resources */ = {isa = PBXBuildFile; fileRef = 6FA87B49DE4E4C3D8D1D30FC /* dev_spot_words.json */; };
 		ED505630C6584CBEA4276195 /* dev_words.json in Resources */ = {isa = PBXBuildFile; fileRef = 56398CBA6EC948BF8027A624 /* dev_words.json */; };
 		EF99794497654680863D2FBD /* RestGameTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAB388B57CD4A79AA767CB7 /* RestGameTheme.swift */; };
@@ -250,6 +253,9 @@
 		BD40B937DA164E089409B358 /* DevSpotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevSpotView.swift; sourceTree = "<group>"; };
 		7D183E25BBA7467DB659C974 /* DevSpotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevSpotViewModel.swift; sourceTree = "<group>"; };
 		24C0EBF0FC18475F962933FF /* DevSpotEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevSpotEngine.swift; sourceTree = "<group>"; };
+		D4E5F6022F8000010068804C /* DevLeetEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevLeetEngine.swift; sourceTree = "<group>"; };
+		D4E5F6042F8000010068804C /* DevLeetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevLeetView.swift; sourceTree = "<group>"; };
+		D4E5F6062F8000010068804C /* dev_leet_problems.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dev_leet_problems.json; sourceTree = "<group>"; };
 		6FA87B49DE4E4C3D8D1D30FC /* dev_spot_words.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dev_spot_words.json; sourceTree = "<group>"; };
 		56398CBA6EC948BF8027A624 /* dev_words.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dev_words.json; sourceTree = "<group>"; };
 		CEAB388B57CD4A79AA767CB7 /* RestGameTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameTheme.swift; sourceTree = "<group>"; };
@@ -582,10 +588,21 @@
 				CA69EED4C427447E9102CB8B /* RestGamesHubView.swift */,
 				DCFB20E6443F44E1AA0A1BE4 /* RestGamePlayView.swift */,
 				643122B8B84043FD96DC45C4 /* DevWordle */,
+				D4E5F6072F8000010068804C /* DevLeet */,
 			8DC07756BB2146818D07F487 /* DevSpot */,
 				3C7D1AE464B2414B8F232BCB /* Shared */,
 			);
 			path = RestGames;
+			sourceTree = "<group>";
+		};
+		D4E5F6072F8000010068804C /* DevLeet */ = {
+			isa = PBXGroup;
+			children = (
+				D4E5F6042F8000010068804C /* DevLeetView.swift */,
+				D4E5F6022F8000010068804C /* DevLeetEngine.swift */,
+				D4E5F6062F8000010068804C /* dev_leet_problems.json */,
+			);
+			path = DevLeet;
 			sourceTree = "<group>";
 		};
 		8DC07756BB2146818D07F487 /* DevSpot */ = {
@@ -1047,6 +1064,7 @@
 												791E87E02A4FD99B00C2F0B4 /* Preview Assets.xcassets in Resources */,
 				791E87DC2A4FD99B00C2F0B4 /* Assets.xcassets in Resources */,
 				ED505630C6584CBEA4276195 /* dev_words.json in Resources */,
+				D4E5F6052F8000010068804C /* dev_leet_problems.json in Resources */,
 				449AA869DB8647A7AA74E861 /* dev_spot_words.json in Resources */,
 
 				79259E8C2EFB82FB004BC057 /* GoogleService-Info.plist in Resources */,
@@ -1238,6 +1256,8 @@
 			BA4055F3DBCE4BE48E4403C1 /* DevSpotView.swift in Sources */,
 			F1AD9D04C2204BE58A554E67 /* DevSpotViewModel.swift in Sources */,
 			C75A5F815869469288FE91B7 /* DevSpotEngine.swift in Sources */,
+			D4E5F6012F8000010068804C /* DevLeetEngine.swift in Sources */,
+			D4E5F6032F8000010068804C /* DevLeetView.swift in Sources */,
 
 				EF99794497654680863D2FBD /* RestGameTheme.swift in Sources */,
 				A1B2C0022F7000010068804C /* GameCenterManager.swift in Sources */,

@@ -16,7 +16,7 @@ struct ContentView: View {
     @AppStorage("current_theme") var currentTheme: Theme = .system
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     @AppStorage("hasSeenTipsOnboarding") var hasSeenTipsOnboarding: Bool = false
-    @AppStorage(RestGamesAnnouncement.storageKey) var hasSeenRestGamesAnnouncement: Bool = false
+    @AppStorage(RestGamesAnnouncement.seenVersionKey) private var restGamesAnnouncementSeenVersion: String = ""
     
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.modelContext) private var modelContext
@@ -115,15 +115,15 @@ struct ContentView: View {
             .interactiveDismissDisabled(false)
         }
         .sheet(isPresented: $showRestGamesAnnouncement, onDismiss: {
-            if !hasSeenRestGamesAnnouncement {
+            if shouldShowRestGamesAnnouncement {
                 RestGamesAnnouncement.markSeen()
-                hasSeenRestGamesAnnouncement = true
+                restGamesAnnouncementSeenVersion = RestGamesAnnouncement.introVersion
             }
         }) {
             RestGamesAnnouncementSheet(
                 onPlay: {
                     RestGamesAnnouncement.markSeen()
-                    hasSeenRestGamesAnnouncement = true
+                    restGamesAnnouncementSeenVersion = RestGamesAnnouncement.introVersion
                     showRestGamesAnnouncement = false
                     selectedTab = .settings
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
@@ -132,7 +132,7 @@ struct ContentView: View {
                 },
                 onLater: {
                     RestGamesAnnouncement.markSeen()
-                    hasSeenRestGamesAnnouncement = true
+                    restGamesAnnouncementSeenVersion = RestGamesAnnouncement.introVersion
                     showRestGamesAnnouncement = false
                 }
             )
@@ -146,7 +146,8 @@ struct ContentView: View {
         }
         .onAppear {
             setupObservers()
-            
+            RestGamesAnnouncement.prepareForLaunchIfNeeded()
+
             if !hasSeenTipsOnboarding && hasSeenOnboarding {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     withAnimation {
@@ -212,16 +213,20 @@ struct ContentView: View {
     
     // MARK: - Lifecycle
 
+    private var shouldShowRestGamesAnnouncement: Bool {
+        restGamesAnnouncementSeenVersion != RestGamesAnnouncement.introVersion
+    }
+
     private func evaluateRestGamesAnnouncement() {
         guard hasSeenOnboarding,
               hasSeenTipsOnboarding,
-              !hasSeenRestGamesAnnouncement,
+              shouldShowRestGamesAnnouncement,
               !showSplash,
               !showTipsOnboarding,
               !showRestGamesAnnouncement else { return }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-            guard !hasSeenRestGamesAnnouncement, !showTipsOnboarding, !showSplash else { return }
+            guard shouldShowRestGamesAnnouncement, !showTipsOnboarding, !showSplash else { return }
             showRestGamesAnnouncement = true
         }
     }
@@ -330,7 +335,7 @@ struct ContentView: View {
             object: nil,
             queue: .main
         ) { [self] _ in
-            hasSeenRestGamesAnnouncement = false
+            restGamesAnnouncementSeenVersion = ""
             showRestGamesAnnouncement = true
         }
         

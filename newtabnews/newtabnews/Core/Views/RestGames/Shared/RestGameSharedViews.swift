@@ -48,48 +48,62 @@ struct MemorizePhaseView: View {
 }
 
 struct ScoreRevealView: View {
+    let gameType: RestGameType
     let score: Double
     let round: Int
+    let targetColor: HSLColor?
+    let guessColor: HSLColor?
+    let targetFrequency: Double?
+    let guessFrequency: Double?
     let onContinue: () -> Void
 
     @State private var displayedScore: Double = 0
     @State private var hasAnimated = false
     @State private var showButton = false
+    @State private var showComparison = false
     @State private var ringScale: CGFloat = 0.6
 
     var body: some View {
-        VStack(spacing: 28) {
-            RestGamePhaseLabel(text: "Round \(round)")
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 24) {
+                RestGamePhaseLabel(text: "Round \(round)")
 
-            ZStack {
-                Circle()
-                    .stroke(RestGameScoring.scoreColor(score).opacity(0.25), lineWidth: 10)
-                    .frame(width: 200, height: 200)
-                    .scaleEffect(ringScale)
+                ZStack {
+                    Circle()
+                        .stroke(RestGameScoring.scoreColor(score).opacity(0.25), lineWidth: 10)
+                        .frame(width: 180, height: 180)
+                        .scaleEffect(ringScale)
 
-                Circle()
-                    .fill(RestGameScoring.scoreColor(score).opacity(0.12))
-                    .frame(width: 160, height: 160)
-                    .scaleEffect(ringScale)
+                    Circle()
+                        .fill(RestGameScoring.scoreColor(score).opacity(0.12))
+                        .frame(width: 144, height: 144)
+                        .scaleEffect(ringScale)
 
-                VStack(spacing: 4) {
-                    Text(RestGameScoring.formattedScore(displayedScore))
-                        .font(.system(size: 64, weight: .bold, design: .rounded))
-                        .foregroundStyle(RestGameScoring.scoreColor(score))
-                        .monospacedDigit()
-                        .contentTransition(.numericText())
+                    VStack(spacing: 4) {
+                        Text(RestGameScoring.formattedScore(displayedScore))
+                            .font(.system(size: 56, weight: .bold, design: .rounded))
+                            .foregroundStyle(RestGameScoring.scoreColor(score))
+                            .monospacedDigit()
+                            .contentTransition(.numericText())
 
-                    Text("/ 10")
-                        .font(.title3.weight(.medium))
-                        .foregroundStyle(.white.opacity(0.45))
+                        Text("/ 10")
+                            .font(.title3.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.45))
+                    }
+                }
+
+                if showComparison {
+                    comparisonSection
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+
+                if showButton {
+                    RestGamePrimaryButton(title: "Continuar", action: onContinue)
+                        .padding(.horizontal, 24)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
-
-            if showButton {
-                RestGamePrimaryButton(title: "Continuar", action: onContinue)
-                    .padding(.horizontal, 24)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
+            .padding(.vertical, 32)
         }
         .onAppear {
             guard !hasAnimated else { return }
@@ -102,6 +116,109 @@ struct ScoreRevealView: View {
         }
     }
 
+    @ViewBuilder
+    private var comparisonSection: some View {
+        switch gameType {
+        case .color:
+            if let guessColor, let targetColor {
+                colorComparisonView(guess: guessColor, target: targetColor)
+            }
+        case .sound:
+            if let guessFrequency, let targetFrequency {
+                frequencyComparisonView(guess: guessFrequency, target: targetFrequency)
+            }
+        }
+    }
+
+    private func colorComparisonView(guess: HSLColor, target: HSLColor) -> some View {
+        VStack(spacing: 14) {
+            HStack(spacing: 12) {
+                colorComparisonCard(title: "Você", color: guess)
+                colorComparisonCard(title: "Esperada", color: target)
+            }
+
+            Text("H · S · L")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.35))
+        }
+        .padding(.horizontal, 24)
+    }
+
+    private func colorComparisonCard(title: String, color: HSLColor) -> some View {
+        VStack(spacing: 10) {
+            Text(title)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white.opacity(0.55))
+
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(color.swiftUIColor)
+                .frame(height: 72)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(.white.opacity(0.22), lineWidth: 1)
+                }
+                .shadow(color: color.swiftUIColor.opacity(0.35), radius: 12, y: 4)
+
+            Text(color.displaySummary)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.72))
+                .multilineTextAlignment(.center)
+                .monospacedDigit()
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 14)
+        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
+    private func frequencyComparisonView(guess: Double, target: Double) -> some View {
+        VStack(spacing: 14) {
+            HStack(spacing: 12) {
+                frequencyComparisonCard(title: "Você", frequency: guess)
+                frequencyComparisonCard(title: "Esperada", frequency: target)
+            }
+
+            Text(frequencyDeltaLabel(guess: guess, target: target))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.4))
+        }
+        .padding(.horizontal, 24)
+    }
+
+    private func frequencyDeltaLabel(guess: Double, target: Double) -> String {
+        let delta = abs(log2(target) - log2(guess))
+        if delta < 0.02 { return "Quase perfeito" }
+        return "Δ \(String(format: "%.0f", delta * 100)) centavos"
+    }
+
+    private func frequencyComparisonCard(title: String, frequency: Double) -> some View {
+        VStack(spacing: 10) {
+            Text(title)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white.opacity(0.55))
+
+            SoundRibbonView(
+                frequency: .constant(frequency),
+                isInteractive: false,
+                compact: true
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(.white.opacity(0.1), lineWidth: 1)
+            }
+
+            Text(RestGameScoring.formattedFrequency(frequency))
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(.white.opacity(0.85))
+                .monospacedDigit()
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 14)
+        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
     private func animateScore() {
         let steps = 36
         for step in 0...steps {
@@ -111,6 +228,7 @@ struct ScoreRevealView: View {
                 if step == steps {
                     RestFeedbackManager.shared.scoreReveal(score: score)
                     withAnimation(RestGameTheme.spring) {
+                        showComparison = true
                         showButton = true
                     }
                 }
@@ -197,6 +315,7 @@ enum RestGameOnboardingID: String {
     case colorMatch
     case soundMatch
     case devWordle
+    case devLeet
     case devSpot
 }
 
@@ -309,6 +428,20 @@ extension RestGameOnboardingOverlay {
                 "Adivinhe o termo dev de 5 letras.",
                 "Verde = certo · Amarelo = existe · Cinza = não existe.",
                 "Você tem 6 tentativas. Um puzzle novo por dia."
+            ],
+            onPlay: onPlay
+        )
+    }
+
+    static func devLeet(onPlay: @escaping () -> Void) -> RestGameOnboardingOverlay {
+        RestGameOnboardingOverlay(
+            title: "DevLeet",
+            icon: "pencil.and.outline",
+            accent: .orange,
+            steps: [
+                "One LeetCode-style problem drops every week.",
+                "Grab paper and a pen — write your solution by hand.",
+                "When you're done, tap Mark as Solved. No code editor here."
             ],
             onPlay: onPlay
         )

@@ -423,54 +423,30 @@ struct SettingsView: View {
                     Text("Criadores")
                         .font(.headline)
 
-                    NavigationLink {
-                        SocialView(
+                    CreatorSocialCard(
+                        creator: CreatorInfo(
+                            name: "Filipe Deschamps",
+                            role: "Criador do TabNews",
+                            accent: .blue,
                             github: "filipedeschamps",
                             linkedin: "filipedeschamps",
                             youtube: "FilipeDeschamps",
                             instagram: "filipedeschamps"
                         )
-                    } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: "person.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.blue)
+                    )
 
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Filipe Deschamps")
-                                    .font(.headline)
-                                Text("Criador do TabNews")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                    .buttonStyle(.plain)
-
-                    NavigationLink {
-                        SocialView(
+                    CreatorSocialCard(
+                        creator: CreatorInfo(
+                            name: "Luiz Mello",
+                            role: "Desenvolvedor deste app",
+                            accent: .green,
                             github: "luizmellodev",
                             linkedin: "luizmellodev",
                             youtube: "euluizmello",
                             instagram: "luizmello.dev",
                             website: "https://luizmello.dev"
                         )
-                    } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: "person.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.green)
-
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Luiz Mello")
-                                    .font(.headline)
-                                Text("Desenvolvedor deste app")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                    .buttonStyle(.plain)
+                    )
                 }
             }
             .padding()

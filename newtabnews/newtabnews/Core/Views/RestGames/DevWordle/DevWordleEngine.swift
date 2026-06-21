@@ -58,6 +58,26 @@ enum DevWordleEngine {
     }
 }
 
+enum DevWordleSchedule {
+    static var nextPuzzleAt: Date {
+        let calendar = Calendar.current
+        let startOfToday = calendar.startOfDay(for: .now)
+        return calendar.date(byAdding: .day, value: 1, to: startOfToday) ?? .now
+    }
+
+    static func remainingInterval(from date: Date = .now) -> TimeInterval {
+        max(0, nextPuzzleAt.timeIntervalSince(date))
+    }
+
+    static func formattedRemaining(from date: Date = .now) -> String {
+        let total = Int(remainingInterval(from: date))
+        let hours = total / 3600
+        let minutes = (total % 3600) / 60
+        let seconds = total % 60
+        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+}
+
 struct DevWordDictionary {
     let answers: [String]
     let validGuesses: Set<String>

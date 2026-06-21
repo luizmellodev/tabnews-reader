@@ -63,7 +63,6 @@ struct FoldersView: View {
                     }
                     .listStyle(.insetGrouped)
                     .scrollContentBackground(.hidden)
-                    .padding(.top, 50)
                 }
             }
             .navigationTitle("Biblioteca")

@@ -12,7 +12,7 @@ struct RestGamesHubBanner: View {
                         .tracking(2)
                         .foregroundStyle(.white)
 
-                    Text("Wordle · Spot · Color · Sound")
+                    Text("Wordle · Leet · Spot · Color · Sound")
                         .font(.caption2.weight(.medium))
                         .foregroundStyle(.white.opacity(0.5))
                 }
@@ -29,6 +29,7 @@ struct RestGamesHubBanner: View {
             .background {
                 ArcadeBlackBannerBackground()
             }
+            .compositingGroup()
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -93,9 +94,9 @@ struct RestGamesRankingsBanner: View {
 struct ArcadeBlackBannerBackground: View {
     var body: some View {
         ZStack {
-            Color.black
+            Color(red: 0.04, green: 0.04, blue: 0.05)
 
-            GeometryReader { geo in
+            GeometryReader { _ in
                 Canvas { context, size in
                     let spacing: CGFloat = 14
                     var offset: CGFloat = -size.height
@@ -104,14 +105,18 @@ struct ArcadeBlackBannerBackground: View {
                         var path = Path()
                         path.move(to: CGPoint(x: offset, y: 0))
                         path.addLine(to: CGPoint(x: offset + size.height * 0.55, y: size.height))
-                        context.stroke(path, with: .color(.white.opacity(0.045)), lineWidth: 1)
+                        context.stroke(
+                            path,
+                            with: .color(Color.white.opacity(0.08)),
+                            lineWidth: 1
+                        )
                         offset += spacing
                     }
                 }
             }
 
             LinearGradient(
-                colors: [.green.opacity(0.12), .clear, .cyan.opacity(0.08)],
+                colors: [.green.opacity(0.14), .clear, .cyan.opacity(0.10)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -119,8 +124,9 @@ struct ArcadeBlackBannerBackground: View {
             Image("ruido")
                 .resizable()
                 .scaledToFill()
-                .blendMode(.overlay)
-                .opacity(0.22)
+                .opacity(0.28)
+                .blendMode(.softLight)
         }
+        .colorScheme(.dark)
     }
 }

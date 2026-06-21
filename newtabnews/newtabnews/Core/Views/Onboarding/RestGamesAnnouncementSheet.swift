@@ -2,18 +2,34 @@ import SwiftUI
 
 enum RestGamesAnnouncement {
     static let storageKey = "hasSeenRestGamesAnnouncement"
+    static let seenVersionKey = "restGamesAnnouncementSeenVersion"
+    static let introVersion = "2.0"
+
+    static var shouldShow: Bool {
+        UserDefaults.standard.string(forKey: seenVersionKey) != introVersion
+    }
 
     static var hasSeen: Bool {
-        UserDefaults.standard.bool(forKey: storageKey)
+        !shouldShow
     }
 
     static func markSeen() {
         UserDefaults.standard.set(true, forKey: storageKey)
+        UserDefaults.standard.set(introVersion, forKey: seenVersionKey)
+    }
+
+    /// Corrige estado legado (ex.: onboarding marcava como visto antes da sheet aparecer).
+    static func prepareForLaunchIfNeeded() {
+        guard UserDefaults.standard.string(forKey: seenVersionKey) == nil else { return }
+        guard UserDefaults.standard.bool(forKey: storageKey) else { return }
+
+        UserDefaults.standard.set(false, forKey: storageKey)
     }
 
     #if DEBUG
     static func resetForTesting() {
         UserDefaults.standard.set(false, forKey: storageKey)
+        UserDefaults.standard.removeObject(forKey: seenVersionKey)
     }
     #endif
 }

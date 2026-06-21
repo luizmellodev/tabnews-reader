@@ -2,6 +2,7 @@ import SwiftUI
 
 private enum HubDestination: Hashable {
     case devWordle
+    case devLeet
     case devSpot
     case arcade(RestGameType)
 }
@@ -11,6 +12,7 @@ struct RestGamesHubView: View {
     var onClose: (() -> Void)? = nil
     @State private var destination: HubDestination?
     @State private var dailySummary = DevWordleViewModel.todaySummary()
+    @State private var weeklySummary = DevLeetHubSummary.current()
     @State private var showLeaderboards = false
 
     var body: some View {
@@ -37,6 +39,18 @@ struct RestGamesHubView: View {
                                 destination = .devWordle
                             } label: {
                                 devWordleCard
+                            }
+                            .buttonStyle(RestGameScaleButtonStyle())
+                        }
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            sectionTitle("This Week")
+
+                            Button {
+                                RestFeedbackManager.shared.cardPress()
+                                destination = .devLeet
+                            } label: {
+                                devLeetCard
                             }
                             .buttonStyle(RestGameScaleButtonStyle())
                         }
@@ -94,6 +108,8 @@ struct RestGamesHubView: View {
                 switch item {
                 case .devWordle:
                     DevWordleView()
+                case .devLeet:
+                    DevLeetView()
                 case .devSpot:
                     DevSpotView()
                 case .arcade(let gameType):
@@ -109,6 +125,7 @@ struct RestGamesHubView: View {
         .onAppear {
             RestFeedbackManager.shared.prepare()
             dailySummary = DevWordleViewModel.todaySummary()
+            weeklySummary = DevLeetHubSummary.current()
         }
         .sheet(isPresented: $showLeaderboards) {
             RestGameLeaderboardsSheet()
@@ -187,7 +204,13 @@ struct RestGamesHubView: View {
 
                 Spacer()
 
-                statusBadge
+                VStack(alignment: .trailing, spacing: 6) {
+                    statusBadge
+
+                    if dailySummary.played {
+                        DevWordleCountdownLabel(prefix: "Próxima em")
+                    }
+                }
             }
 
             HStack(spacing: 16) {
@@ -222,17 +245,97 @@ struct RestGamesHubView: View {
     private var statusBadge: some View {
         Group {
             if dailySummary.won {
-                Image(systemName: "checkmark.circle.fill")
+                Label("Acertou", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
             } else if dailySummary.played {
-                Text("✗")
-                    .font(.headline.weight(.bold))
+                Label("Errou", systemImage: "xmark.circle.fill")
+                    .foregroundStyle(.orange)
             } else {
-                Text("—")
-                    .font(.headline.weight(.bold))
+                Text("Novo")
+                    .foregroundStyle(.green)
             }
         }
-        .font(.caption.weight(.bold))
-        .foregroundStyle(dailySummary.won ? .green : .white.opacity(0.45))
+        .font(.caption2.weight(.bold))
+        .labelStyle(.titleAndIcon)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var devLeetCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top) {
+                Image(systemName: "pencil.and.outline")
+                    .font(.title2)
+                    .foregroundStyle(.orange)
+                    .frame(width: 44, height: 44)
+                    .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("DevLeet")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text("Weekly LeetCode · paper & pen")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.55))
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 6) {
+                    devLeetStatusBadge
+
+                    if weeklySummary.solved {
+                        DevLeetCountdownLabel(prefix: "Next in")
+                    }
+                }
+            }
+
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(weeklySummary.problemTitle)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+
+                    Text(weeklySummary.difficulty.rawValue)
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(weeklySummary.difficulty.color)
+                }
+
+                Spacer()
+
+                if weeklySummary.currentStreak > 0 {
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("\(weeklySummary.currentStreak)")
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(.white)
+                        Text("weeks")
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.45))
+                    }
+                }
+            }
+        }
+        .padding(18)
+        .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Color.orange.opacity(0.25), lineWidth: 1)
+        }
+    }
+
+    private var devLeetStatusBadge: some View {
+        Group {
+            if weeklySummary.solved {
+                Label("Solved", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            } else {
+                Text("New")
+                    .foregroundStyle(.orange)
+            }
+        }
+        .font(.caption2.weight(.bold))
+        .labelStyle(.titleAndIcon)
+        .accessibilityElement(children: .combine)
     }
 
     private func miniTile(color: Color, letter: String, delay: Double) -> some View {

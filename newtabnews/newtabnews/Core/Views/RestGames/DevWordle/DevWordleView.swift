@@ -74,6 +74,10 @@ struct DevWordleView: View {
             Text("Termo dev de 5 letras · PT e EN")
                 .font(.caption)
                 .foregroundStyle(.white.opacity(0.55))
+
+            if viewModel.isCompletedToday {
+                DevWordleCountdownLabel()
+            }
         }
         .padding(.top, 12)
     }
@@ -115,9 +119,25 @@ private struct DevWordleResultSheet: View {
                 .font(.headline)
             }
 
+            DevWordleCountdownLabel(onDarkBackground: false)
+
             Button("Fechar") { dismiss() }
                 .font(.headline)
         }
         .padding(24)
+    }
+}
+
+struct DevWordleCountdownLabel: View {
+    var prefix: String = "Próxima palavra em"
+    var onDarkBackground = true
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            Text("\(prefix) \(DevWordleSchedule.formattedRemaining(from: context.date))")
+                .font(onDarkBackground ? .caption2.weight(.semibold) : .subheadline)
+                .monospacedDigit()
+                .foregroundStyle(onDarkBackground ? .white.opacity(0.5) : .secondary)
+        }
     }
 }

@@ -14,6 +14,10 @@ struct HSLColor: Equatable {
     var displaySaturation: String { String(format: "%.0f%%", saturation) }
     var displayLightness: String { String(format: "%.0f%%", lightness) }
 
+    var displaySummary: String {
+        "\(displayHue) · \(displaySaturation) · \(displayLightness)"
+    }
+
     static func randomEasy() -> HSLColor {
         HSLColor(
             hue: Double.random(in: 0...360),
@@ -50,6 +54,10 @@ enum RestGameScoring {
 
     static func formattedScore(_ score: Double) -> String {
         String(format: "%.2f", score)
+    }
+
+    static func formattedFrequency(_ hz: Double) -> String {
+        String(format: "%.0f Hz", hz)
     }
 
     static func scoreColor(_ score: Double) -> Color {

@@ -65,7 +65,6 @@ struct OnboardingView: View {
                                 withAnimation {
                                     showOnboarding = false
                                     UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
-                                    UserDefaults.standard.set(true, forKey: RestGamesAnnouncement.storageKey)
                                     // Garantir que os tips vão aparecer após o onboarding inicial
                                     UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
                                 }
