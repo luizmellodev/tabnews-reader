@@ -357,6 +357,7 @@ class GamificationManager: ObservableObject {
         }
 
         checkDevWordleBadges()
+        GameCenterManager.shared.syncRestGameAchievements(from: stats)
         saveData()
     }
 
@@ -381,6 +382,7 @@ class GamificationManager: ObservableObject {
         updateChallengeProgress(type: .solveLeet)
 
         checkDevLeetBadges()
+        GameCenterManager.shared.syncRestGameAchievements(from: stats)
         saveData()
     }
 

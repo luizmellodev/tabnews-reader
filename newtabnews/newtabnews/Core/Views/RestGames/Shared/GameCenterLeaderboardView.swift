@@ -9,24 +9,55 @@ struct RestGameLeaderboardsSheet: View {
         NavigationStack {
             Group {
                 if gameCenter.isAuthenticated {
-                    List(RestGameLeaderboard.allCases) { leaderboard in
-                        Button {
-                            gameCenter.showLeaderboard(leaderboard)
-                        } label: {
-                            HStack(spacing: 12) {
-                                Image(systemName: leaderboard.icon)
-                                    .font(.title3)
-                                    .foregroundStyle(.purple)
-                                    .frame(width: 32)
+                    List {
+                        Section("Rankings") {
+                            ForEach(RestGameLeaderboard.allCases) { leaderboard in
+                                Button {
+                                    gameCenter.showLeaderboard(leaderboard)
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: leaderboard.icon)
+                                            .font(.title3)
+                                            .foregroundStyle(.purple)
+                                            .frame(width: 32)
 
-                                Text(leaderboard.displayName)
-                                    .foregroundStyle(.primary)
+                                        Text(leaderboard.displayName)
+                                            .foregroundStyle(.primary)
 
-                                Spacer()
+                                        Spacer()
 
-                                Image(systemName: "chevron.right")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(.tertiary)
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundStyle(.tertiary)
+                                    }
+                                }
+                            }
+                        }
+
+                        Section("Conquistas") {
+                            Button {
+                                gameCenter.showAchievements()
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "trophy.fill")
+                                        .font(.title3)
+                                        .foregroundStyle(.yellow)
+                                        .frame(width: 32)
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("DevWordle & DevLeet")
+                                            .foregroundStyle(.primary)
+                                        Text("\(RestGameAchievement.allCases.count) conquistas disponíveis")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+
+                                    Spacer()
+
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.tertiary)
+                                }
                             }
                         }
                     }
@@ -38,7 +69,7 @@ struct RestGameLeaderboardsSheet: View {
                     }
                 }
             }
-            .navigationTitle("Rankings")
+            .navigationTitle("Game Center")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

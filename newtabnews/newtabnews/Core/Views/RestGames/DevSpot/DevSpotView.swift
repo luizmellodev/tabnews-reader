@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DevSpotView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     @State private var viewModel = DevSpotViewModel()
     @State private var hasStarted = false
     @State private var showOnboarding = !RestGameOnboarding.hasSeen(.devSpot)
@@ -44,7 +45,7 @@ struct DevSpotView: View {
         }
         .task(id: revealTaskID) {
             guard viewModel.phase == .revealing else { return }
-            try? await Task.sleep(for: .milliseconds(1100))
+            try? await Task.sleep(for: .milliseconds(DevSpotEngine.revealDurationMs))
             viewModel.advanceAfterReveal()
         }
     }
@@ -100,6 +101,15 @@ struct DevSpotView: View {
                 )
                 .padding(.horizontal, 20)
                 .id("\(viewModel.currentRound)-\(round.devTerm)-\(round.decoy)")
+
+                if viewModel.phase == .revealing {
+                    DevSpotSearchButton(term: round.devTerm) { term in
+                        guard let url = DevSpotSearch.programmingSearchURL(for: term) else { return }
+                        openURL(url)
+                    }
+                    .padding(.top, 16)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
             }
 
             Spacer(minLength: 16)
@@ -292,6 +302,33 @@ private struct DevSpotWordCard: View {
 
 private enum DevSpotCardVisualState {
     case neutral, selected, correct, wrong, dimmed
+}
+
+private struct DevSpotSearchButton: View {
+    let term: String
+    let onSearch: (String) -> Void
+
+    var body: some View {
+        Button {
+            RestFeedbackManager.shared.tap()
+            onSearch(term)
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                Text("Pesquisar \"\(term)\"")
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.white.opacity(0.85))
+            .padding(.horizontal, 18)
+            .padding(.vertical, 12)
+            .background(.white.opacity(0.10), in: Capsule())
+            .overlay(Capsule().stroke(.white.opacity(0.14), lineWidth: 1))
+        }
+        .buttonStyle(RestGameScaleButtonStyle())
+        .padding(.horizontal, 24)
+    }
 }
 
 private struct DevSpotResultsView: View {

@@ -103,11 +103,21 @@ struct DevSpotDictionary {
 
 enum DevSpotEngine {
     static let totalRounds = 10
+    static let revealDurationMs = 2_500
 
     static func isCorrect(round: DevSpotRound, selectedSide: DevSpotSide) -> Bool {
         switch selectedSide {
         case .left: return round.devOnLeft
         case .right: return !round.devOnLeft
         }
+    }
+}
+
+enum DevSpotSearch {
+    static func programmingSearchURL(for term: String) -> URL? {
+        let query = "O que é \(term) na programação"
+        var components = URLComponents(string: "https://www.google.com/search")
+        components?.queryItems = [URLQueryItem(name: "q", value: query)]
+        return components?.url
     }
 }

@@ -66,7 +66,7 @@ struct RestGamesRankingsBanner: View {
                     Text("Rankings")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.primary)
-                    Text("Game Center · 4 leaderboards")
+                    Text("Game Center · 4 leaderboards · 17 conquistas")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
