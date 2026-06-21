@@ -56,13 +56,12 @@ struct EmptyLikedListView: View {
                         .offset(y: isAnimating ? 0 : 20)
                 }
                 
-                // Botão do jogo com efeito hover
                 NavigationLink {
-                    FlappyBirdGame()
+                    RestGamesHubView()
                 } label: {
                     HStack {
                         Image(systemName: "gamecontroller.fill")
-                        Text("Jogar enquanto isso")
+                        Text("Descanse um pouco")
                     }
                     .font(.headline)
                     .foregroundStyle(.white)

@@ -139,6 +139,15 @@ struct SearchView: View {
                         )
                     }
 
+                    ForEach(PromotedContent.catalog) { card in
+                        PromotedCardLink(
+                            card: card,
+                            isViewInApp: $isViewInApp,
+                            size: .featured
+                        )
+                        .padding(.horizontal)
+                    }
+
                     Text("Busque por @usuário, link do TabNews ou palavra-chave")
                         .font(.caption2)
                         .foregroundStyle(.secondary)

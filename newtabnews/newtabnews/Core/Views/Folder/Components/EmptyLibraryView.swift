@@ -46,7 +46,7 @@ struct EmptyLibraryView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "gamecontroller.fill")
                             .font(.caption)
-                        Text("Jogar enquanto isso")
+                        Text("Descanse um pouco")
                             .font(.caption)
                     }
                     .foregroundColor(.secondary)

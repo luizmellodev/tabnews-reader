@@ -116,7 +116,7 @@ struct FoldersView: View {
                 }
             }
             .fullScreenCover(isPresented: $showingGame) {
-                FlappyBirdGame(showCloseButton: true)
+                RestGamesHubView()
             }
             .overlay(alignment: .bottomTrailing) {
                 if !folders.isEmpty {
@@ -412,7 +412,7 @@ struct FoldersView: View {
                                                 .font(.body)
                                                 .fontWeight(.medium)
                                             
-                                            Text("Você merece uma pausa! 🎮")
+                                            Text("DevWordle · DevSpot · Color · Sound")
                                                 .font(.caption2)
                                                 .foregroundStyle(.secondary)
                                         }

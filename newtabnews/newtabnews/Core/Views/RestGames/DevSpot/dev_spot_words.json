@@ -1,0 +1,977 @@
+{
+  "pairs": [
+    {
+      "dev": "Container",
+      "decoy": "Conductor"
+    },
+    {
+      "dev": "Middleware",
+      "decoy": "Middleweight"
+    },
+    {
+      "dev": "Kubernetes",
+      "decoy": "Cubicle"
+    },
+    {
+      "dev": "Callback",
+      "decoy": "Calligraphy"
+    },
+    {
+      "dev": "Endpoint",
+      "decoy": "Entourage"
+    },
+    {
+      "dev": "Repository",
+      "decoy": "Repertory"
+    },
+    {
+      "dev": "Pipeline",
+      "decoy": "Pinecone"
+    },
+    {
+      "dev": "Framework",
+      "decoy": "Firework"
+    },
+    {
+      "dev": "Debugger",
+      "decoy": "Bandleader"
+    },
+    {
+      "dev": "Compiler",
+      "decoy": "Composer"
+    },
+    {
+      "dev": "Interface",
+      "decoy": "Interference"
+    },
+    {
+      "dev": "Deployment",
+      "decoy": "Department"
+    },
+    {
+      "dev": "Microservice",
+      "decoy": "Microscope"
+    },
+    {
+      "dev": "Serverless",
+      "decoy": "Seamless"
+    },
+    {
+      "dev": "Webhook",
+      "decoy": "Webcast"
+    },
+    {
+      "dev": "Frontend",
+      "decoy": "Frontrunner"
+    },
+    {
+      "dev": "Backend",
+      "decoy": "Backslide"
+    },
+    {
+      "dev": "DevOps",
+      "decoy": "Devout"
+    },
+    {
+      "dev": "Monorepo",
+      "decoy": "Monopoly"
+    },
+    {
+      "dev": "GraphQL",
+      "decoy": "Graphics"
+    },
+    {
+      "dev": "WebSocket",
+      "decoy": "Webseries"
+    },
+    {
+      "dev": "localhost",
+      "decoy": "Localized"
+    },
+    {
+      "dev": "Terraform",
+      "decoy": "Terrarium"
+    },
+    {
+      "dev": "Prometheus",
+      "decoy": "Promethean"
+    },
+    {
+      "dev": "Grafana",
+      "decoy": "Granola"
+    },
+    {
+      "dev": "Firebase",
+      "decoy": "Fireside"
+    },
+    {
+      "dev": "Vercel",
+      "decoy": "Vessel"
+    },
+    {
+      "dev": "Netlify",
+      "decoy": "Net Worth"
+    },
+    {
+      "dev": "Cloudflare",
+      "decoy": "Cloudburst"
+    },
+    {
+      "dev": "Lambda",
+      "decoy": "Laminate"
+    },
+    {
+      "dev": "Singleton",
+      "decoy": "Singular"
+    },
+    {
+      "dev": "Injection",
+      "decoy": "Induction"
+    },
+    {
+      "dev": "Elasticsearch",
+      "decoy": "Electrician"
+    },
+    {
+      "dev": "PostgreSQL",
+      "decoy": "Postgraduate"
+    },
+    {
+      "dev": "MongoDB",
+      "decoy": "Mongrel"
+    },
+    {
+      "dev": "TypeScript",
+      "decoy": "Typeset"
+    },
+    {
+      "dev": "JavaScript",
+      "decoy": "Jackknife"
+    },
+    {
+      "dev": "Bitbucket",
+      "decoy": "Bittersweet"
+    },
+    {
+      "dev": "Jenkins",
+      "decoy": "Jettison"
+    },
+    {
+      "dev": "Ansible",
+      "decoy": "Audible"
+    },
+    {
+      "dev": "Blockchain",
+      "decoy": "Blockade"
+    },
+    {
+      "dev": "Webpack",
+      "decoy": "Webcam"
+    },
+    {
+      "dev": "Bootstrap",
+      "decoy": "Bootcamp"
+    },
+    {
+      "dev": "OAuth",
+      "decoy": "Oath"
+    },
+    {
+      "dev": "Dockerfile",
+      "decoy": "Dockworker"
+    },
+    {
+      "dev": "Hot Reload",
+      "decoy": "Hot Rod"
+    },
+    {
+      "dev": "Event Loop",
+      "decoy": "Event Lounge"
+    },
+    {
+      "dev": "Stack Trace",
+      "decoy": "Stack Trays"
+    },
+    {
+      "dev": "Null Pointer",
+      "decoy": "Null Point"
+    },
+    {
+      "dev": "Sharding",
+      "decoy": "Shadowing"
+    },
+    {
+      "dev": "Replication",
+      "decoy": "Repetition"
+    },
+    {
+      "dev": "RabbitMQ",
+      "decoy": "Rabbit Hole"
+    },
+    {
+      "dev": "Kafka",
+      "decoy": "Cajun"
+    },
+    {
+      "dev": "gRPC",
+      "decoy": "Gyroscope"
+    },
+    {
+      "dev": "Protobuf",
+      "decoy": "Prototype"
+    },
+    {
+      "dev": "Cron Job",
+      "decoy": "Corn Dog"
+    },
+    {
+      "dev": "Shell Script",
+      "decoy": "Shell Shock"
+    },
+    {
+      "dev": "Makefile",
+      "decoy": "Makework"
+    },
+    {
+      "dev": "Prettier",
+      "decoy": "Predator"
+    },
+    {
+      "dev": "ESLint",
+      "decoy": "Enlist"
+    },
+    {
+      "dev": "Ingress",
+      "decoy": "Progress"
+    },
+    {
+      "dev": "Namespace",
+      "decoy": "Nameplate"
+    },
+    {
+      "dev": "Sidecar",
+      "decoy": "Sidekick"
+    },
+    {
+      "dev": "ConfigMap",
+      "decoy": "Conflict"
+    },
+    {
+      "dev": "StatefulSet",
+      "decoy": "State Fair"
+    },
+    {
+      "dev": "DaemonSet",
+      "decoy": "Diamond Set"
+    },
+    {
+      "dev": "Helm Chart",
+      "decoy": "Help Chart"
+    },
+    {
+      "dev": "Load Balancer",
+      "decoy": "Load Bouncer"
+    },
+    {
+      "dev": "Reverse Proxy",
+      "decoy": "Reverse Psychology"
+    },
+    {
+      "dev": "Message Queue",
+      "decoy": "Message Board"
+    },
+    {
+      "dev": "Memory Leak",
+      "decoy": "Memory Lane"
+    },
+    {
+      "dev": "Garbage Collection",
+      "decoy": "Garbage Collector"
+    },
+    {
+      "dev": "Pull Request",
+      "decoy": "Pull Quote"
+    },
+    {
+      "dev": "Merge Conflict",
+      "decoy": "Merge Comfort"
+    },
+    {
+      "dev": "Cherry Pick",
+      "decoy": "Cherry Pie"
+    },
+    {
+      "dev": "Code Review",
+      "decoy": "Code Revue"
+    },
+    {
+      "dev": "Unit Test",
+      "decoy": "Unittesting"
+    },
+    {
+      "dev": "Tree Shaking",
+      "decoy": "Tree Shading"
+    },
+    {
+      "dev": "Pair Programming",
+      "decoy": "Pair Skating"
+    },
+    {
+      "dev": "Rubber Duck",
+      "decoy": "Rubber Band"
+    },
+    {
+      "dev": "Design Pattern",
+      "decoy": "Design Patent"
+    },
+    {
+      "dev": "Factory Pattern",
+      "decoy": "Factory Outlet"
+    },
+    {
+      "dev": "Observer Pattern",
+      "decoy": "Observer Post"
+    },
+    {
+      "dev": "Strategy Pattern",
+      "decoy": "Strategy Game"
+    },
+    {
+      "dev": "Object Oriented",
+      "decoy": "Objection"
+    },
+    {
+      "dev": "Static Typing",
+      "decoy": "Static Timing"
+    },
+    {
+      "dev": "Dynamic Typing",
+      "decoy": "Dynamic Timing"
+    },
+    {
+      "dev": "Type Safety",
+      "decoy": "Typeface"
+    },
+    {
+      "dev": "Hashmap",
+      "decoy": "Hashbrown"
+    },
+    {
+      "dev": "Submodule",
+      "decoy": "Submarine"
+    },
+    {
+      "dev": "Monolith",
+      "decoy": "Monologue"
+    },
+    {
+      "dev": "Turborepo",
+      "decoy": "Turbocharge"
+    },
+    {
+      "dev": "CircleCI",
+      "decoy": "Circle Time"
+    },
+    {
+      "dev": "Travis CI",
+      "decoy": "Travel Size"
+    },
+    {
+      "dev": "GitHub Actions",
+      "decoy": "Gift Shop"
+    },
+    {
+      "dev": "SonarQube",
+      "decoy": "Sonar Scope"
+    },
+    {
+      "dev": "Codecov",
+      "decoy": "Code Cove"
+    },
+    {
+      "dev": "ArgoCD",
+      "decoy": "Argonaut"
+    },
+    {
+      "dev": "Memcached",
+      "decoy": "Member Card"
+    },
+    {
+      "dev": "Homebrew",
+      "decoy": "Homegrown"
+    },
+    {
+      "dev": "semver",
+      "decoy": "Semper Fi"
+    },
+    {
+      "dev": "RuboCop",
+      "decoy": "RoboCop"
+    },
+    {
+      "dev": "Clippy",
+      "decoy": "Clippership"
+    },
+    {
+      "dev": "Linting",
+      "decoy": "Listing"
+    },
+    {
+      "dev": "Refactoring",
+      "decoy": "Refraction"
+    },
+    {
+      "dev": "Serialization",
+      "decoy": "Seriation"
+    },
+    {
+      "dev": "Authentication",
+      "decoy": "Authenticity"
+    },
+    {
+      "dev": "Authorization",
+      "decoy": "Authoritarian"
+    },
+    {
+      "dev": "Cryptography",
+      "decoy": "Cartography"
+    },
+    {
+      "dev": "Encapsulation",
+      "decoy": "Emancipation"
+    },
+    {
+      "dev": "Polymorphism",
+      "decoy": "Polymer"
+    },
+    {
+      "dev": "Abstraction",
+      "decoy": "Abstractionism"
+    },
+    {
+      "dev": "Fullstack",
+      "decoy": "Fullback"
+    },
+    {
+      "dev": "React Native",
+      "decoy": "Reactive"
+    },
+    {
+      "dev": "SwiftUI",
+      "decoy": "Swiftly"
+    },
+    {
+      "dev": "Flutter",
+      "decoy": "Fluster"
+    },
+    {
+      "dev": "Supabase",
+      "decoy": "Superbase"
+    },
+    {
+      "dev": "Datadog",
+      "decoy": "Data Log"
+    },
+    {
+      "dev": "Sentry",
+      "decoy": "Century"
+    },
+    {
+      "dev": "Nginx",
+      "decoy": "Enjoin"
+    },
+    {
+      "dev": "Redis",
+      "decoy": "Radius"
+    },
+    {
+      "dev": "YAML",
+      "decoy": "Yammer"
+    },
+    {
+      "dev": "TOML",
+      "decoy": "Tome"
+    },
+    {
+      "dev": "Markdown",
+      "decoy": "Mark Down"
+    },
+    {
+      "dev": "Regex",
+      "decoy": "Regal"
+    },
+    {
+      "dev": "Bash",
+      "decoy": "Bashful"
+    },
+    {
+      "dev": "Zsh",
+      "decoy": "Zinger"
+    },
+    {
+      "dev": "PowerShell",
+      "decoy": "Power Shift"
+    },
+    {
+      "dev": "npm",
+      "decoy": "Noun"
+    },
+    {
+      "dev": "yarn",
+      "decoy": "Yearn"
+    },
+    {
+      "dev": "pip",
+      "decoy": "Peep"
+    },
+    {
+      "dev": "cargo",
+      "decoy": "Car Go"
+    },
+    {
+      "dev": "GitLab",
+      "decoy": "Giblet"
+    },
+    {
+      "dev": "JWT Token",
+      "decoy": "Jet Token"
+    },
+    {
+      "dev": "REST API",
+      "decoy": "Rest Stop"
+    },
+    {
+      "dev": "CI/CD",
+      "decoy": "Cicada"
+    },
+    {
+      "dev": "SDK",
+      "decoy": "Asked"
+    },
+    {
+      "dev": "CLI",
+      "decoy": "Climb"
+    },
+    {
+      "dev": "IDE",
+      "decoy": "Idle"
+    },
+    {
+      "dev": "ORM",
+      "decoy": "Omen"
+    },
+    {
+      "dev": "VPC",
+      "decoy": "Vac"
+    },
+    {
+      "dev": "CDN",
+      "decoy": "Caden"
+    },
+    {
+      "dev": "DNS Record",
+      "decoy": "Dense Record"
+    },
+    {
+      "dev": "SSL Certificate",
+      "decoy": "Social Certificate"
+    },
+    {
+      "dev": "S3 Bucket",
+      "decoy": "Esoteric Bucket"
+    },
+    {
+      "dev": "EC2 Instance",
+      "decoy": "Easy Instance"
+    },
+    {
+      "dev": "Breakpoint",
+      "decoy": "Break Point"
+    },
+    {
+      "dev": "Functional",
+      "decoy": "Functioning"
+    },
+    {
+      "dev": "Dependency",
+      "decoy": "Dependents"
+    },
+    {
+      "dev": "SOLID",
+      "decoy": "Solidify"
+    },
+    {
+      "dev": "DRY Principle",
+      "decoy": "Dry Principal"
+    },
+    {
+      "dev": "YAGNI",
+      "decoy": "Yawnful"
+    },
+    {
+      "dev": "KISS",
+      "decoy": "Kismet"
+    },
+    {
+      "dev": "Scrum",
+      "decoy": "Scrumptious"
+    },
+    {
+      "dev": "Kanban",
+      "decoy": "Can Ban"
+    },
+    {
+      "dev": "Sprint",
+      "decoy": "Splint"
+    },
+    {
+      "dev": "Backlog",
+      "decoy": "Back Log"
+    },
+    {
+      "dev": "Standup",
+      "decoy": "Stand Up"
+    },
+    {
+      "dev": "Rebase",
+      "decoy": "Rebaseball"
+    },
+    {
+      "dev": "Stash",
+      "decoy": "Stashed"
+    },
+    {
+      "dev": "Indexing",
+      "decoy": "Indicting"
+    },
+    {
+      "dev": "Query Plan",
+      "decoy": "Query Planet"
+    },
+    {
+      "dev": "Migration",
+      "decoy": "Migraine"
+    },
+    {
+      "dev": "Seed Data",
+      "decoy": "Seed Date"
+    },
+    {
+      "dev": "JSON Schema",
+      "decoy": "Jason Scheme"
+    },
+    {
+      "dev": "Liveness Probe",
+      "decoy": "Liveness Prod"
+    },
+    {
+      "dev": "Readiness Probe",
+      "decoy": "Readiness Prod"
+    },
+    {
+      "dev": "Init Container",
+      "decoy": "Innit Container"
+    },
+    {
+      "dev": "ReplicaSet",
+      "decoy": "Replica Set"
+    },
+    {
+      "dev": "Pod",
+      "decoy": "Pond"
+    },
+    {
+      "dev": "Secret",
+      "decoy": "Secrete"
+    },
+    {
+      "dev": "Firewall",
+      "decoy": "Fire Wall"
+    },
+    {
+      "dev": "Integration",
+      "decoy": "Immigration"
+    },
+    {
+      "dev": "Open Source",
+      "decoy": "Open Sauce"
+    },
+    {
+      "dev": "Commit Hash",
+      "decoy": "Commit Hashbrown"
+    },
+    {
+      "dev": "Branch",
+      "decoy": "Brunch"
+    },
+    {
+      "dev": "Terminal",
+      "decoy": "Termite"
+    },
+    {
+      "dev": "Abstract Class",
+      "decoy": "Abstract Glass"
+    },
+    {
+      "dev": "Linked List",
+      "decoy": "Linked Wrist"
+    },
+    {
+      "dev": "Binary Tree",
+      "decoy": "Binary True"
+    },
+    {
+      "dev": "Big O",
+      "decoy": "Big Oh"
+    },
+    {
+      "dev": "Codar",
+      "decoy": "Cozinhar"
+    },
+    {
+      "dev": "Pilha",
+      "decoy": "Praia"
+    },
+    {
+      "dev": "Senha",
+      "decoy": "Serra"
+    },
+    {
+      "dev": "Dados",
+      "decoy": "Datas"
+    },
+    {
+      "dev": "Deploy",
+      "decoy": "Depois"
+    },
+    {
+      "dev": "Commit",
+      "decoy": "Comite"
+    },
+    {
+      "dev": "Merge",
+      "decoy": "Mesa"
+    },
+    {
+      "dev": "Push",
+      "decoy": "Puxar"
+    },
+    {
+      "dev": "Pull",
+      "decoy": "Pular"
+    },
+    {
+      "dev": "Cache",
+      "decoy": "Cacho"
+    },
+    {
+      "dev": "Query",
+      "decoy": "Queijo"
+    },
+    {
+      "dev": "Stack",
+      "decoy": "Estaca"
+    },
+    {
+      "dev": "Fila",
+      "decoy": "Fita"
+    },
+    {
+      "dev": "Ramo",
+      "decoy": "Ramal"
+    },
+    {
+      "dev": "Metodo",
+      "decoy": "Metade"
+    },
+    {
+      "dev": "Classe",
+      "decoy": "Clara"
+    },
+    {
+      "dev": "Heranca",
+      "decoy": "Hera"
+    },
+    {
+      "dev": "Funcao",
+      "decoy": "Fungo"
+    },
+    {
+      "dev": "Variavel",
+      "decoy": "Varal"
+    },
+    {
+      "dev": "Refatorar",
+      "decoy": "Refrigerar"
+    },
+    {
+      "dev": "Pacote",
+      "decoy": "Pagode"
+    },
+    {
+      "dev": "Banco de dados",
+      "decoy": "Banco"
+    },
+    {
+      "dev": "Docker",
+      "decoy": "Doce"
+    },
+    {
+      "dev": "Lint",
+      "decoy": "Lindo"
+    },
+    {
+      "dev": "Bug",
+      "decoy": "Buque"
+    },
+    {
+      "dev": "Null",
+      "decoy": "Numero"
+    },
+    {
+      "dev": "Log",
+      "decoy": "Longe"
+    },
+    {
+      "dev": "API",
+      "decoy": "Apito"
+    }
+  ],
+  "decoys": [
+    "Synergy",
+    "Paradigm",
+    "Deliverable",
+    "Stakeholder",
+    "Touchpoint",
+    "Leverage",
+    "Holistic",
+    "Catalyst",
+    "Spectrum",
+    "Proximity",
+    "Heuristic",
+    "Bandwidth",
+    "Conversion",
+    "Retention",
+    "Engagement",
+    "Impression",
+    "Funnel",
+    "Milestone",
+    "Cartography",
+    "Thermodynamics",
+    "Kinematics",
+    "Mitosis",
+    "Chromosome",
+    "Amortization",
+    "Liquidity",
+    "Derivative",
+    "Portfolio",
+    "Dividend",
+    "Equity",
+    "Deposition",
+    "Litigation",
+    "Subpoena",
+    "Affidavit",
+    "Jurisdiction",
+    "Verdict",
+    "Conductor",
+    "Middleweight",
+    "Cubicle",
+    "Calligraphy",
+    "Entourage",
+    "Repertory",
+    "Terrarium",
+    "Granola",
+    "Seamless",
+    "Sidekick",
+    "Interference",
+    "Microscope",
+    "Frontrunner",
+    "Backslide",
+    "Devout",
+    "Monopoly",
+    "Promethean",
+    "Fireside",
+    "Laminate",
+    "Singular",
+    "Induction",
+    "Electrician",
+    "Postgraduate",
+    "Mongrel",
+    "Typeset",
+    "Bittersweet",
+    "Jettison",
+    "Audible",
+    "Blockade",
+    "Bootcamp",
+    "Dockworker",
+    "Shadowing",
+    "Repetition",
+    "Gyroscope",
+    "Makework",
+    "Predator",
+    "Nameplate",
+    "Authenticity",
+    "Refraction",
+    "Emancipation",
+    "Polymer",
+    "Fullback",
+    "Fluster",
+    "Swiftly",
+    "Superbase",
+    "Century",
+    "Enjoin",
+    "Radius",
+    "Regal",
+    "Bashful",
+    "Homegrown",
+    "RoboCop",
+    "Listing",
+    "Seriation",
+    "Authoritarian",
+    "Abstractionism",
+    "Reactive",
+    "Turbocharge",
+    "Argonaut",
+    "Member Card",
+    "Corn Dog",
+    "Shell Shock",
+    "Reverse Psychology",
+    "Memory Lane",
+    "Cherry Pie",
+    "Code Revue",
+    "Tree Shading",
+    "Pair Skating",
+    "Rubber Band",
+    "Design Patent",
+    "Factory Outlet",
+    "Observer Post",
+    "Strategy Game",
+    "Objection",
+    "Static Timing",
+    "Dynamic Timing",
+    "Typeface",
+    "Hashbrown",
+    "Submarine",
+    "Monologue",
+    "Circle Time",
+    "Travel Size",
+    "Gift Shop",
+    "Sonar Scope",
+    "Code Cove",
+    "Help Chart",
+    "State Fair",
+    "Diamond Set",
+    "Load Bouncer",
+    "Message Board",
+    "Garbage Collector",
+    "Pull Quote",
+    "Merge Comfort",
+    "Open Sauce",
+    "Brunch",
+    "Termite",
+    "Immigration",
+    "Dependents",
+    "Solidify",
+    "Dry Principal"
+  ]
+}
