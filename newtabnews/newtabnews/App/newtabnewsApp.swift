@@ -96,7 +96,7 @@ struct newtabnewsApp: App {
     
     init() {
         NotificationManager.shared.requestPermission()
-        AppUsageTracker.shared.startTracking()
+        GameCenterManager.shared.authenticate()
         _ = WatchSyncManager.shared
         _ = BetaTesterService.shared
     }

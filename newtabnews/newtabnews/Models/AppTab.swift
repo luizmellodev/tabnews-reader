@@ -19,7 +19,7 @@ enum AppTab: Int, CaseIterable, Hashable {
         case .home: return "Início"
         case .library: return "Biblioteca"
         case .newsletter: return "Newsletter"
-        case .settings: return "Ajustes"
+        case .settings: return "Perfil"
         case .search: return "Buscar"
         }
     }
@@ -29,7 +29,7 @@ enum AppTab: Int, CaseIterable, Hashable {
         case .home: return "house.fill"
         case .library: return "book.pages"
         case .newsletter: return "newspaper.fill"
-        case .settings: return "gearshape.fill"
+        case .settings: return "person.crop.circle.fill"
         case .search: return "magnifyingglass"
         }
     }

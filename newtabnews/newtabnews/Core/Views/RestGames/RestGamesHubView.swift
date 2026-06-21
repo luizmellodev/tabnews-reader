@@ -11,6 +11,7 @@ struct RestGamesHubView: View {
     var onClose: (() -> Void)? = nil
     @State private var destination: HubDestination?
     @State private var dailySummary = DevWordleViewModel.todaySummary()
+    @State private var showLeaderboards = false
 
     var body: some View {
         NavigationStack {
@@ -20,9 +21,9 @@ struct RestGamesHubView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 28) {
                         VStack(spacing: 10) {
-                            RestGamePhaseLabel(text: "Descanse")
+                            RestGamePhaseLabel(text: "TabNews")
 
-                            Text("Jogos dev")
+                            Text("Jogos Dev")
                                 .font(.system(size: 34, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
                         }
@@ -81,6 +82,7 @@ struct RestGamesHubView: View {
             .safeAreaInset(edge: .top, spacing: 0) {
                 if destination == nil {
                     HStack {
+                        rankingsButton
                         Spacer()
                         closeButton
                     }
@@ -108,6 +110,31 @@ struct RestGamesHubView: View {
             RestFeedbackManager.shared.prepare()
             dailySummary = DevWordleViewModel.todaySummary()
         }
+        .sheet(isPresented: $showLeaderboards) {
+            RestGameLeaderboardsSheet()
+        }
+    }
+
+    private var rankingsButton: some View {
+        Button {
+            RestFeedbackManager.shared.tap()
+            showLeaderboards = true
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "trophy.fill")
+                Text("Rankings")
+            }
+            .font(.caption.weight(.bold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(.ultraThinMaterial, in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(.white.opacity(0.22), lineWidth: 1)
+            }
+        }
+        .accessibilityLabel("Ver rankings")
     }
 
     private var closeButton: some View {

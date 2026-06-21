@@ -23,8 +23,9 @@ struct SettingsView: View {
     @State private var showingClearLibrary = false
     @State private var showLoginSheet = false
     @State private var showLogoutAlert = false
+    @State private var showingGames = false
+    @State private var showingRankings = false
     @StateObject private var authService = AuthService.shared
-    @StateObject private var appUsageTracker = AppUsageTracker.shared
     @AppStorage("debugShowDigestBanner") private var debugShowDigestBanner = false
     @AppStorage("debugShowDailyDigestBanner") private var appStorage_debugShowDailyDigestBanner = false
     @AppStorage("showReadOnTabNewsButton") private var showReadOnTabNewsButton = false
@@ -36,46 +37,16 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 Section {
-                    profileSection
+                    VStack(spacing: 12) {
+                        profileSection
+
+                        RestGamesHubBanner(onTap: { showingGames = true })
+                        RestGamesRankingsBanner(onTap: { showingRankings = true })
+                    }
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 16, trailing: 0))
                 .listRowSeparator(.hidden)
-                
-                Section {
-                        Picker("Tema", selection: $currentTheme) {
-                            Label("Sistema", systemImage: "iphone").tag(Theme.system)
-                            Label("Claro", systemImage: "sun.max").tag(Theme.light)
-                            Label("Escuro", systemImage: "moon").tag(Theme.dark)
-                        }
-                        .pickerStyle(.menu)
-                    } header: {
-                        Label("Aparência", systemImage: "paintbrush")
-                    }
-                    
-                Section {
-                        Toggle(isOn: $isViewInApp) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Visualizar no App")
-                                Text("Abrir posts dentro do aplicativo")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        
-                        Toggle(isOn: $showReadOnTabNewsButton) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Botão 'Ler no TabNews'")
-                                Text("Mostra botão flutuante para abrir no Safari")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    } header: {
-                        Label("Leitura", systemImage: "book")
-                    } footer: {
-                        Text("O botão flutuante permite abrir o post no navegador. Desativado por padrão para melhor experiência nativa.")
-                    }
                 
                 Section {
                     NavigationLink {
@@ -114,35 +85,6 @@ struct SettingsView: View {
                 }
                 
                 Section {
-                    Button {
-                        AppReviewManager.shared.openAppStoreReviewPage()
-                    } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: "star.bubble.fill")
-                                .font(.title3)
-                                .foregroundStyle(.yellow)
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Avaliar o App")
-                                    .font(.body)
-                                    .foregroundStyle(.primary)
-                                Text("Abre a App Store para você deixar sua avaliação")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            
-                            Spacer()
-                            
-                            Image(systemName: "arrow.up.right")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                } header: {
-                    Label("Apoie o App", systemImage: "hand.thumbsup.fill")
-                }
-                
-                Section {
                     HStack {
                         Label("Posts Curtidos", systemImage: "heart")
                         Spacer()
@@ -173,54 +115,67 @@ struct SettingsView: View {
                 } header: {
                     Label("Sua Biblioteca", systemImage: "chart.bar")
                 }
-                
+
                 Section {
+                    Picker("Tema", selection: $currentTheme) {
+                        Label("Sistema", systemImage: "iphone").tag(Theme.system)
+                        Label("Claro", systemImage: "sun.max").tag(Theme.light)
+                        Label("Escuro", systemImage: "moon").tag(Theme.dark)
+                    }
+                    .pickerStyle(.menu)
+
+                    Toggle("Visualizar no App", isOn: $isViewInApp)
+
+                    Toggle("Botão 'Ler no TabNews'", isOn: $showReadOnTabNewsButton)
+
+                    HStack {
+                        Label("Notificações", systemImage: "bell.badge")
+                        Spacer()
+                        Text(NotificationManager.shared.isPermissionGranted ? "Ativadas" : "Desativadas")
+                            .foregroundStyle(NotificationManager.shared.isPermissionGranted ? .green : .secondary)
+                    }
+
+                    if !NotificationManager.shared.isPermissionGranted {
+                        Button {
+                            if let url = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(url)
+                            }
+                        } label: {
+                            Label("Abrir Ajustes do Sistema", systemImage: "gear")
+                        }
+                    }
+                } header: {
+                    Label("Preferências", systemImage: "slider.horizontal.3")
+                } footer: {
+                    Text("Leitura no app, botão Safari nos posts e alertas de newsletter e resumo semanal.")
+                }
+
+                Section {
+                    Button {
+                        AppReviewManager.shared.openAppStoreReviewPage()
+                    } label: {
+                        HStack(spacing: 12) {
+                            Label("Avaliar o App", systemImage: "star.bubble.fill")
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    NavigationLink {
+                        aboutAppView
+                    } label: {
+                        Label("Sobre o TabNews Reader", systemImage: "info.circle")
+                    }
+
                     Button {
                         UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
                         NotificationCenter.default.post(name: .showTipsOnboarding, object: nil)
                     } label: {
                         Label("Ver Dicas Novamente", systemImage: "lightbulb.fill")
                     }
-                    
-                    Button {
-                        UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
-                        UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
-                        // Reiniciar o app para mostrar o onboarding completo
-                        exit(0)
-                    } label: {
-                        Label("Resetar Onboarding Completo", systemImage: "arrow.counterclockwise.circle")
-                    }
-                } header: {
-                    Label("Ajuda", systemImage: "questionmark.circle")
-                } footer: {
-                    Text("Ver dicas: mostra apenas as dicas contextuais. Resetar completo: reinicia o app e mostra todo o onboarding inicial + dicas.")
-                }
-                
-                Section {
-                    HStack {
-                        Label("Status das Notificações", systemImage: "bell.badge")
-                        Spacer()
-                        Text(NotificationManager.shared.isPermissionGranted ? "Ativadas" : "Desativadas")
-                            .foregroundStyle(NotificationManager.shared.isPermissionGranted ? .green : .secondary)
-                    }
-                    
-                    if !NotificationManager.shared.isPermissionGranted {
-                        Button {
-                            // Abrir configurações do app
-                            if let url = URL(string: UIApplication.openSettingsURLString) {
-                                UIApplication.shared.open(url)
-                            }
-                        } label: {
-                            Label("Abrir Configurações do App", systemImage: "gear")
-                        }
-                    }
-                } header: {
-                    Label("Notificações", systemImage: "bell")
-                } footer: {
-                    Text("Receba notificações de novas newsletters e resumos semanais do TabNews")
-                }
-                
-                Section {
+
                     Button(role: .destructive) {
                         showingClearCache = true
                     } label: {
@@ -232,106 +187,36 @@ struct SettingsView: View {
                     } label: {
                         Label("Limpar Biblioteca Completa", systemImage: "trash.fill")
                     }
-                } header: {
-                    Label("Dados", systemImage: "internaldrive")
-                } footer: {
-                    Text("O cache força atualização dos posts. Limpar a biblioteca remove TUDO (curtidas, destaques, anotações e pastas)")
-                }
-                
-                Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Sobre o App")
-                            .font(.headline)
-                        
-                        Text("Este é um aplicativo não-oficial do TabNews, criado por um entusiasta da comunidade. O objetivo é facilitar o acesso ao conteúdo e permitir organização pessoal através de destaques e anotações.")
-                            .font(.subheadline)
+
+                    HStack {
+                        Text("Versão")
+                        Spacer()
+                        Text("2.0")
                             .foregroundStyle(.secondary)
                     }
-                    .padding(.vertical, 4)
-                }
-                
-                Section {
-                    NavigationLink {
-                        SocialView(
-                            github: "filipedeschamps",
-                            linkedin: "filipedeschamps",
-                            youtube: "FilipeDeschamps",
-                            instagram: "filipedeschamps"
-                        )
-                    } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: "person.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.blue)
-                            
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Filipe Deschamps")
-                                    .font(.headline)
-                                Text("Criador do TabNews")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                    
-                    NavigationLink {
-                        SocialView(
-                            github: "luizmellodev",
-                            linkedin: "luizmellodev",
-                            youtube: "euluizmello",
-                            instagram: "luizmello.dev",
-                            website: "https://luizmello.dev"
-                        )
-                    } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: "person.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.green)
-                            
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Luiz Mello")
-                                    .font(.headline)
-                                Text("Desenvolvedor deste app")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
                 } header: {
-                    Label("Criadores", systemImage: "person.2")
+                    Label("Mais", systemImage: "ellipsis.circle")
+                } footer: {
+                    Text("Limpar cache força posts atualizados. Limpar biblioteca remove curtidas, destaques, anotações e pastas.")
                 }
                 
                 #if DEBUG
                 Section {
-                    HStack {
-                        Text("Tempo no app")
-                            .font(.caption)
-                        Spacer()
-                        Text(appUsageTracker.formattedTime)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    
                     Button {
-                        appUsageTracker.shouldShowGameButton = true
-                        UserDefaults.standard.set(true, forKey: "hasShownGameButton")
+                        RestGamesAnnouncement.resetForTesting()
+                        NotificationCenter.default.post(name: .showRestGamesAnnouncement, object: nil)
                     } label: {
-                        Label("🕹️ Forçar Botão de Jogo", systemImage: "gamecontroller")
+                        Label("Mostrar Novidade dos Jogos", systemImage: "gamecontroller.fill")
                     }
-                    
+
                     Button {
-                        appUsageTracker.shouldShowRestFolder = true
-                        UserDefaults.standard.set(true, forKey: "hasShownRestFolder")
+                        UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
+                        UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
+                        exit(0)
                     } label: {
-                        Label("🎮 Forçar Pasta 'Descanse'", systemImage: "bed.double")
+                        Label("Resetar Onboarding Completo", systemImage: "arrow.counterclockwise.circle")
                     }
-                    
-                    Button(role: .destructive) {
-                        appUsageTracker.resetUsageForTesting()
-                    } label: {
-                        Label("Resetar Tempo", systemImage: "arrow.counterclockwise")
-                    }
-                    
+
                     Button {
                         syncWithWatchManually()
                     } label: {
@@ -448,19 +333,10 @@ struct SettingsView: View {
                     Text("Ferramentas de desenvolvimento para testes. O banner de Digest normalmente só aparece nos fins de semana (sábado e domingo).")
                 }
                 #endif
-                
-                Section {
-                    HStack {
-                        Text("Versão")
-                        Spacer()
-                        Text("2.0")
-                            .foregroundStyle(.secondary)
-                    }
-                }
             }
-            .padding(.top, 50)
             .scrollContentBackground(.hidden)
-            .navigationTitle("Ajustes")
+            .navigationTitle("Perfil")
+            .navigationBarTitleDisplayMode(.large)
             .refreshable {
                 await refreshUserData()
             }
@@ -496,6 +372,12 @@ struct SettingsView: View {
             .sheet(isPresented: $showLoginSheet) {
                 NativeLoginView()
             }
+            .fullScreenCover(isPresented: $showingGames) {
+                RestGamesHubView(onClose: { showingGames = false })
+            }
+            .sheet(isPresented: $showingRankings) {
+                RestGameLeaderboardsSheet()
+            }
             .alert("Limpar Cache da API", isPresented: $showingClearCache) {
                 Button("Cancelar", role: .cancel) { }
                 Button("Limpar", role: .destructive) {
@@ -524,6 +406,86 @@ struct SettingsView: View {
                 if authService.isAuthenticated, let username = authService.currentUser?.username {
                     await loadPublicationsCount(username: username)
                 }
+            }
+        }
+    }
+    
+    // MARK: - About
+    
+    private var aboutAppView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                Text("O TabNews Reader é um aplicativo não-oficial do TabNews, criado por um entusiasta da comunidade. O objetivo é facilitar o acesso ao conteúdo e permitir organização pessoal através de destaques e anotações.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Criadores")
+                        .font(.headline)
+
+                    NavigationLink {
+                        SocialView(
+                            github: "filipedeschamps",
+                            linkedin: "filipedeschamps",
+                            youtube: "FilipeDeschamps",
+                            instagram: "filipedeschamps"
+                        )
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "person.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.blue)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Filipe Deschamps")
+                                    .font(.headline)
+                                Text("Criador do TabNews")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+
+                    NavigationLink {
+                        SocialView(
+                            github: "luizmellodev",
+                            linkedin: "luizmellodev",
+                            youtube: "euluizmello",
+                            instagram: "luizmello.dev",
+                            website: "https://luizmello.dev"
+                        )
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "person.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.green)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Luiz Mello")
+                                    .font(.headline)
+                                Text("Desenvolvedor deste app")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding()
+        }
+        .navigationTitle("Sobre o TabNews Reader")
+        .navigationBarTitleDisplayMode(.inline)
+        .background {
+            ZStack {
+                Color("Background")
+                    .ignoresSafeArea()
+                Image("ruido")
+                    .resizable()
+                    .scaledToFill()
+                    .blendMode(.overlay)
+                    .ignoresSafeArea()
             }
         }
     }

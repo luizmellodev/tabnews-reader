@@ -109,6 +109,9 @@ final class DevWordleViewModel {
         if guess == targetWord {
             gameStatus = .won
             storage.recordWin(on: dateKey)
+            if let attempt = winningAttemptNumber {
+                GameCenterManager.shared.submitDevWordleScore(attempts: attempt)
+            }
         } else if currentRowIndex >= DevWordleEngine.maxAttempts - 1 {
             gameStatus = .lost
             storage.recordLoss(on: dateKey)

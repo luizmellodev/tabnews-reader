@@ -121,8 +121,11 @@ struct ScoreRevealView: View {
 
 struct FinalResultsView: View {
     let scores: [Double]
+    let leaderboard: RestGameLeaderboard
     let onPlayAgain: () -> Void
     let onClose: () -> Void
+
+    @StateObject private var gameCenter = GameCenterManager.shared
 
     private var total: Double {
         scores.reduce(0, +)
@@ -173,6 +176,11 @@ struct FinalResultsView: View {
 
                 VStack(spacing: 12) {
                     RestGamePrimaryButton(title: "Jogar de novo", action: onPlayAgain)
+                    if gameCenter.isAuthenticated {
+                        RestGameSecondaryButton(title: "Ver ranking") {
+                            gameCenter.showLeaderboard(leaderboard)
+                        }
+                    }
                     RestGameSecondaryButton(title: "Voltar", action: onClose)
                 }
                 .padding(.horizontal, 24)

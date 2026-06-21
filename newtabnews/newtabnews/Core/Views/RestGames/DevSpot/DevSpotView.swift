@@ -302,6 +302,7 @@ private struct DevSpotResultsView: View {
     let onPlayAgain: () -> Void
     let onClose: () -> Void
 
+    @StateObject private var gameCenter = GameCenterManager.shared
     @State private var ringScale: CGFloat = 0.6
     @State private var showContent = false
 
@@ -359,6 +360,11 @@ private struct DevSpotResultsView: View {
                 if showContent {
                     VStack(spacing: 12) {
                         RestGamePrimaryButton(title: "Jogar de novo", action: onPlayAgain)
+                        if gameCenter.isAuthenticated {
+                            RestGameSecondaryButton(title: "Ver ranking") {
+                                gameCenter.showLeaderboard(.devSpot)
+                            }
+                        }
                         RestGameSecondaryButton(title: "Voltar", action: onClose)
                     }
                     .padding(.horizontal, 24)

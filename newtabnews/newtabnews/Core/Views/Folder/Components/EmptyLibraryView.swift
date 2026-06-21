@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct EmptyLibraryView: View {
-    let showGameButton: Bool
     let onCreateFolder: () -> Void
-    let onPlayGame: () -> Void
     
     var body: some View {
         VStack(spacing: 20) {
@@ -40,21 +38,7 @@ struct EmptyLibraryView: View {
                     .cornerRadius(12)
             }
             .padding(.top, 8)
-            
-            if showGameButton {
-                Button(action: onPlayGame) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "gamecontroller.fill")
-                            .font(.caption)
-                        Text("Descanse um pouco")
-                            .font(.caption)
-                    }
-                    .foregroundColor(.secondary)
-                    .padding(.top, 20)
-                }
-            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
-

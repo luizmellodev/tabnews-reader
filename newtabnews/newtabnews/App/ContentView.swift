@@ -16,6 +16,7 @@ struct ContentView: View {
     @AppStorage("current_theme") var currentTheme: Theme = .system
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     @AppStorage("hasSeenTipsOnboarding") var hasSeenTipsOnboarding: Bool = false
+    @AppStorage(RestGamesAnnouncement.storageKey) var hasSeenRestGamesAnnouncement: Bool = false
     
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.modelContext) private var modelContext
@@ -33,6 +34,8 @@ struct ContentView: View {
     @State var isLoadingPost: Bool = false
     @State var showTipsOnboarding: Bool = false
 	@State var showDigestSheet: Bool = false
+    @State private var showRestGamesAnnouncement = false
+    @State private var showRestGamesHub = false
     @State private var showSplash = true
     @StateObject private var gamificationManager = GamificationManager.shared
     @StateObject private var toastManager = ToastManager.shared
@@ -111,6 +114,36 @@ struct ContentView: View {
             .presentationDetents([.large])
             .interactiveDismissDisabled(false)
         }
+        .sheet(isPresented: $showRestGamesAnnouncement, onDismiss: {
+            if !hasSeenRestGamesAnnouncement {
+                RestGamesAnnouncement.markSeen()
+                hasSeenRestGamesAnnouncement = true
+            }
+        }) {
+            RestGamesAnnouncementSheet(
+                onPlay: {
+                    RestGamesAnnouncement.markSeen()
+                    hasSeenRestGamesAnnouncement = true
+                    showRestGamesAnnouncement = false
+                    selectedTab = .settings
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        showRestGamesHub = true
+                    }
+                },
+                onLater: {
+                    RestGamesAnnouncement.markSeen()
+                    hasSeenRestGamesAnnouncement = true
+                    showRestGamesAnnouncement = false
+                }
+            )
+            .presentationDetents([.height(288)])
+            .presentationDragIndicator(.visible)
+            .presentationCornerRadius(24)
+            .interactiveDismissDisabled(false)
+        }
+        .fullScreenCover(isPresented: $showRestGamesHub) {
+            RestGamesHubView(onClose: { showRestGamesHub = false })
+        }
         .onAppear {
             setupObservers()
             
@@ -120,6 +153,8 @@ struct ContentView: View {
                         showTipsOnboarding = true
                     }
                 }
+            } else {
+                evaluateRestGamesAnnouncement()
             }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
@@ -134,6 +169,12 @@ struct ContentView: View {
         .onChange(of: showTipsOnboarding) { _, newValue in
             if !newValue {
                 hasSeenTipsOnboarding = true
+                evaluateRestGamesAnnouncement()
+            }
+        }
+        .onChange(of: showSplash) { _, isShowing in
+            if !isShowing {
+                evaluateRestGamesAnnouncement()
             }
         }
         .onChange(of: hasSeenOnboarding) { _, newValue in
@@ -170,7 +211,21 @@ struct ContentView: View {
     }
     
     // MARK: - Lifecycle
-    
+
+    private func evaluateRestGamesAnnouncement() {
+        guard hasSeenOnboarding,
+              hasSeenTipsOnboarding,
+              !hasSeenRestGamesAnnouncement,
+              !showSplash,
+              !showTipsOnboarding,
+              !showRestGamesAnnouncement else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+            guard !hasSeenRestGamesAnnouncement, !showTipsOnboarding, !showSplash else { return }
+            showRestGamesAnnouncement = true
+        }
+    }
+
     private func loadInitialContent() {
         viewModel.getLikedContent()
         
@@ -268,6 +323,15 @@ struct ContentView: View {
                     showTipsOnboarding = true
                 }
             }
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: .showRestGamesAnnouncement,
+            object: nil,
+            queue: .main
+        ) { [self] _ in
+            hasSeenRestGamesAnnouncement = false
+            showRestGamesAnnouncement = true
         }
         
         NotificationCenter.default.addObserver(

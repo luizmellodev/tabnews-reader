@@ -62,6 +62,7 @@ final class DevSpotViewModel {
 
         if currentRound >= totalRounds {
             phase = .finished
+            GameCenterManager.shared.submitDevSpotScore(correctCount: correctCount)
             RestFeedbackManager.shared.phaseTransition()
         } else {
             currentRound += 1

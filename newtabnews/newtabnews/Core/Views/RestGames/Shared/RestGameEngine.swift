@@ -86,6 +86,7 @@ final class RestGameSession {
 
     func advanceAfterScoreReveal() {
         if currentRound >= totalRounds {
+            GameCenterManager.shared.submitArcadeScore(totalScore: totalScore, gameType: gameType)
             withPhaseTransition(to: .finalResults)
         } else {
             currentRound += 1

@@ -126,6 +126,7 @@ struct RestGamePlayView: View {
         case .finalResults:
             FinalResultsView(
                 scores: session.roundScores,
+                leaderboard: session.gameType == .color ? .colorMatch : .soundMatch,
                 onPlayAgain: {
                     hasStarted = false
                     showOnboarding = false

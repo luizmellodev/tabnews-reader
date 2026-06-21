@@ -18,6 +18,9 @@
 		449AA869DB8647A7AA74E861 /* dev_spot_words.json in Resources */ = {isa = PBXBuildFile; fileRef = 6FA87B49DE4E4C3D8D1D30FC /* dev_spot_words.json */; };
 		ED505630C6584CBEA4276195 /* dev_words.json in Resources */ = {isa = PBXBuildFile; fileRef = 56398CBA6EC948BF8027A624 /* dev_words.json */; };
 		EF99794497654680863D2FBD /* RestGameTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAB388B57CD4A79AA767CB7 /* RestGameTheme.swift */; };
+		A1B2C0022F7000010068804C /* GameCenterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C0012F7000010068804C /* GameCenterManager.swift */; };
+		A1B2C0042F7000010068804C /* GameCenterLeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C0032F7000010068804C /* GameCenterLeaderboardView.swift */; };
+		A1B2C0062F7000010068804C /* RestGamesBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C0052F7000010068804C /* RestGamesBanner.swift */; };
 		C6EF614F898847D08AB8DB86 /* RestGamesHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA69EED4C427447E9102CB8B /* RestGamesHubView.swift */; };
 		B2D9826FE8EB4E6AB635C19F /* RestGamePlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB20E6443F44E1AA0A1BE4 /* RestGamePlayView.swift */; };
 		985849525534425EACEA4E07 /* ToneGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87F7915FE654FB8BE6560FB /* ToneGenerator.swift */; };
@@ -169,6 +172,7 @@
 		79C706462D9AE157005C26A7 /* NewsletterCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C706452D9AE157005C26A7 /* NewsletterCard.swift */; };
 		79C706482D9AE477005C26A7 /* SocialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C706472D9AE477005C26A7 /* SocialView.swift */; };
 		79C7064B2D9AFCE5005C26A7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C7064A2D9AFCE5005C26A7 /* OnboardingView.swift */; };
+		A1B2C0082F7000010068804C /* RestGamesAnnouncementSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C0072F7000010068804C /* RestGamesAnnouncementSheet.swift */; };
 		79A1B0022F7000010068804C /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A1B0012F7000010068804C /* SplashView.swift */; };
 		79C706552D9ADBFB005C26A7 /* PostZoomTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C706542D9ADBFB005C26A7 /* PostZoomTransition.swift */; };
 		79D7E37A2D81266A00391C82 /* NewsletterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D7E3792D81266A00391C82 /* NewsletterViewModel.swift */; };
@@ -249,6 +253,9 @@
 		6FA87B49DE4E4C3D8D1D30FC /* dev_spot_words.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dev_spot_words.json; sourceTree = "<group>"; };
 		56398CBA6EC948BF8027A624 /* dev_words.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dev_words.json; sourceTree = "<group>"; };
 		CEAB388B57CD4A79AA767CB7 /* RestGameTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameTheme.swift; sourceTree = "<group>"; };
+		A1B2C0012F7000010068804C /* GameCenterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterManager.swift; sourceTree = "<group>"; };
+		A1B2C0032F7000010068804C /* GameCenterLeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterLeaderboardView.swift; sourceTree = "<group>"; };
+		A1B2C0052F7000010068804C /* RestGamesBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGamesBanner.swift; sourceTree = "<group>"; };
 		D87F7915FE654FB8BE6560FB /* ToneGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToneGenerator.swift; sourceTree = "<group>"; };
 		3577F4A1EE7F48E5AC0735F4 /* RestFeedbackManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestFeedbackManager.swift; sourceTree = "<group>"; };
 		FBB2CD64BBD04D07906D36E4 /* RestGameScoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameScoring.swift; sourceTree = "<group>"; };
@@ -365,6 +372,7 @@
 		79C706452D9AE157005C26A7 /* NewsletterCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsletterCard.swift; sourceTree = "<group>"; };
 		79C706472D9AE477005C26A7 /* SocialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialView.swift; sourceTree = "<group>"; };
 		79C7064A2D9AFCE5005C26A7 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		A1B2C0072F7000010068804C /* RestGamesAnnouncementSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGamesAnnouncementSheet.swift; sourceTree = "<group>"; };
 		79A1B0012F7000010068804C /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		79C706542D9ADBFB005C26A7 /* PostZoomTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostZoomTransition.swift; sourceTree = "<group>"; };
 		79D7E3792D81266A00391C82 /* NewsletterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsletterViewModel.swift; sourceTree = "<group>"; };
@@ -614,6 +622,7 @@
 				835881F7443246A385749456 /* RestGameSharedViews.swift */,
 				1576AB50B8D5426AB20781DC /* RestGamePickers.swift */,
 				CEAB388B57CD4A79AA767CB7 /* RestGameTheme.swift */,
+				A1B2C0032F7000010068804C /* GameCenterLeaderboardView.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -798,6 +807,7 @@
 				79C706472D9AE477005C26A7 /* SocialView.swift */,
 				79BB0EE12F23E83B005D981E /* DeleteAccountContactView.swift */,
 				79904A0D2A732FC90050240C /* SettingsView.swift */,
+				A1B2C0052F7000010068804C /* RestGamesBanner.swift */,
 				790887272F0F16AD0068804C /* UserPublicationsView.swift */,
 			);
 			path = SettingsView;
@@ -834,6 +844,7 @@
 				796D05D82F0AC5610064A2BC /* WidgetSyncManager.swift */,
 				790AB11B2ECF811F00E443E6 /* WatchSyncManager.swift */,
 				790AB0D42ECEBE3A00E443E6 /* AppUsageTracker.swift */,
+				A1B2C0012F7000010068804C /* GameCenterManager.swift */,
 				790AB0C02ECEAE9500E443E6 /* TextToSpeechManager.swift */,
 				79C7062E2D95E5E6005C26A7 /* ContentService.swift */,
 				79C7062C2D95E5E2005C26A7 /* ContentServiceProtocol.swift */,
@@ -868,6 +879,7 @@
 			isa = PBXGroup;
 			children = (
 				79C7064A2D9AFCE5005C26A7 /* OnboardingView.swift */,
+				A1B2C0072F7000010068804C /* RestGamesAnnouncementSheet.swift */,
 				791584972EFC97F900C69745 /* OnboardingTipsView.swift */,
 			);
 			path = Onboarding;
@@ -985,6 +997,11 @@
 					};
 					791E87D32A4FD99B00C2F0B4 = {
 						CreatedOnToolsVersion = 14.3.1;
+						SystemCapabilities = {
+							com.apple.GameCenter = {
+								enabled = 1;
+							};
+						};
 					};
 					796D05AE2F0AC28C0064A2BC = {
 						CreatedOnToolsVersion = 26.2;
@@ -1140,6 +1157,7 @@
 				79E727F72EFB9DA2007BF27A /* MainTabView.swift in Sources */,
 				790AB0C82ECEAED600E443E6 /* FoldersView.swift in Sources */,
 				79C7064B2D9AFCE5005C26A7 /* OnboardingView.swift in Sources */,
+				A1B2C0082F7000010068804C /* RestGamesAnnouncementSheet.swift in Sources */,
 				79A1B0022F7000010068804C /* SplashView.swift in Sources */,
 				791584752EFC86B600C69745 /* PostHeaderView.swift in Sources */,
 				799049F82A72F4BC0050240C /* Extensions.swift in Sources */,
@@ -1222,6 +1240,9 @@
 			C75A5F815869469288FE91B7 /* DevSpotEngine.swift in Sources */,
 
 				EF99794497654680863D2FBD /* RestGameTheme.swift in Sources */,
+				A1B2C0022F7000010068804C /* GameCenterManager.swift in Sources */,
+				A1B2C0042F7000010068804C /* GameCenterLeaderboardView.swift in Sources */,
+				A1B2C0062F7000010068804C /* RestGamesBanner.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

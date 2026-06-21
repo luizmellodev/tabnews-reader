@@ -82,6 +82,7 @@ struct DevWordleView: View {
 private struct DevWordleResultSheet: View {
     let viewModel: DevWordleViewModel
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var gameCenter = GameCenterManager.shared
 
     var body: some View {
         VStack(spacing: 20) {
@@ -101,10 +102,17 @@ private struct DevWordleResultSheet: View {
             ShareLink(item: viewModel.shareText) {
                 Text("Compartilhar resultado")
                     .font(.headline)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.primary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(.primary.opacity(0.08), in: Capsule())
+            }
+
+            if viewModel.gameStatus == .won, gameCenter.isAuthenticated {
+                Button("Ver ranking") {
+                    gameCenter.showLeaderboard(.devWordle)
+                }
+                .font(.headline)
             }
 
             Button("Fechar") { dismiss() }

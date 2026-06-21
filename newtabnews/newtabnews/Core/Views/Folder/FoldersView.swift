@@ -30,8 +30,6 @@ struct FoldersView: View {
     @State private var selectedHighlights: [Highlight] = []
     @State private var isEditMode = false
     @State private var selectedFolderIds: Set<UUID> = []
-    @StateObject private var usageTracker = AppUsageTracker.shared
-    @State private var showingGame = false
     @AppStorage("debugShowDigestBanner") private var debugShowDigestBanner = false
     
     // Verifica se é fim de semana - sábado ou domingo (ou modo debug ativado)
@@ -61,7 +59,6 @@ struct FoldersView: View {
                         likedPostsSection
                         highlightsSection
                         notesSection
-                        restFolderSection
                         userFoldersSection
                     }
                     .listStyle(.insetGrouped)
@@ -114,9 +111,6 @@ struct FoldersView: View {
                 if count > 0 {
                     expandedFolders.insert(SpecialFolder.readLater.rawValue)
                 }
-            }
-            .fullScreenCover(isPresented: $showingGame) {
-                RestGamesHubView(onClose: { showingGame = false })
             }
             .overlay(alignment: .bottomTrailing) {
                 if !folders.isEmpty {
@@ -390,52 +384,6 @@ struct FoldersView: View {
                         }
                         
     @ViewBuilder
-    private var restFolderSection: some View {
-                        if usageTracker.shouldShowRestFolder {
-                            Section {
-                                Button(action: {
-                                    showingGame = true
-                                }) {
-                                    HStack(spacing: 12) {
-                                        Image(systemName: "chevron.right")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                            .frame(width: 12)
-                                        
-                                        Image(systemName: "moon.stars.fill")
-                                            .foregroundColor(Color(hex: "#9B59B6"))
-                                            .font(.title3)
-                                        
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text("Descanse")
-                                                .foregroundColor(.primary)
-                                                .font(.body)
-                                                .fontWeight(.medium)
-                                            
-                                            Text("DevWordle · DevSpot · Color · Sound")
-                                                .font(.caption2)
-                                                .foregroundStyle(.secondary)
-                                        }
-                                        
-                                        Spacer()
-                                        
-                                        Text("1")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                            .padding(.horizontal, 8)
-                                            .padding(.vertical, 4)
-                                            .background(Color.secondary.opacity(0.1))
-                                            .cornerRadius(8)
-                                    }
-                                    .padding(.vertical, 4)
-                                    .contentShape(Rectangle())
-                                }
-                                .buttonStyle(.plain)
-                            }
-        }
-                        }
-                        
-    @ViewBuilder
     private var userFoldersSection: some View {
         Section {
             if folders.isEmpty {
@@ -552,11 +500,7 @@ struct FoldersView: View {
     }
     
     private var emptyState: some View {
-        EmptyLibraryView(
-            showGameButton: usageTracker.shouldShowGameButton,
-            onCreateFolder: { showingAddFolder = true },
-            onPlayGame: { showingGame = true }
-        )
+        EmptyLibraryView(onCreateFolder: { showingAddFolder = true })
             }
     
     // MARK: - Computed Properties

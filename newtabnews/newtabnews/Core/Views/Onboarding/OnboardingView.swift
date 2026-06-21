@@ -31,6 +31,12 @@ struct OnboardingView: View {
             secondaryImageName: "arrow.up.forward.app"
         ),
         OnboardingPage(
+            title: "Jogos Dev",
+            subtitle: "Descanse entre as leituras com DevWordle, DevSpot, Color Match e Sound Match. Dispute rankings no Game Center!",
+            imageName: "gamecontroller.fill",
+            secondaryImageName: "trophy.fill"
+        ),
+        OnboardingPage(
             title: "Além do App",
             subtitle: "Widgets para tela inicial, Apple Watch e muito mais. Seu TabNews em todos os lugares!",
             imageName: "applewatch",
@@ -59,6 +65,7 @@ struct OnboardingView: View {
                                 withAnimation {
                                     showOnboarding = false
                                     UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+                                    UserDefaults.standard.set(true, forKey: RestGamesAnnouncement.storageKey)
                                     // Garantir que os tips vão aparecer após o onboarding inicial
                                     UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
                                 }

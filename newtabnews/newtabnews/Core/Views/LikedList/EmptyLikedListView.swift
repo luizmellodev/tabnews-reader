@@ -9,11 +9,9 @@ import SwiftUI
 
 struct EmptyLikedListView: View {
     @State private var isAnimating = false
-    @State private var showingRestGames = false
     
     var body: some View {
         ZStack {
-            // Background
             Color("Background")
                 .ignoresSafeArea()
             Image("ruido")
@@ -25,7 +23,6 @@ struct EmptyLikedListView: View {
             VStack(spacing: 24) {
                 Spacer()
                 
-                // Ícone animado
                 Image(systemName: "heart.slash")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -57,29 +54,6 @@ struct EmptyLikedListView: View {
                         .offset(y: isAnimating ? 0 : 20)
                 }
                 
-                Button {
-                    showingRestGames = true
-                } label: {
-                    HStack {
-                        Image(systemName: "gamecontroller.fill")
-                        Text("Descanse um pouco")
-                    }
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.blue)
-                            .shadow(radius: 5)
-                    )
-                    .scaleEffect(isAnimating ? 1.05 : 1)
-                    .animation(
-                        .spring(response: 0.3, dampingFraction: 0.6),
-                        value: isAnimating
-                    )
-                }
-                
                 Spacer()
             }
             .padding()
@@ -88,9 +62,6 @@ struct EmptyLikedListView: View {
             withAnimation {
                 isAnimating = true
             }
-        }
-        .fullScreenCover(isPresented: $showingRestGames) {
-            RestGamesHubView(onClose: { showingRestGames = false })
         }
     }
 }
