@@ -48,8 +48,8 @@ struct DiscoverBentoSectionView: View {
     private var sectionHeader: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.headline)
+                .foregroundStyle(.primary)
 
             if !subtitle.isEmpty {
                 Text(subtitle)

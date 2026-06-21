@@ -86,7 +86,11 @@ struct DiscoverPostMetadata: View {
                 Text(DiscoverDateFormatter.relativeDate(from: post.createdAt))
             }
 
-            Text("\(post.tabcoins ?? 0) tabcoins")
+            HStack(spacing: 3) {
+                Image(systemName: "star.fill")
+                    .font(.system(size: 9))
+                Text("\(post.tabcoins ?? 0)")
+            }
         }
         .font(.caption2)
         .foregroundStyle(.secondary)

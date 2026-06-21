@@ -68,15 +68,7 @@ final class DiscoverService {
             excluding: usedKeys
         )
 
-        // Vale a pena ler: mais votados no geral — recentes e antigos, sem viés de idade
-        let worthReading: [PostRequest]
-        (worthReading, usedKeys) = worthPool.topDiscoverPosts(
-            limit: 6,
-            minTabcoins: 6,
-            minAgeDays: 3,
-            excluding: usedKeys
-        )
-
+        // Você pode ter perdido — antes de "Vale a pena ler" para não esvaziar o pool
         let missed: [PostRequest]
         (missed, usedKeys) = missedPool.topDiscoverPosts(
             limit: 6,
@@ -98,6 +90,15 @@ final class DiscoverService {
         } else {
             resolvedMissed = missed
         }
+
+        // Vale a pena ler: mais votados no geral — recentes e antigos, sem viés de idade
+        let worthReading: [PostRequest]
+        (worthReading, usedKeys) = worthPool.topDiscoverPosts(
+            limit: 6,
+            minTabcoins: 6,
+            minAgeDays: 3,
+            excluding: usedKeys
+        )
 
         let hero = pickHero(from: surprisePool, seed: seed, excluding: usedKeys)
 
@@ -133,7 +134,7 @@ final class DiscoverService {
     private func cacheKey() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        return "discover_cache_v3_\(formatter.string(from: Date()))"
+        return "discover_cache_v4_\(formatter.string(from: Date()))"
     }
 
     private func loadCachedSections() -> DiscoverSections? {

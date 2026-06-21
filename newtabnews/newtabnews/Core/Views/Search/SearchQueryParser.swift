@@ -9,9 +9,20 @@ enum SearchQuery: Equatable {
     case author(String)
     case post(user: String, slug: String)
     case local(String)
+
+    var requiresNetwork: Bool {
+        switch self {
+        case .author, .post:
+            return true
+        case .local:
+            return false
+        }
+    }
 }
 
 enum SearchQueryParser {
+    static let minimumUsernameLength = 3
+
     private static let usernamePattern = #"^[a-z0-9_-]+$"#
     private static let slugPattern = #"^[a-z0-9_-]+$"#
     private static let userSlugPattern = #"^([a-z0-9_-]+)/([a-z0-9_-]+)$"#
@@ -21,8 +32,8 @@ enum SearchQueryParser {
         guard !trimmed.isEmpty else { return nil }
 
         if trimmed.hasPrefix("@") {
-            let username = String(trimmed.dropFirst())
-            if isValidUsername(username) {
+            let username = String(trimmed.dropFirst()).lowercased()
+            if !username.isEmpty, matches(username, pattern: usernamePattern) {
                 return .author(username)
             }
         }
@@ -89,7 +100,9 @@ enum SearchQueryParser {
     }
 
     private static func isValidUsername(_ value: String) -> Bool {
-        matches(value.lowercased(), pattern: usernamePattern)
+        let normalized = value.lowercased()
+        return normalized.count >= minimumUsernameLength
+            && matches(normalized, pattern: usernamePattern)
     }
 
     private static func isValidSlug(_ value: String) -> Bool {

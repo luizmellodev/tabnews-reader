@@ -160,7 +160,31 @@ struct SearchView: View {
     @ViewBuilder
     private var searchResultsContent: some View {
         switch searchVM.state {
-        case .idle, .loading:
+        case .idle:
+            if searchVM.mode == .author,
+               let username = searchVM.authorUsername,
+               username.count < SearchQueryParser.minimumUsernameLength {
+                ContentUnavailableView {
+                    Label("Continue digitando", systemImage: "at")
+                } description: {
+                    Text("O username precisa ter pelo menos \(SearchQueryParser.minimumUsernameLength) caracteres.")
+                }
+            } else if searchVM.mode == .author || searchVM.mode == .post {
+                VStack(spacing: 12) {
+                    if let mode = searchVM.mode {
+                        SearchModeBadge(mode: mode)
+                    }
+                    Text("Aguardando você terminar de digitar…")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                Color.clear
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+
+        case .loading:
             VStack(spacing: 12) {
                 ProgressView()
                 Text("Buscando...")
@@ -237,7 +261,7 @@ struct SearchView: View {
     private var emptyStateTitle: String {
         switch searchVM.mode {
         case .author:
-            return "Autor não encontrado"
+            return searchVM.authorNotFound ? "Autor não encontrado" : "Nenhuma publicação"
         case .post:
             return "Post não encontrado"
         case .local, .none:
@@ -248,7 +272,9 @@ struct SearchView: View {
     private var emptyStateDescription: String {
         switch searchVM.mode {
         case .author:
-            return "Não encontramos publicações para este usuário."
+            return searchVM.authorNotFound
+                ? "Verifique se o @usuário está correto."
+                : "Este usuário ainda não publicou posts."
         case .post:
             return "Verifique o link ou o formato usuario/slug."
         case .local, .none:
