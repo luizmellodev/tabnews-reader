@@ -1,0 +1,21 @@
+{
+  "minimum-time-difference": "Given a list of 24-hour clock time points in \"HH:MM\" format, return the minimum minutes difference between any two time points in the list.",
+  "average-of-levels-in-binary-tree": "Given the root of a binary tree, return the average value of the nodes on each level in the form of an array.",
+  "number-of-valid-words-for-each-puzzle": "With respect to a given puzzle, a word is valid if it contains the first letter of the puzzle, each letter of the word appears at most once in it, and the word is at least the length of the puzzle.",
+  "subtract-the-product-and-sum-of-digits-of-an-integer": "Given an integer n, return the difference between the product of its digits and the sum of its digits.",
+  "deepest-leaves-sum": "Given the root of a binary tree, return the sum of values of its deepest level.",
+  "maximum-product-of-two-elements-in-an-array": "Given the array of integers nums, you will choose two different indices i and j such that the value of (nums[i]-1)*(nums[j]-1) is maximized. Return the maximum value you can get.",
+  "three-consecutive-odds": "Given an integer array arr, return true if there are three consecutive odd numbers in the array. Otherwise, return false.",
+  "two-out-of-three": "Given three integer arrays nums1, nums2, and nums3, return a distinct array containing all the values that are present in at least two out of the three arrays.",
+  "kth-smallest-product-of-two-sorted-arrays": "Given two sorted 0-indexed integer arrays nums1 and nums2 as well as an integer k, return the kth smallest product of nums1[i] * nums2[j] where 0 <= i < nums1.length and 0 <= j < nums2.length.",
+  "count-equal-and-divisible-pairs-in-an-array": "Given a 0-indexed integer array nums of length n and an integer k, return the number of pairs (i, j) where 0 <= i < j < n, such that nums[i] == nums[j] and (i * j) is divisible by k.",
+  "add-two-integers": "Given two integers num1 and num2, return the sum of the two integers.",
+  "intersection-of-multiple-arrays": "Given a 2D integer array nums where nums[i] is a distinct array of integers, return the intersection of all the arrays in the form of a sorted array.",
+  "smallest-even-multiple": "Given a positive integer n, return the smallest positive multiple of both 2 and n.",
+  "form-smallest-number-from-two-digit-arrays": "Given two arrays of unique digits nums1 and nums2, return the smallest number that contains at least one digit from each array.",
+  "create-hello-world-function": "Write a function createHelloWorld that returns a function. The returned function should return the string \"Hello World\" when called.",
+  "return-length-of-arguments-passed": "Write a function argumentsLength that returns the count of arguments passed to it.",
+  "add-two-promises": "Given two promises promise1 and promise2, return a promise that resolves with the sum of their values.",
+  "count-pairs-whose-sum-is-less-than-target": "Given a 0-indexed integer array nums of length n and an integer target, return the number of pairs (i, j) where 0 <= i < j < n and nums[i] + nums[j] < target.",
+  "maximum-length-substring-with-two-occurrences": "Given a string s, return the maximum length of a substring that contains at most two occurrences of each character."
+}

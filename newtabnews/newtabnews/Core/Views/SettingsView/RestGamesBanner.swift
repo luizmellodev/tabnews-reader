@@ -91,6 +91,127 @@ struct RestGamesRankingsBanner: View {
     }
 }
 
+enum RestGamesNewPuzzlePrompt {
+    private enum Keys {
+        static let dismissedWordleDate = "restGamesHomeBannerDismissedWordleDate"
+        static let dismissedLeetWeek = "restGamesHomeBannerDismissedLeetWeek"
+    }
+
+    struct State: Equatable {
+        let message: String
+        let hasWordle: Bool
+        let hasLeet: Bool
+    }
+
+    @MainActor
+    static func current() -> State? {
+        guard RestGamesAnnouncement.hasSeen else { return nil }
+
+        let wordleSummary = DevWordleViewModel.todaySummary()
+        let leetSummary = DevLeetHubSummary.current()
+        let dateKey = devWordleDateKey()
+        let weekKey = DevLeetSchedule.weekKey()
+
+        let newWordle = !wordleSummary.played && !isWordleDismissed(dateKey: dateKey)
+        let newLeet = !leetSummary.solved && !isLeetDismissed(weekKey: weekKey)
+
+        guard newWordle || newLeet else { return nil }
+
+        return State(
+            message: bannerMessage(wordle: newWordle, leet: newLeet),
+            hasWordle: newWordle,
+            hasLeet: newLeet
+        )
+    }
+
+    static func dismiss(_ state: State) {
+        let defaults = UserDefaults.standard
+        if state.hasWordle {
+            defaults.set(devWordleDateKey(), forKey: Keys.dismissedWordleDate)
+        }
+        if state.hasLeet {
+            defaults.set(DevLeetSchedule.weekKey(), forKey: Keys.dismissedLeetWeek)
+        }
+    }
+
+    private static func bannerMessage(wordle: Bool, leet: Bool) -> String {
+        switch (wordle, leet) {
+        case (true, true):
+            return "DevWordle e DevLeet novos · toque para jogar"
+        case (true, false):
+            return "Novo DevWordle hoje · toque para jogar"
+        case (false, true):
+            return "Novo DevLeet esta semana · toque para jogar"
+        default:
+            return ""
+        }
+    }
+
+    private static func devWordleDateKey(for date: Date = .now) -> String {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar.current
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
+    }
+
+    private static func isWordleDismissed(dateKey: String) -> Bool {
+        UserDefaults.standard.string(forKey: Keys.dismissedWordleDate) == dateKey
+    }
+
+    private static func isLeetDismissed(weekKey: String) -> Bool {
+        UserDefaults.standard.string(forKey: Keys.dismissedLeetWeek) == weekKey
+    }
+
+    #if DEBUG
+    static func resetDismissalsForTesting() {
+        UserDefaults.standard.removeObject(forKey: Keys.dismissedWordleDate)
+        UserDefaults.standard.removeObject(forKey: Keys.dismissedLeetWeek)
+    }
+    #endif
+}
+
+struct RestGamesNewPuzzleBanner: View {
+    let state: RestGamesNewPuzzlePrompt.State
+    let onTap: () -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        HStack(spacing: 0) {
+            Button(action: onTap) {
+                HStack(spacing: 5) {
+                    Text(state.message)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.88))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.35))
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.plain)
+
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.35))
+                    .frame(width: 28, height: 26)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Fechar aviso")
+        }
+        .padding(.leading, 14)
+        .frame(maxWidth: .infinity)
+        .frame(height: 26)
+        .background(Color(red: 0.04, green: 0.04, blue: 0.05))
+        .colorScheme(.dark)
+    }
+}
+
 struct ArcadeBlackBannerBackground: View {
     var body: some View {
         ZStack {

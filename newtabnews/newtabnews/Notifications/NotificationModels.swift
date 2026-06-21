@@ -44,6 +44,7 @@ extension Notification.Name {
     static let watchLikedPostsReceived = Notification.Name("watchLikedPostsReceived")
     static let showTipsOnboarding = Notification.Name("showTipsOnboarding")
     static let showRestGamesAnnouncement = Notification.Name("showRestGamesAnnouncement")
+    static let showRestGamesHub = Notification.Name("showRestGamesHub")
     static let simulateFirstPostLongPress = Notification.Name("simulateFirstPostLongPress")
     static let dismissContextMenu = Notification.Name("dismissContextMenu")
     static let navigateToHome = Notification.Name("navigateToHome")

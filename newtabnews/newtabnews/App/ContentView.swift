@@ -338,6 +338,14 @@ struct ContentView: View {
             restGamesAnnouncementSeenVersion = ""
             showRestGamesAnnouncement = true
         }
+
+        NotificationCenter.default.addObserver(
+            forName: .showRestGamesHub,
+            object: nil,
+            queue: .main
+        ) { [self] _ in
+            showRestGamesHub = true
+        }
         
         NotificationCenter.default.addObserver(
             forName: .navigateToHome,

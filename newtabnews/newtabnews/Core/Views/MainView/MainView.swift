@@ -20,6 +20,9 @@ struct MainView: View {
     @State private var showDailyDigestSheet = false
     @StateObject private var dailyDigestManager = DailyDigestManager.shared
     @Namespace private var zoomNamespace
+    @Environment(\.scenePhase) private var scenePhase
+
+    @State private var newPuzzleBanner = RestGamesNewPuzzlePrompt.current()
 
     @Binding var postToOpen: PostRequest?
     @Binding var isLoadingPost: Bool
@@ -89,6 +92,24 @@ struct MainView: View {
             .refreshable {
                 await refreshContent()
             }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if let banner = newPuzzleBanner {
+                    RestGamesNewPuzzleBanner(
+                        state: banner,
+                        onTap: {
+                            NotificationCenter.default.post(name: .showRestGamesHub, object: nil)
+                        },
+                        onDismiss: {
+                            RestGamesNewPuzzlePrompt.dismiss(banner)
+                            withAnimation(.easeOut(duration: 0.2)) {
+                                newPuzzleBanner = RestGamesNewPuzzlePrompt.current()
+                            }
+                        }
+                    )
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
+            .animation(.easeOut(duration: 0.25), value: newPuzzleBanner)
             .animation(.spring(), value: shouldShowDigestBanner)
             .animation(.spring(), value: shouldShowDailyDigestBanner)
             .navigationTitle("Tab News")
@@ -144,6 +165,14 @@ struct MainView: View {
                 .presentationDragIndicator(.hidden)
                 .presentationDetents([.large])
             }
+            .onAppear {
+                refreshNewPuzzleBanner()
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    refreshNewPuzzleBanner()
+                }
+            }
         }
     }
 
@@ -181,5 +210,9 @@ struct MainView: View {
 
     private func refreshContent() async {
         await viewModel.resetPagination()
+    }
+
+    private func refreshNewPuzzleBanner() {
+        newPuzzleBanner = RestGamesNewPuzzlePrompt.current()
     }
 }

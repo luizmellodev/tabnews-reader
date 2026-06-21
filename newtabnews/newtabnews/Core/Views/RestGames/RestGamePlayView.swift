@@ -22,6 +22,7 @@ struct RestGamePlayView: View {
                     gameType: session.gameType,
                     targetColor: session.targetColor,
                     targetFrequency: session.targetFrequency,
+                    soundVisualProfile: session.soundVisualProfile,
                     timeRemaining: session.memorizeTimeRemaining
                 )
             case .recreating:

@@ -28,6 +28,7 @@ final class RestGameSession {
 
     var guessColor = HSLColor(hue: 180, saturation: 50, lightness: 50)
     var guessFrequency: Double = 440
+    var soundVisualProfile: SoundRibbonVisualProfile = .interactive
 
     var lastRoundScore: Double = 0
     private var memorizeTask: Task<Void, Never>?
@@ -60,6 +61,7 @@ final class RestGameSession {
         case .sound:
             targetFrequency = RestGameScoring.randomEasyFrequency()
             guessFrequency = 440
+            soundVisualProfile = SoundRibbonVisualProfile.randomMemorize()
         }
 
         withPhaseTransition(to: .memorizing)

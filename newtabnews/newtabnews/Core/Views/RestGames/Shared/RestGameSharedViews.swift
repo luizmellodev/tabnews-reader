@@ -4,6 +4,7 @@ struct MemorizePhaseView: View {
     let gameType: RestGameType
     let targetColor: HSLColor?
     let targetFrequency: Double?
+    let soundVisualProfile: SoundRibbonVisualProfile
     let timeRemaining: TimeInterval
 
     @State private var breathe = false
@@ -24,7 +25,9 @@ struct MemorizePhaseView: View {
                 if let targetFrequency {
                     SoundRibbonView(
                         frequency: .constant(targetFrequency),
-                        isInteractive: false
+                        isInteractive: false,
+                        visualProfile: soundVisualProfile,
+                        showHint: false
                     )
                     .allowsHitTesting(false)
                 }
@@ -342,7 +345,7 @@ struct RestGameOnboardingOverlay: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.72)
+            Color.black.opacity(0.38)
                 .ignoresSafeArea()
 
             VStack(spacing: 24) {
@@ -368,7 +371,7 @@ struct RestGameOnboardingOverlay: View {
 
                                 Text(step)
                                     .font(.subheadline)
-                                    .foregroundStyle(.white.opacity(0.82))
+                                    .foregroundStyle(.white.opacity(0.9))
                                     .fixedSize(horizontal: false, vertical: true)
                             }
                         }
@@ -380,10 +383,11 @@ struct RestGameOnboardingOverlay: View {
                 RestGamePrimaryButton(title: "Jogar", action: onPlay)
             }
             .padding(28)
-            .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .stroke(.white.opacity(0.12), lineWidth: 1)
+                    .stroke(.white.opacity(0.18), lineWidth: 1)
             }
             .padding(.horizontal, 24)
         }
@@ -439,9 +443,9 @@ extension RestGameOnboardingOverlay {
             icon: "pencil.and.outline",
             accent: .orange,
             steps: [
-                "One LeetCode-style problem drops every week.",
-                "Grab paper and a pen — write your solution by hand.",
-                "When you're done, tap Mark as Solved. No code editor here."
+                "Um problema estilo LeetCode por semana.",
+                "Pegue papel e caneta, escreva a solução à mão.",
+                "Quando terminar, toque em Marcar como resolvido. Sem editor aqui."
             ],
             onPlay: onPlay
         )

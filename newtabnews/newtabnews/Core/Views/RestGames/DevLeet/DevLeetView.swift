@@ -4,6 +4,7 @@ struct DevLeetView: View {
     @State private var weekKey = DevLeetSchedule.weekKey()
     @State private var isSolved = DevLeetStorage.shared.isSolved(weekKey: DevLeetSchedule.weekKey())
     @State private var showHonorSheet = false
+    @State private var showSolutionSheet = false
     @State private var showOnboarding = !RestGameOnboarding.hasSeen(.devLeet)
 
     private let problem = DevLeetCatalog.shared.weeklyProblem()
@@ -19,6 +20,10 @@ struct DevLeetView: View {
                     problemCard
                     examplesSection
                     constraintsSection
+
+                    if problem.hasSolutions {
+                        solutionButton
+                    }
 
                     if isSolved {
                         solvedBanner
@@ -61,6 +66,13 @@ struct DevLeetView: View {
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $showSolutionSheet) {
+            if let solutions = problem.solutions {
+                DevLeetSolutionSheet(problemTitle: problem.title, solutions: solutions)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+            }
+        }
     }
 
     private var header: some View {
@@ -69,7 +81,7 @@ struct DevLeetView: View {
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
 
-            Text("Weekly challenge · paper & pen only")
+            Text("Desafio semanal · papel e caneta")
                 .font(.caption)
                 .foregroundStyle(.white.opacity(0.55))
 
@@ -84,7 +96,7 @@ struct DevLeetView: View {
     }
 
     private var difficultyBadge: some View {
-        Text(problem.difficulty.rawValue)
+        Text(problem.difficulty.displayName)
             .font(.caption2.weight(.bold))
             .foregroundStyle(problem.difficulty.color)
             .padding(.horizontal, 10)
@@ -100,11 +112,11 @@ struct DevLeetView: View {
                 .frame(width: 36)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("Grab paper and a pen")
+                Text("Pegue papel e caneta")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.white)
 
-                Text("Write your solution by hand — that's how it works at Google, Meta, and Amazon. No IDE. No autocomplete. Just you and the problem.")
+                Text("Escreva a solução à mão, é assim que funciona no Google, Meta e Amazon. Sem IDE. Sem autocomplete. Só você e o problema.")
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.65))
                     .fixedSize(horizontal: false, vertical: true)
@@ -124,10 +136,12 @@ struct DevLeetView: View {
                 .font(.title2.weight(.bold))
                 .foregroundStyle(.white)
 
-            Text(problem.description)
-                .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.82))
-                .fixedSize(horizontal: false, vertical: true)
+            if let description = problem.displayDescription {
+                Text(description)
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.82))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
 
             if !problem.topics.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -148,7 +162,7 @@ struct DevLeetView: View {
                 Link(destination: url) {
                     HStack(spacing: 6) {
                         Image(systemName: "arrow.up.right.square")
-                        Text("View on LeetCode")
+                        Text("Ver no LeetCode")
                     }
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.cyan)
@@ -167,19 +181,19 @@ struct DevLeetView: View {
 
     private var examplesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionLabel("Examples")
+            sectionLabel("Exemplos")
 
             ForEach(Array(problem.examples.enumerated()), id: \.element.id) { index, example in
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Example \(index + 1)")
+                    Text("Exemplo \(index + 1)")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.white.opacity(0.45))
 
-                    exampleBlock("Input", example.input)
-                    exampleBlock("Output", example.output)
+                    exampleBlock("Entrada", example.input)
+                    exampleBlock("Saída", example.output)
 
                     if let explanation = example.explanation {
-                        exampleBlock("Explanation", explanation)
+                        exampleBlock("Explicação", explanation)
                     }
                 }
                 .padding(14)
@@ -191,7 +205,7 @@ struct DevLeetView: View {
 
     private var constraintsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionLabel("Constraints")
+            sectionLabel("Restrições")
 
             VStack(alignment: .leading, spacing: 6) {
                 ForEach(problem.constraints, id: \.self) { constraint in
@@ -207,6 +221,40 @@ struct DevLeetView: View {
         }
     }
 
+    private var solutionButton: some View {
+        Button {
+            RestFeedbackManager.shared.tap()
+            showSolutionSheet = true
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "chevron.left.forwardslash.chevron.right")
+                    .font(.subheadline.weight(.semibold))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Ver solução de referência")
+                        .font(.subheadline.weight(.semibold))
+                    Text("Python · Java · JavaScript · C++")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.55))
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.white.opacity(0.4))
+            }
+            .foregroundStyle(.white)
+            .padding(16)
+            .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(.cyan.opacity(0.25), lineWidth: 1)
+            }
+        }
+        .buttonStyle(RestGameScaleButtonStyle())
+    }
+
     private var markSolvedButton: some View {
         Button {
             RestFeedbackManager.shared.tap()
@@ -214,7 +262,7 @@ struct DevLeetView: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "checkmark.circle.fill")
-                Text("Mark as Solved")
+                Text("Marcar como resolvido")
             }
             .font(.headline.weight(.semibold))
             .foregroundStyle(.black)
@@ -233,10 +281,10 @@ struct DevLeetView: View {
                 .foregroundStyle(.green)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Marked as solved")
+                Text("Marcado como resolvido")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.white)
-                Text("See you next week for a new challenge.")
+                Text("Até semana que vem com um desafio novo.")
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.55))
             }
@@ -289,22 +337,22 @@ private struct DevLeetHonorSheet: View {
                 .background(.orange.opacity(0.12), in: Circle())
 
             VStack(spacing: 10) {
-                Text("Be honest with yourself")
+                Text("Seja honesto consigo")
                     .font(.title3.weight(.bold))
 
-                Text("You're only fooling yourself if you tap solved without actually working it out.")
+                Text("Você só está se enganando se marcar como resolvido sem ter feito de verdade.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
 
-                Text("Did you grab paper, write the code, and trace through your solution?")
+                Text("Pegou papel, escreveu o código e rastreou a solução?")
                     .font(.subheadline.weight(.medium))
                     .multilineTextAlignment(.center)
             }
 
             VStack(spacing: 12) {
                 Button(action: onConfirm) {
-                    Text("Yes, I solved it")
+                    Text("Sim, resolvi")
                         .font(.headline.weight(.semibold))
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -313,7 +361,7 @@ private struct DevLeetHonorSheet: View {
                 }
 
                 Button(action: onCancel) {
-                    Text("Not yet — back to the problem")
+                    Text("Ainda não — voltar ao problema")
                         .font(.headline.weight(.medium))
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity)
@@ -325,8 +373,59 @@ private struct DevLeetHonorSheet: View {
     }
 }
 
+private struct DevLeetSolutionSheet: View {
+    let problemTitle: String
+    let solutions: DevLeetSolutions
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedLanguage: DevLeetSolutionLanguage
+
+    init(problemTitle: String, solutions: DevLeetSolutions) {
+        self.problemTitle = problemTitle
+        self.solutions = solutions
+        _selectedLanguage = State(initialValue: solutions.availableLanguages.first ?? .python)
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Compare com o que você escreveu no papel.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 20)
+
+                Picker("Linguagem", selection: $selectedLanguage) {
+                    ForEach(solutions.availableLanguages) { language in
+                        Text(language.displayName).tag(language)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal, 20)
+
+                ScrollView(showsIndicators: true) {
+                    Text(solutions.code(for: selectedLanguage) ?? "")
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.primary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .padding(.horizontal, 20)
+                }
+            }
+            .padding(.top, 8)
+            .navigationTitle(problemTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Fechar") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
 struct DevLeetCountdownLabel: View {
-    var prefix: String = "Next challenge in"
+    var prefix: String = "Próximo desafio em"
     var onDarkBackground = true
 
     var body: some View {

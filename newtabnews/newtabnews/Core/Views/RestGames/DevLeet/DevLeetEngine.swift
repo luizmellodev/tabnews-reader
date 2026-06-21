@@ -13,6 +13,14 @@ enum DevLeetDifficulty: String, Codable, CaseIterable {
         case .hard: return .red
         }
     }
+
+    var displayName: String {
+        switch self {
+        case .easy: return "Fácil"
+        case .medium: return "Médio"
+        case .hard: return "Difícil"
+        }
+    }
 }
 
 struct DevLeetExample: Codable, Equatable, Identifiable {
@@ -21,6 +29,44 @@ struct DevLeetExample: Codable, Equatable, Identifiable {
     let explanation: String?
 
     var id: String { input + output }
+}
+
+struct DevLeetSolutions: Codable, Equatable {
+    var python: String?
+    var java: String?
+    var javascript: String?
+    var cpp: String?
+
+    var availableLanguages: [DevLeetSolutionLanguage] {
+        DevLeetSolutionLanguage.allCases.filter { code(for: $0) != nil }
+    }
+
+    func code(for language: DevLeetSolutionLanguage) -> String? {
+        switch language {
+        case .python: python
+        case .java: java
+        case .javascript: javascript
+        case .cpp: cpp
+        }
+    }
+}
+
+enum DevLeetSolutionLanguage: String, CaseIterable, Identifiable, Codable {
+    case python
+    case java
+    case javascript
+    case cpp
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .python: "Python"
+        case .java: "Java"
+        case .javascript: "JavaScript"
+        case .cpp: "C++"
+        }
+    }
 }
 
 struct DevLeetProblem: Codable, Equatable, Identifiable {
@@ -32,9 +78,32 @@ struct DevLeetProblem: Codable, Equatable, Identifiable {
     let description: String
     let examples: [DevLeetExample]
     let constraints: [String]
+    let solutions: DevLeetSolutions?
+
+    var hasSolutions: Bool {
+        guard let solutions else { return false }
+        return !solutions.availableLanguages.isEmpty
+    }
 
     var leetcodeURL: URL? {
         URL(string: "https://leetcode.com/problems/\(id)/")
+    }
+
+    var displayDescription: String? {
+        let trimmed = description.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        let lines = trimmed.split(separator: "\n", omittingEmptySubsequences: false)
+        let meaningful = lines.filter { line in
+            let value = line.trimmingCharacters(in: .whitespaces)
+            guard !value.isEmpty else { return false }
+            if value.range(of: #"^Example \d+:$"#, options: .regularExpression) != nil { return false }
+            if value == "Constraints:" { return false }
+            return true
+        }
+
+        guard !meaningful.isEmpty else { return nil }
+        return meaningful.joined(separator: "\n")
     }
 }
 
@@ -133,7 +202,8 @@ struct DevLeetCatalog {
             examples: [
                 DevLeetExample(input: "nums = [2,7,11,15], target = 9", output: "[0,1]", explanation: "Because nums[0] + nums[1] == 9, we return [0, 1].")
             ],
-            constraints: ["2 <= nums.length <= 10^4"]
+            constraints: ["2 <= nums.length <= 10^4"],
+            solutions: nil
         )
     ])
 

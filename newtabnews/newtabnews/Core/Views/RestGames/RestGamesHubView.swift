@@ -44,7 +44,7 @@ struct RestGamesHubView: View {
                         }
 
                         VStack(alignment: .leading, spacing: 14) {
-                            sectionTitle("This Week")
+                            sectionTitle("Esta semana")
 
                             Button {
                                 RestFeedbackManager.shared.cardPress()
@@ -273,7 +273,7 @@ struct RestGamesHubView: View {
                     Text("DevLeet")
                         .font(.headline.weight(.semibold))
                         .foregroundStyle(.white)
-                    Text("Weekly LeetCode · paper & pen")
+                    Text("LeetCode semanal · papel e caneta")
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.55))
                 }
@@ -284,7 +284,7 @@ struct RestGamesHubView: View {
                     devLeetStatusBadge
 
                     if weeklySummary.solved {
-                        DevLeetCountdownLabel(prefix: "Next in")
+                        DevLeetCountdownLabel(prefix: "Próximo em")
                     }
                 }
             }
@@ -296,7 +296,7 @@ struct RestGamesHubView: View {
                         .foregroundStyle(.white)
                         .lineLimit(1)
 
-                    Text(weeklySummary.difficulty.rawValue)
+                    Text(weeklySummary.difficulty.displayName)
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(weeklySummary.difficulty.color)
                 }
@@ -308,7 +308,7 @@ struct RestGamesHubView: View {
                         Text("\(weeklySummary.currentStreak)")
                             .font(.title3.weight(.bold))
                             .foregroundStyle(.white)
-                        Text("weeks")
+                        Text("semanas")
                             .font(.caption2)
                             .foregroundStyle(.white.opacity(0.45))
                     }
@@ -326,7 +326,7 @@ struct RestGamesHubView: View {
     private var devLeetStatusBadge: some View {
         Group {
             if weeklySummary.solved {
-                Label("Solved", systemImage: "checkmark.circle.fill")
+                Label("Resolvido", systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
             } else {
                 Text("New")
