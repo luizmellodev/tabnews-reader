@@ -183,20 +183,34 @@ struct DevLeetCatalog {
 
     private static func loadFromBundle() -> DevLeetCatalog? {
         guard let url = Bundle.main.url(forResource: "dev_leet_problems", withExtension: "json"),
-              let data = try? Data(contentsOf: url) else {
+              let data = try? Data(contentsOf: url),
+              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let rawProblems = object["problems"] as? [[String: Any]] else {
             return nil
         }
 
-        do {
-            let payload = try JSONDecoder().decode(ProblemPayload.self, from: data)
-            guard !payload.problems.isEmpty else { return nil }
-            return DevLeetCatalog(problems: payload.problems)
-        } catch {
-            #if DEBUG
-            print("DevLeet catalog decode failed:", error)
-            #endif
-            return nil
+        let decoder = JSONDecoder()
+        var problems: [DevLeetProblem] = []
+        var skipped = 0
+
+        for rawProblem in rawProblems {
+            guard JSONSerialization.isValidJSONObject(rawProblem),
+                  let problemData = try? JSONSerialization.data(withJSONObject: rawProblem),
+                  let problem = try? decoder.decode(DevLeetProblem.self, from: problemData) else {
+                skipped += 1
+                continue
+            }
+            problems.append(problem)
         }
+
+        #if DEBUG
+        if skipped > 0 {
+            print("DevLeet catalog skipped \(skipped) invalid problems")
+        }
+        #endif
+
+        guard !problems.isEmpty else { return nil }
+        return DevLeetCatalog(problems: problems)
     }
 
     private static let fallback = DevLeetCatalog(problems: [
@@ -211,13 +225,53 @@ struct DevLeetCatalog {
                 DevLeetExample(input: "nums = [2,7,11,15], target = 9", output: "[0,1]", explanation: "Because nums[0] + nums[1] == 9, we return [0, 1].")
             ],
             constraints: ["2 <= nums.length <= 10^4"],
-            solutions: nil
+            solutions: DevLeetSolutions(
+                python: """
+                def twoSum(nums, target):
+                    seen = {}
+                    for i, num in enumerate(nums):
+                        complement = target - num
+                        if complement in seen:
+                            return [seen[complement], i]
+                        seen[num] = i
+                """,
+                java: """
+                public int[] twoSum(int[] nums, int target) {
+                    Map<Integer, Integer> seen = new HashMap<>();
+                    for (int i = 0; i < nums.length; i++) {
+                        int complement = target - nums[i];
+                        if (seen.containsKey(complement)) {
+                            return new int[] { seen.get(complement), i };
+                        }
+                        seen.put(nums[i], i);
+                    }
+                    return new int[0];
+                }
+                """,
+                javascript: """
+                function twoSum(nums, target) {
+                    const seen = new Map();
+                    for (let i = 0; i < nums.length; i++) {
+                        const complement = target - nums[i];
+                        if (seen.has(complement)) return [seen.get(complement), i];
+                        seen.set(nums[i], i);
+                    }
+                }
+                """,
+                cpp: """
+                vector<int> twoSum(vector<int>& nums, int target) {
+                    unordered_map<int, int> seen;
+                    for (int i = 0; i < nums.size(); i++) {
+                        int complement = target - nums[i];
+                        if (seen.count(complement)) return { seen[complement], i };
+                        seen[nums[i]] = i;
+                    }
+                    return {};
+                }
+                """
+            )
         )
     ])
-
-    private struct ProblemPayload: Decodable {
-        let problems: [DevLeetProblem]
-    }
 
     private func stableHash(_ string: String) -> Int {
         string.unicodeScalars.reduce(0) { partial, scalar in
@@ -265,10 +319,14 @@ final class DevLeetStorage {
     func summary(for weekKey: String, problem: DevLeetProblem) -> DevLeetWeeklySummary {
         DevLeetWeeklySummary(
             solved: isSolved(weekKey: weekKey),
-            currentStreak: UserDefaults.standard.integer(forKey: Keys.currentStreak),
+            currentStreak: currentStreak,
             problemTitle: problem.title,
             difficulty: problem.difficulty
         )
+    }
+
+    var currentStreak: Int {
+        UserDefaults.standard.integer(forKey: Keys.currentStreak)
     }
 
     private func updateStreak(for weekKey: String) {

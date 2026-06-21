@@ -23,6 +23,12 @@ DEFAULT_OUTPUT = DEV_LEET_DIR / "dev_leet_problems.json"
 DEFAULT_OVERRIDES = DEV_LEET_DIR / "dev_leet_description_overrides.json"
 
 
+def normalize_difficulty(value: object) -> str:
+    if value in ("Easy", "Medium", "Hard"):
+        return value
+    return "Medium"
+
+
 def strip_markdown(text: str) -> str:
     text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
     text = re.sub(r"_([^_]+)_", r"\1", text)
@@ -159,7 +165,7 @@ def generate_from_jsonl(source: Path, output: Path, overrides_path: Path) -> Non
                 {
                     "id": slug,
                     "title": row["title"],
-                    "difficulty": row["difficulty"],
+                    "difficulty": normalize_difficulty(row["difficulty"]),
                     "leetcodeNumber": int(frontend_id),
                     "topics": [],
                     "description": description,
@@ -205,7 +211,7 @@ def generate_from_merged(source: Path, output: Path, overrides_path: Path) -> No
             {
                 "id": slug,
                 "title": question["title"],
-                "difficulty": question["difficulty"],
+                "difficulty": normalize_difficulty(question["difficulty"]),
                 "leetcodeNumber": int(frontend_id),
                 "topics": question.get("topics") or [],
                 "description": description,

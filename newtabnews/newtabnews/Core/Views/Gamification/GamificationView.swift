@@ -274,6 +274,20 @@ struct GamificationView: View {
             return 0 // TODO: implementar tracking específico
         case .masterCurator:
             return stats.foldersCreated
+        case .firstWordle, .wordleWins5, .wordleWins10, .wordleWins25, .wordleWins50:
+            return stats.devWordleWins
+        case .wordleStreak7, .wordleStreak30:
+            return stats.devWordleStreak
+        case .wordleGenius:
+            return stats.devWordleFirstTryWins
+        case .wordleSharp:
+            return stats.devWordleTwoOrLessWins
+        case .firstLeet, .leetSolves5, .leetSolves10, .leetSolves25:
+            return stats.devLeetSolves
+        case .leetStreak3, .leetStreak5, .leetStreak10:
+            return stats.devLeetStreak
+        case .leetHardMode:
+            return stats.devLeetHardSolves
         }
     }
 }

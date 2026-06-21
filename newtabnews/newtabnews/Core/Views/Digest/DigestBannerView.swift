@@ -17,7 +17,7 @@ struct DigestBannerView: View {
         "Semana corrida? Relaxa! Separamos o melhor do TabNews pra você!",
         "Não deu tempo de acompanhar tudo? A gente fez a curadoria!",
         "Os posts mais quentes da semana estão te esperando!",
-        "Sua dose semanal de conhecimento chegou! 🚀",
+        "Sua dose semanal de conhecimento chegou!",
         "O resumo que você não sabia que precisava está aqui! 💡",
         "Fim de semana chegando? Que tal dar uma olhada no melhor da semana?",
         "A comunidade produziu conteúdo incrível essa semana. Vem ver!",

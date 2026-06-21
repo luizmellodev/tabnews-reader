@@ -25,6 +25,12 @@ enum ChallengeType: String, Codable, CaseIterable {
     case socialButterfly = "social_butterfly"
     case curator = "curator"
     case researcher = "researcher"
+
+    // Rest games challenges
+    case winWordle = "win_wordle"
+    case playWordle = "play_wordle"
+    case solveLeet = "solve_leet"
+    case wordlePrecision = "wordle_precision"
     
     var title: String {
         switch self {
@@ -44,6 +50,10 @@ enum ChallengeType: String, Codable, CaseIterable {
         case .socialButterfly: return "Social"
         case .curator: return "Curador Premium"
         case .researcher: return "Pesquisador"
+        case .winWordle: return "DevWordle da Semana"
+        case .playWordle: return "Jogador Diário"
+        case .solveLeet: return "DevLeet da Semana"
+        case .wordlePrecision: return "Palpite Preciso"
         }
     }
     
@@ -65,6 +75,10 @@ enum ChallengeType: String, Codable, CaseIterable {
         case .socialButterfly: return "Interaja em \(goal) discussões"
         case .curator: return "Organize sua biblioteca"
         case .researcher: return "Destaque e anote em \(goal) posts"
+        case .winWordle: return "Vença \(goal) \(goal == 1 ? "DevWordle" : "DevWordles")"
+        case .playWordle: return "Jogue DevWordle \(goal) \(goal == 1 ? "vez" : "vezes")"
+        case .solveLeet: return "Complete o desafio DevLeet da semana"
+        case .wordlePrecision: return "Vença DevWordle em até 3 tentativas"
         }
     }
     
@@ -86,6 +100,9 @@ enum ChallengeType: String, Codable, CaseIterable {
         case .socialButterfly: return "person.3.fill"
         case .curator: return "star.fill"
         case .researcher: return "magnifyingglass"
+        case .winWordle, .playWordle: return "character.textbox"
+        case .solveLeet: return "chevron.left.forwardslash.chevron.right"
+        case .wordlePrecision: return "scope"
         }
     }
     
@@ -107,6 +124,10 @@ enum ChallengeType: String, Codable, CaseIterable {
         case .socialButterfly: return .pink
         case .curator: return .yellow
         case .researcher: return .teal
+        case .winWordle: return .green
+        case .playWordle: return .mint
+        case .solveLeet: return .blue
+        case .wordlePrecision: return .orange
         }
     }
 }

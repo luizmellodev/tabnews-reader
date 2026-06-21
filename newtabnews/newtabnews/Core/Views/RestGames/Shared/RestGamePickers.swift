@@ -10,6 +10,8 @@ struct SoundRibbonVisualProfile: Equatable {
     var envelopeCycles: Double
     var phaseOffset: Double
     var lineThinning: Double
+    /// Quando definido, a onda ignora a frequência real (fase de memorização).
+    var decoyVisualNorm: Double?
 
     static let interactive = SoundRibbonVisualProfile(
         amplitudeScale: 1,
@@ -18,7 +20,8 @@ struct SoundRibbonVisualProfile: Equatable {
         spreadScale: 1,
         envelopeCycles: 2.1,
         phaseOffset: 0,
-        lineThinning: 0.72
+        lineThinning: 0.72,
+        decoyVisualNorm: nil
     )
 
     static func randomMemorize() -> SoundRibbonVisualProfile {
@@ -29,7 +32,8 @@ struct SoundRibbonVisualProfile: Equatable {
             spreadScale: Double.random(in: 0.6...1.45),
             envelopeCycles: Double.random(in: 1.1...3.8),
             phaseOffset: Double.random(in: 0...(2 * .pi)),
-            lineThinning: Double.random(in: 0.45...1.15)
+            lineThinning: Double.random(in: 0.45...1.15),
+            decoyVisualNorm: Double.random(in: 0...1)
         )
     }
 }
@@ -51,6 +55,10 @@ struct SoundRibbonView: View {
     private let maxFrequency = RestGameScoring.frequencyRange.upperBound
     private var isDragging: Bool { dragAnchorY != nil }
 
+    private var displayTargetNorm: Double {
+        visualProfile.decoyVisualNorm ?? normalizedFrequency(frequency)
+    }
+
     var body: some View {
         GeometryReader { geo in
             ZStack {
@@ -60,7 +68,7 @@ struct SoundRibbonView: View {
 
                 TimelineView(.animation(minimumInterval: 1 / 60)) { timeline in
                     SoundRibbonSmoothingTick(
-                        targetNorm: normalizedFrequency(frequency),
+                        targetNorm: displayTargetNorm,
                         isDragging: isDragging,
                         visualNorm: $visualNorm,
                         tick: timeline.date.timeIntervalSinceReferenceDate
@@ -104,7 +112,8 @@ struct SoundRibbonView: View {
 
                             let deltaY = value.location.y - anchorY
                             let startNorm = normalizedFrequency(anchorFrequency)
-                            let deltaNorm = Double(-deltaY / geo.size.height) * 0.82
+                            // ~40% da altura da tela cobre toda a faixa 200–800 Hz
+                            let deltaNorm = Double(-deltaY / geo.size.height) / 0.4
                             let newNorm = min(1, max(0, startNorm + deltaNorm))
                             let newFrequency = frequencyFromNormalized(newNorm)
 
@@ -125,7 +134,7 @@ struct SoundRibbonView: View {
         .frame(height: compact ? 72 : nil)
         .frame(maxHeight: compact ? 72 : .infinity)
         .onAppear {
-            visualNorm = normalizedFrequency(frequency)
+            visualNorm = displayTargetNorm
             if isInteractive && !compact {
                 ToneGenerator.shared.sustain(frequency: frequency)
             }
@@ -136,7 +145,7 @@ struct SoundRibbonView: View {
             }
         }
         .onChange(of: visualProfile) { _, _ in
-            visualNorm = normalizedFrequency(frequency)
+            visualNorm = displayTargetNorm
         }
     }
 
@@ -228,11 +237,12 @@ private enum SoundRibbonRenderer {
         let deform = frequencyDeformation(norm: visualNorm, compact: compact)
         let visualFrequency = frequencyFromNormalized(visualNorm)
 
-        let wavelength = max(compact ? 28 : 32, (compact ? 5200 : 11500) / visualFrequency)
+        let minWavelength = compact ? 44.0 : 56.0
+        let wavelength = max(minWavelength, (compact ? 4800 : 9200) / visualFrequency)
             * profile.wavelengthScale
             * deform.wavelengthScale
         let baseAmplitude = compact ? 6.5 : min(52, size.width * 0.14)
-        let amplitude = baseAmplitude * deform.amplitudeScale * profile.amplitudeScale
+        let amplitude = max(compact ? 4.8 : 14, baseAmplitude * deform.amplitudeScale * profile.amplitudeScale)
         let driftSpeed = isInteractive && !compact ? profile.speedScale * 0.82 : profile.speedScale * deform.animSpeed
         let drift = time * driftSpeed
 
@@ -247,7 +257,8 @@ private enum SoundRibbonRenderer {
             time: time,
             compact: compact,
             profile: profile,
-            deform: deform
+            deform: deform,
+            visualNorm: visualNorm
         )
     }
 
@@ -272,13 +283,13 @@ private enum SoundRibbonRenderer {
         let boost = compact ? 0.75 : 1.0
 
         return FrequencyDeformation(
-            spreadScale: (0.28 + low * 1.05) * boost,
-            amplitudeScale: 0.22 + low * 1.45,
-            wavelengthScale: 0.55 + low * 0.75,
-            lineScale: 0.35 + low * 0.95,
-            bulgeScale: 0.18 + low * 1.12,
+            spreadScale: (0.44 + low * 0.82) * boost,
+            amplitudeScale: 0.46 + low * 1.05,
+            wavelengthScale: 0.68 + low * 0.58,
+            lineScale: 0.52 + low * 0.72,
+            bulgeScale: 0.32 + low * 0.88,
             animSpeed: 0.75 + norm * 0.85,
-            pinch: 0.12 + norm * 0.72
+            pinch: 0.06 + norm * 0.28
         )
     }
 
@@ -293,7 +304,8 @@ private enum SoundRibbonRenderer {
         time: TimeInterval,
         compact: Bool,
         profile: SoundRibbonVisualProfile,
-        deform: FrequencyDeformation
+        deform: FrequencyDeformation,
+        visualNorm: Double
     ) {
         let step = compact ? 2.6 : 2.0
         let breathe = sin(time * 0.85) * 0.045
@@ -310,7 +322,7 @@ private enum SoundRibbonRenderer {
                 let strandDrift = drift + sin(time * 0.55 + strand.phase) * 0.045
                 let phase = (y / wavelength + strandDrift + strand.phase * 0.05) * .pi * 2
                 let primary = sin(phase)
-                let silk = sin(phase * 0.5 + strand.harmonicPhase) * strand.harmonic * 0.32
+                let silk = sin(phase * 0.5 + strand.harmonicPhase) * strand.harmonic * (0.32 + visualNorm * 0.12)
                 let wave = (primary + silk) * amplitude * bulge * edgeFade * (1 + breathe)
 
                 let spread = strand.spread * profile.spreadScale * deform.spreadScale

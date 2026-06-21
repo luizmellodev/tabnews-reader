@@ -104,6 +104,10 @@ class GamificationManager: ObservableObject {
             case .socialButterfly: goal = Int.random(in: 3...8)
             case .curator: goal = Int.random(in: 3...6)
             case .researcher: goal = Int.random(in: 2...4)
+            case .winWordle: goal = Int.random(in: 3...5)
+            case .playWordle: goal = Int.random(in: 4...7)
+            case .solveLeet: goal = 1
+            case .wordlePrecision: goal = 1
             }
             
             return WeeklyChallenge(type: type, goal: goal, startDate: weekStart, endDate: weekEnd)
@@ -178,6 +182,23 @@ class GamificationManager: ObservableObject {
         case .socialButterfly: shouldUnlock = (stats.postsLiked + stats.commentsPosted) >= 20
         case .knowledgeSeeker: shouldUnlock = false // TODO: track read+highlight+note
         case .masterCurator: shouldUnlock = stats.foldersCreated >= 50
+        case .firstWordle: shouldUnlock = stats.devWordleWins >= 1
+        case .wordleWins5: shouldUnlock = stats.devWordleWins >= 5
+        case .wordleWins10: shouldUnlock = stats.devWordleWins >= 10
+        case .wordleWins25: shouldUnlock = stats.devWordleWins >= 25
+        case .wordleWins50: shouldUnlock = stats.devWordleWins >= 50
+        case .wordleStreak7: shouldUnlock = stats.devWordleStreak >= 7
+        case .wordleStreak30: shouldUnlock = stats.devWordleStreak >= 30
+        case .wordleGenius: shouldUnlock = stats.devWordleFirstTryWins >= 1
+        case .wordleSharp: shouldUnlock = stats.devWordleTwoOrLessWins >= 5
+        case .firstLeet: shouldUnlock = stats.devLeetSolves >= 1
+        case .leetSolves5: shouldUnlock = stats.devLeetSolves >= 5
+        case .leetSolves10: shouldUnlock = stats.devLeetSolves >= 10
+        case .leetSolves25: shouldUnlock = stats.devLeetSolves >= 25
+        case .leetStreak3: shouldUnlock = stats.devLeetStreak >= 3
+        case .leetStreak5: shouldUnlock = stats.devLeetStreak >= 5
+        case .leetStreak10: shouldUnlock = stats.devLeetStreak >= 10
+        case .leetHardMode: shouldUnlock = stats.devLeetHardSolves >= 1
         }
         
         if shouldUnlock {
@@ -312,6 +333,79 @@ class GamificationManager: ObservableObject {
             updateChallengeProgress(type: .readWeekend)
         }
     }
+
+    // MARK: - Rest Games Tracking
+
+    @MainActor
+    func trackDevWordleWin(attempts: Int) {
+        stats.devWordleWins += 1
+        stats.devWordlePlays += 1
+
+        if attempts == 1 {
+            stats.devWordleFirstTryWins += 1
+        }
+        if attempts <= 2 {
+            stats.devWordleTwoOrLessWins += 1
+        }
+
+        stats.devWordleStreak = DevWordleStorage.shared.currentStreak
+
+        updateChallengeProgress(type: .winWordle)
+        updateChallengeProgress(type: .playWordle)
+        if attempts <= 3 {
+            updateChallengeProgress(type: .wordlePrecision)
+        }
+
+        checkDevWordleBadges()
+        saveData()
+    }
+
+    @MainActor
+    func trackDevWordlePlayed() {
+        stats.devWordlePlays += 1
+        stats.devWordleStreak = DevWordleStorage.shared.currentStreak
+
+        updateChallengeProgress(type: .playWordle)
+        saveData()
+    }
+
+    @MainActor
+    func trackDevLeetSolved(difficulty: DevLeetDifficulty) {
+        stats.devLeetSolves += 1
+        stats.devLeetStreak = DevLeetStorage.shared.currentStreak
+
+        if difficulty == .hard {
+            stats.devLeetHardSolves += 1
+        }
+
+        updateChallengeProgress(type: .solveLeet)
+
+        checkDevLeetBadges()
+        saveData()
+    }
+
+    private func checkDevWordleBadges() {
+        checkAndUnlockBadge(.firstWordle)
+        checkAndUnlockBadge(.wordleWins5)
+        checkAndUnlockBadge(.wordleWins10)
+        checkAndUnlockBadge(.wordleWins25)
+        checkAndUnlockBadge(.wordleWins50)
+        checkAndUnlockBadge(.wordleStreak7)
+        checkAndUnlockBadge(.wordleStreak30)
+        checkAndUnlockBadge(.wordleGenius)
+        checkAndUnlockBadge(.wordleSharp)
+    }
+
+    private func checkDevLeetBadges() {
+        checkAndUnlockBadge(.firstLeet)
+        checkAndUnlockBadge(.leetSolves5)
+        checkAndUnlockBadge(.leetSolves10)
+        checkAndUnlockBadge(.leetSolves25)
+        checkAndUnlockBadge(.leetStreak3)
+        checkAndUnlockBadge(.leetStreak5)
+        checkAndUnlockBadge(.leetStreak10)
+        checkAndUnlockBadge(.leetHardMode)
+    }
     
     // MARK: - Progress Info
     
@@ -335,4 +429,12 @@ struct GamificationStats: Codable {
     var earlyBirdReads: Int = 0
     var nightOwlReads: Int = 0
     var weekendReads: Int = 0
+    var devWordleWins: Int = 0
+    var devWordlePlays: Int = 0
+    var devWordleFirstTryWins: Int = 0
+    var devWordleTwoOrLessWins: Int = 0
+    var devWordleStreak: Int = 0
+    var devLeetSolves: Int = 0
+    var devLeetHardSolves: Int = 0
+    var devLeetStreak: Int = 0
 }

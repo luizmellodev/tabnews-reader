@@ -81,16 +81,16 @@ struct DevSpotDictionary {
 
     private static let fallback = DevSpotDictionary(
         pairs: [
-            DevSpotPair(dev: "Container", decoy: "Conductor"),
-            DevSpotPair(dev: "Middleware", decoy: "Middleweight"),
-            DevSpotPair(dev: "Terraform", decoy: "Terrarium"),
-            DevSpotPair(dev: "Kubernetes", decoy: "Cubicle"),
-            DevSpotPair(dev: "Cryptography", decoy: "Cartography"),
-            DevSpotPair(dev: "Webpack", decoy: "Webcam"),
-            DevSpotPair(dev: "Serverless", decoy: "Seamless"),
-            DevSpotPair(dev: "GraphQL", decoy: "Graphics"),
-            DevSpotPair(dev: "Callback", decoy: "Calligraphy"),
-            DevSpotPair(dev: "Redis", decoy: "Radius")
+            DevSpotPair(dev: "ARC", decoy: "RPC"),
+            DevSpotPair(dev: "ViewModifier", decoy: "ViewModel"),
+            DevSpotPair(dev: "CQRS", decoy: "CORS"),
+            DevSpotPair(dev: "MVCC", decoy: "MVC"),
+            DevSpotPair(dev: "Retain Cycle", decoy: "Release Train"),
+            DevSpotPair(dev: "Type Erasure", decoy: "Type Inference"),
+            DevSpotPair(dev: "Circuit Breaker", decoy: "Circuit Board"),
+            DevSpotPair(dev: "Garbage Collection", decoy: "Garbage Collector"),
+            DevSpotPair(dev: "Race Condition", decoy: "Rate Limiting"),
+            DevSpotPair(dev: "Dependency Injection", decoy: "Dependency Graph")
         ],
         decoys: []
     )

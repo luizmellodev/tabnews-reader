@@ -68,6 +68,27 @@ enum BadgeType: String, Codable, CaseIterable {
     case socialButterfly = "social_butterfly"
     case knowledgeSeeker = "knowledge_seeker"
     case masterCurator = "master_curator"
+
+    // DevWordle badges
+    case firstWordle = "first_wordle"
+    case wordleWins5 = "wordle_wins_5"
+    case wordleWins10 = "wordle_wins_10"
+    case wordleWins25 = "wordle_wins_25"
+    case wordleWins50 = "wordle_wins_50"
+    case wordleStreak7 = "wordle_streak_7"
+    case wordleStreak30 = "wordle_streak_30"
+    case wordleGenius = "wordle_genius"
+    case wordleSharp = "wordle_sharp"
+
+    // DevLeet badges
+    case firstLeet = "first_leet"
+    case leetSolves5 = "leet_solves_5"
+    case leetSolves10 = "leet_solves_10"
+    case leetSolves25 = "leet_solves_25"
+    case leetStreak3 = "leet_streak_3"
+    case leetStreak5 = "leet_streak_5"
+    case leetStreak10 = "leet_streak_10"
+    case leetHardMode = "leet_hard_mode"
     
     var title: String {
         switch self {
@@ -113,6 +134,23 @@ enum BadgeType: String, Codable, CaseIterable {
         case .socialButterfly: return "Social"
         case .knowledgeSeeker: return "Buscador de Conhecimento"
         case .masterCurator: return "Curador Master"
+        case .firstWordle: return "Primeiro DevWordle"
+        case .wordleWins5: return "Palpiteiro"
+        case .wordleWins10: return "Cracker de Código"
+        case .wordleWins25: return "Lexicógrafo Dev"
+        case .wordleWins50: return "Mestre das Letras"
+        case .wordleStreak7: return "Sequência Semanal"
+        case .wordleStreak30: return "Imparável"
+        case .wordleGenius: return "Gênio"
+        case .wordleSharp: return "Precisão"
+        case .firstLeet: return "Primeiro Algoritmo"
+        case .leetSolves5: return "Coder Iniciante"
+        case .leetSolves10: return "Problem Solver"
+        case .leetSolves25: return "Engenheiro Dev"
+        case .leetStreak3: return "Leet Consistente"
+        case .leetStreak5: return "Leet Dedicado"
+        case .leetStreak10: return "Veterano Leet"
+        case .leetHardMode: return "Modo Hard"
         }
     }
     
@@ -160,6 +198,23 @@ enum BadgeType: String, Codable, CaseIterable {
         case .socialButterfly: return "Curtiu e comentou 20 vezes"
         case .knowledgeSeeker: return "Leu, destacou e anotou em 10 posts"
         case .masterCurator: return "Organizou 50 posts em pastas"
+        case .firstWordle: return "Venceu seu primeiro DevWordle"
+        case .wordleWins5: return "Venceu 5 DevWordles"
+        case .wordleWins10: return "Venceu 10 DevWordles"
+        case .wordleWins25: return "Venceu 25 DevWordles"
+        case .wordleWins50: return "Venceu 50 DevWordles"
+        case .wordleStreak7: return "Sequência de 7 dias no DevWordle"
+        case .wordleStreak30: return "Sequência de 30 dias no DevWordle"
+        case .wordleGenius: return "Acertou a palavra na 1ª tentativa"
+        case .wordleSharp: return "Venceu em até 2 tentativas, 5 vezes"
+        case .firstLeet: return "Completou seu primeiro DevLeet"
+        case .leetSolves5: return "Completou 5 desafios DevLeet"
+        case .leetSolves10: return "Completou 10 desafios DevLeet"
+        case .leetSolves25: return "Completou 25 desafios DevLeet"
+        case .leetStreak3: return "Sequência de 3 semanas no DevLeet"
+        case .leetStreak5: return "Sequência de 5 semanas no DevLeet"
+        case .leetStreak10: return "Sequência de 10 semanas no DevLeet"
+        case .leetHardMode: return "Completou um DevLeet de dificuldade Hard"
         }
     }
     
@@ -194,6 +249,18 @@ enum BadgeType: String, Codable, CaseIterable {
         case .socialButterfly: return "person.3.fill"
         case .knowledgeSeeker: return "brain.head.profile"
         case .masterCurator: return "star.leadinghalf.filled"
+        case .firstWordle, .wordleWins5: return "character.textbox"
+        case .wordleWins10, .wordleWins25: return "textformat.abc"
+        case .wordleWins50: return "crown.fill"
+        case .wordleStreak7: return "flame.fill"
+        case .wordleStreak30: return "bolt.fill"
+        case .wordleGenius: return "lightbulb.fill"
+        case .wordleSharp: return "scope"
+        case .firstLeet, .leetSolves5: return "chevron.left.forwardslash.chevron.right"
+        case .leetSolves10, .leetSolves25: return "function"
+        case .leetStreak3, .leetStreak5: return "calendar.badge.clock"
+        case .leetStreak10: return "trophy.fill"
+        case .leetHardMode: return "flame.circle.fill"
         }
     }
     
@@ -229,6 +296,19 @@ enum BadgeType: String, Codable, CaseIterable {
         case .socialButterfly: return .pink
         case .knowledgeSeeker: return .purple
         case .masterCurator: return .yellow
+        case .firstWordle, .wordleWins5: return .green
+        case .wordleWins10, .wordleWins25: return .teal
+        case .wordleWins50: return .yellow
+        case .wordleStreak7: return .orange
+        case .wordleStreak30: return .red
+        case .wordleGenius: return .yellow
+        case .wordleSharp: return .mint
+        case .firstLeet, .leetSolves5: return .blue
+        case .leetSolves10, .leetSolves25: return .indigo
+        case .leetStreak3: return .orange
+        case .leetStreak5: return .red
+        case .leetStreak10: return .yellow
+        case .leetHardMode: return .red
         }
     }
     
@@ -275,6 +355,17 @@ enum BadgeType: String, Codable, CaseIterable {
         case .socialButterfly: return 20
         case .knowledgeSeeker: return 10
         case .masterCurator: return 50
+        case .firstWordle, .firstLeet, .wordleGenius, .leetHardMode: return 1
+        case .wordleWins5, .leetSolves5: return 5
+        case .wordleWins10, .leetSolves10: return 10
+        case .wordleWins25, .leetSolves25: return 25
+        case .wordleWins50: return 50
+        case .wordleStreak7: return 7
+        case .wordleStreak30: return 30
+        case .wordleSharp: return 5
+        case .leetStreak3: return 3
+        case .leetStreak5: return 5
+        case .leetStreak10: return 10
         }
     }
 }

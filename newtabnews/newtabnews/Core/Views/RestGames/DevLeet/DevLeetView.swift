@@ -16,11 +16,6 @@ struct DevLeetView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 24) {
                     header
-
-                    if problem.hasSolutions {
-                        solutionButton
-                    }
-
                     paperCallout
                     problemCard
                     examplesSection
@@ -28,13 +23,19 @@ struct DevLeetView: View {
 
                     if isSolved {
                         solvedBanner
-                    } else {
-                        markSolvedButton
-                    }
 
-                    if isSolved {
+                        if problem.hasSolutions {
+                            prominentSolutionButton
+                        }
+
                         DevLeetCountdownLabel()
                             .frame(maxWidth: .infinity)
+                    } else {
+                        markSolvedButton
+
+                        if problem.hasSolutions {
+                            subtleSolutionLink
+                        }
                     }
                 }
                 .padding(.horizontal, 20)
@@ -69,6 +70,7 @@ struct DevLeetView: View {
             DevLeetHonorSheet(
                 onConfirm: {
                     DevLeetStorage.shared.markSolved(weekKey: weekKey)
+                    GamificationManager.shared.trackDevLeetSolved(difficulty: problem.difficulty)
                     RestFeedbackManager.shared.confirm()
                     isSolved = true
                     showHonorSheet = false
@@ -82,9 +84,13 @@ struct DevLeetView: View {
         }
         .sheet(isPresented: $showSolutionSheet) {
             if let solutions = problem.solutions {
-                DevLeetSolutionSheet(problemTitle: problem.title, solutions: solutions)
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
+                DevLeetSolutionSheet(
+                    problemTitle: problem.title,
+                    solutions: solutions,
+                    isPostSolve: isSolved
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
             }
         }
     }
@@ -235,7 +241,7 @@ struct DevLeetView: View {
         }
     }
 
-    private var solutionButton: some View {
+    private var prominentSolutionButton: some View {
         Button {
             RestFeedbackManager.shared.tap()
             showSolutionSheet = true
@@ -243,36 +249,57 @@ struct DevLeetView: View {
             HStack(spacing: 12) {
                 Image(systemName: "chevron.left.forwardslash.chevron.right")
                     .font(.title3.weight(.semibold))
-                    .foregroundStyle(.cyan)
-                    .frame(width: 40, height: 40)
-                    .background(.cyan.opacity(0.15), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .foregroundStyle(.green)
+                    .frame(width: 44, height: 44)
+                    .background(Color.green.opacity(0.15), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("Ver solução de referência")
-                        .font(.subheadline.weight(.semibold))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Compare com a solução")
+                        .font(.headline.weight(.semibold))
                         .foregroundStyle(.white)
                     Text("Python · Java · JavaScript · C++")
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.white.opacity(0.55))
                 }
 
                 Spacer()
 
-                Text("Abrir")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.cyan)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(.cyan.opacity(0.15), in: Capsule())
+                Image(systemName: "arrow.right.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.green)
             }
-            .padding(16)
-            .background(.cyan.opacity(0.1), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .padding(18)
+            .background(.green.opacity(0.12), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(.cyan.opacity(0.35), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(.green.opacity(0.3), lineWidth: 1)
             }
         }
         .buttonStyle(RestGameScaleButtonStyle())
+    }
+
+    private var subtleSolutionLink: some View {
+        Button {
+            RestFeedbackManager.shared.tap()
+            showSolutionSheet = true
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "lightbulb")
+                    .font(.caption.weight(.semibold))
+
+                Text("Travou? Ver solução de referência")
+                    .font(.caption.weight(.medium))
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption2.weight(.bold))
+            }
+            .foregroundStyle(.white.opacity(0.5))
+            .padding(.vertical, 4)
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var markSolvedButton: some View {
@@ -396,20 +423,24 @@ private struct DevLeetHonorSheet: View {
 private struct DevLeetSolutionSheet: View {
     let problemTitle: String
     let solutions: DevLeetSolutions
+    var isPostSolve = false
 
     @Environment(\.dismiss) private var dismiss
     @State private var selectedLanguage: DevLeetSolutionLanguage
 
-    init(problemTitle: String, solutions: DevLeetSolutions) {
+    init(problemTitle: String, solutions: DevLeetSolutions, isPostSolve: Bool = false) {
         self.problemTitle = problemTitle
         self.solutions = solutions
+        self.isPostSolve = isPostSolve
         _selectedLanguage = State(initialValue: solutions.availableLanguages.first ?? .python)
     }
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Compare com o que você escreveu no papel.")
+                Text(isPostSolve
+                     ? "Compare com o que você escreveu no papel."
+                     : "Use como referência para aprender — tente resolver sozinho primeiro.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 20)

@@ -111,10 +111,12 @@ final class DevWordleViewModel {
             storage.recordWin(on: dateKey)
             if let attempt = winningAttemptNumber {
                 GameCenterManager.shared.submitDevWordleScore(attempts: attempt)
+                GamificationManager.shared.trackDevWordleWin(attempts: attempt)
             }
         } else if currentRowIndex >= DevWordleEngine.maxAttempts - 1 {
             gameStatus = .lost
             storage.recordLoss(on: dateKey)
+            GamificationManager.shared.trackDevWordlePlayed()
         } else {
             currentRowIndex += 1
             currentGuess = ""
@@ -221,6 +223,10 @@ final class DevWordleStorage {
 
     func recordLoss(on dateKey: String) {
         updateStreak(for: dateKey, won: false)
+    }
+
+    var currentStreak: Int {
+        UserDefaults.standard.integer(forKey: Keys.currentStreak)
     }
 
     private func updateStreak(for dateKey: String, won: Bool) {
