@@ -16,14 +16,15 @@ struct DevLeetView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 24) {
                     header
-                    paperCallout
-                    problemCard
-                    examplesSection
-                    constraintsSection
 
                     if problem.hasSolutions {
                         solutionButton
                     }
+
+                    paperCallout
+                    problemCard
+                    examplesSection
+                    constraintsSection
 
                     if isSolved {
                         solvedBanner
@@ -50,6 +51,19 @@ struct DevLeetView: View {
         .onAppear {
             RestFeedbackManager.shared.prepare()
             refreshState()
+        }
+        .toolbar {
+            if problem.hasSolutions {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        RestFeedbackManager.shared.tap()
+                        showSolutionSheet = true
+                    } label: {
+                        Image(systemName: "chevron.left.forwardslash.chevron.right")
+                    }
+                    .accessibilityLabel("Ver solução de referência")
+                }
+            }
         }
         .sheet(isPresented: $showHonorSheet) {
             DevLeetHonorSheet(
@@ -226,13 +240,17 @@ struct DevLeetView: View {
             RestFeedbackManager.shared.tap()
             showSolutionSheet = true
         } label: {
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 Image(systemName: "chevron.left.forwardslash.chevron.right")
-                    .font(.subheadline.weight(.semibold))
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.cyan)
+                    .frame(width: 40, height: 40)
+                    .background(.cyan.opacity(0.15), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text("Ver solução de referência")
                         .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
                     Text("Python · Java · JavaScript · C++")
                         .font(.caption2)
                         .foregroundStyle(.white.opacity(0.55))
@@ -240,16 +258,18 @@ struct DevLeetView: View {
 
                 Spacer()
 
-                Image(systemName: "chevron.right")
+                Text("Abrir")
                     .font(.caption.weight(.bold))
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.cyan)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.cyan.opacity(0.15), in: Capsule())
             }
-            .foregroundStyle(.white)
             .padding(16)
-            .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .background(.cyan.opacity(0.1), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(.cyan.opacity(0.25), lineWidth: 1)
+                    .stroke(.cyan.opacity(0.35), lineWidth: 1)
             }
         }
         .buttonStyle(RestGameScaleButtonStyle())

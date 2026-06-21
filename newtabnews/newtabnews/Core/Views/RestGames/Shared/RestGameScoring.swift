@@ -29,7 +29,7 @@ struct HSLColor: Equatable {
 
 enum RestGameScoring {
     static let frequencyRange: ClosedRange<Double> = 200...800
-    static let memorizeDuration: TimeInterval = 5
+    static let memorizeDuration: TimeInterval = 3
     static let totalRounds = 5
 
     static func randomEasyFrequency() -> Double {

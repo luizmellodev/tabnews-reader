@@ -73,14 +73,12 @@ struct ScoreRevealView: View {
 
                 ZStack {
                     Circle()
-                        .stroke(RestGameScoring.scoreColor(score).opacity(0.25), lineWidth: 10)
-                        .frame(width: 180, height: 180)
-                        .scaleEffect(ringScale)
+                        .stroke(RestGameScoring.scoreColor(score).opacity(0.25), lineWidth: 8)
+                        .frame(width: 156, height: 156)
 
                     Circle()
                         .fill(RestGameScoring.scoreColor(score).opacity(0.12))
-                        .frame(width: 144, height: 144)
-                        .scaleEffect(ringScale)
+                        .frame(width: 128, height: 128)
 
                     VStack(spacing: 4) {
                         Text(RestGameScoring.formattedScore(displayedScore))
@@ -94,6 +92,9 @@ struct ScoreRevealView: View {
                             .foregroundStyle(.white.opacity(0.45))
                     }
                 }
+                .frame(width: 176, height: 176)
+                .scaleEffect(ringScale)
+                .padding(12)
 
                 if showComparison {
                     comparisonSection
@@ -107,6 +108,7 @@ struct ScoreRevealView: View {
                 }
             }
             .padding(.vertical, 32)
+            .padding(.horizontal, 20)
         }
         .onAppear {
             guard !hasAnimated else { return }
@@ -189,9 +191,9 @@ struct ScoreRevealView: View {
     }
 
     private func frequencyDeltaLabel(guess: Double, target: Double) -> String {
-        let delta = abs(log2(target) - log2(guess))
-        if delta < 0.02 { return "Quase perfeito" }
-        return "Δ \(String(format: "%.0f", delta * 100)) centavos"
+        let hzDiff = abs(target - guess)
+        if hzDiff < 4 { return "Quase perfeito" }
+        return "Diferença de \(String(format: "%.0f", hzDiff)) Hz"
     }
 
     private func frequencyComparisonCard(title: String, frequency: Double) -> some View {
@@ -401,7 +403,7 @@ extension RestGameOnboardingOverlay {
             icon: "paintpalette.fill",
             accent: .pink,
             steps: [
-                "Memorize a cor por 5 segundos — preste atenção no tom.",
+                "Memorize a cor por 3 segundos — preste atenção no tom.",
                 "Recrie a cor com os sliders à esquerda.",
                 "Toque ✓ quando achar que acertou. São 5 rounds."
             ],
@@ -415,7 +417,7 @@ extension RestGameOnboardingOverlay {
             icon: "waveform",
             accent: .cyan,
             steps: [
-                "Ouça o som por 5 segundos — grave o pitch na cabeça.",
+                "Ouça o som por 3 segundos — grave o pitch na cabeça.",
                 "Arraste ↑↓ na onda para recriar a frequência.",
                 "Toque ✓ para confirmar. São 5 rounds."
             ],

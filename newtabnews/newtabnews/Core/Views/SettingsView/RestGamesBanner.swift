@@ -137,11 +137,11 @@ enum RestGamesNewPuzzlePrompt {
     private static func bannerMessage(wordle: Bool, leet: Bool) -> String {
         switch (wordle, leet) {
         case (true, true):
-            return "DevWordle e DevLeet novos · toque para jogar"
+            return "DevWordle e DevLeet novos"
         case (true, false):
-            return "Novo DevWordle hoje · toque para jogar"
+            return "Novo DevWordle hoje"
         case (false, true):
-            return "Novo DevLeet esta semana · toque para jogar"
+            return "Novo DevLeet esta semana"
         default:
             return ""
         }
@@ -177,38 +177,59 @@ struct RestGamesNewPuzzleBanner: View {
     let onDismiss: () -> Void
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 10) {
             Button(action: onTap) {
-                HStack(spacing: 5) {
+                HStack(spacing: 10) {
+                    HStack(spacing: 6) {
+                        if state.hasWordle {
+                            gameIcon("character.textbox", color: .green)
+                        }
+                        if state.hasLeet {
+                            gameIcon("pencil.and.outline", color: .orange)
+                        }
+                    }
+
                     Text(state.message)
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.white.opacity(0.88))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.primary)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.85)
+
+                    Spacer(minLength: 0)
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 8, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.35))
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.tertiary)
                 }
-                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
 
             Button(action: onDismiss) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.35))
-                    .frame(width: 28, height: 26)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .frame(width: 24, height: 24)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Fechar aviso")
         }
-        .padding(.leading, 14)
-        .frame(maxWidth: .infinity)
-        .frame(height: 26)
-        .background(Color(red: 0.04, green: 0.04, blue: 0.05))
-        .colorScheme(.dark)
+        .padding(.leading, 12)
+        .padding(.trailing, 8)
+        .padding(.vertical, 10)
+        .background(Color("CardColor"), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        }
+    }
+
+    private func gameIcon(_ symbol: String, color: Color) -> some View {
+        Image(systemName: symbol)
+            .font(.caption2.weight(.bold))
+            .foregroundStyle(color)
+            .frame(width: 22, height: 22)
+            .background(color.opacity(0.14), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
 }
 

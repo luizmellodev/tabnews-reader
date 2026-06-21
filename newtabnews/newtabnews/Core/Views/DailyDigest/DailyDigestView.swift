@@ -29,7 +29,7 @@ struct DailyDigestView: View {
                     emptyStateView
                 }
             }
-            .navigationTitle("Daily Dev Briefing")
+            .navigationTitle("Briefing Diário")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -85,9 +85,11 @@ struct DailyDigestView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(20)
-                    .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
+                    .background(Color("CardColor"), in: Capsule())
+                    .overlay {
+                        Capsule()
+                            .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+                    }
                     .padding(.top, 8)
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
@@ -107,8 +109,7 @@ struct DailyDigestView: View {
                                 .foregroundStyle(.white)
                         }
                         .padding(24)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(16)
+                        .background(Color("CardColor"), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                     }
                 }
             }
@@ -167,41 +168,25 @@ struct DailyDigestView: View {
     }
     
     private func headerView(_ digest: DailyDigest) -> some View {
-        VStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [.blue.opacity(0.3), .purple.opacity(0.2)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 80, height: 80)
-                
-                Image(systemName: "chart.line.uptrend.xyaxis")
-                    .font(.system(size: 35))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.blue, .purple],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-            }
-            
-            VStack(spacing: 6) {
-                Text(digest.formattedDate)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                
-                Text("Top \(digest.items.count) discussões de hoje")
-                    .font(.title3)
-                    .fontWeight(.semibold)
-            }
+        VStack(spacing: 8) {
+            Image(systemName: "sun.max.fill")
+                .font(.system(size: 44))
+                .foregroundStyle(.blue)
+
+            Text("Briefing Diário")
+                .font(.title2)
+                .fontWeight(.bold)
+
+            Text(digest.formattedDate)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Text("Top \(digest.items.count) discussões de hoje")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
         }
-        .padding(.top, 20)
-        .padding(.bottom, 10)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
     }
     
     private var loadingView: some View {
@@ -237,40 +222,36 @@ struct DigestItemCard: View {
     let item: DailyDigestItem
     let rank: Int
     let onTap: () -> Void
-    
+
     var body: some View {
         Button(action: onTap) {
-            HStack(alignment: .top, spacing: 16) {
-                ZStack {
-                    Circle()
-                        .fill(rankColor.opacity(0.15))
-                        .frame(width: 36, height: 36)
-                    
-                    Text("\(rank)")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(rankColor)
-                }
-                
+            HStack(alignment: .top, spacing: 14) {
+                Text("\(rank)")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(rank <= 3 ? rankColor : .secondary)
+                    .frame(width: 22, alignment: .center)
+                    .padding(.top, 2)
+
                 VStack(alignment: .leading, spacing: 8) {
                     Text(item.post.title ?? "Sem título")
                         .font(.headline)
                         .foregroundStyle(.primary)
                         .lineLimit(3)
                         .multilineTextAlignment(.leading)
-                    
+
                     HStack(spacing: 12) {
                         Label("\(item.post.tabcoins ?? 0)", systemImage: "star.fill")
                             .font(.caption)
                             .foregroundStyle(.orange)
-                        
+
                         if let comments = item.post.childrenDeepCount, comments > 0 {
                             Label("\(comments)", systemImage: "bubble.left.fill")
                                 .font(.caption)
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(.secondary)
                         }
-                        
+
                         Spacer()
-                        
+
                         if let username = item.post.ownerUsername {
                             Text("@\(username)")
                                 .font(.caption)
@@ -278,28 +259,32 @@ struct DigestItemCard: View {
                         }
                     }
                 }
-                
+
                 Image(systemName: "chevron.right")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }
             .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(16)
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(rankColor.opacity(0.2), lineWidth: rank <= 3 ? 2 : 0)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color("CardColor"))
             )
+            .overlay {
+                if rank <= 3 {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(rankColor.opacity(0.25), lineWidth: 1)
+                }
+            }
         }
         .buttonStyle(.plain)
     }
-    
+
     private var rankColor: Color {
         switch rank {
-        case 1: return .yellow
-        case 2: return .gray
-        case 3: return .orange
-        default: return .blue
+        case 1: return .orange
+        case 2: return .secondary
+        case 3: return .blue
+        default: return .clear
         }
     }
 }
@@ -308,70 +293,59 @@ struct DigestItemCard: View {
 
 struct DailyDigestBanner: View {
     let onTap: () -> Void
-    
+
+    private let messages = [
+        "Acordou? Os melhores posts de hoje já estão aqui!",
+        "Seu café da manhã de conteúdo chegou! ☕",
+        "Não perdeu nada do TabNews hoje — a gente filtrou pra você!",
+        "As discussões mais quentes do dia te esperam!",
+        "Pouco tempo? Veja o que rolou hoje no TabNews!",
+        "Briefing pronto: o essencial de hoje em um lugar só!",
+        "Começou o dia? Veja o que a comunidade produziu!",
+        "Seu resumo diário está prontinho!"
+    ]
+
+    @State private var currentMessage: String = ""
+
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 14) {
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [.blue.opacity(0.2), .purple.opacity(0.15)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 44, height: 44)
-                    
-                    Image(systemName: "chart.line.uptrend.xyaxis")
-                        .font(.title3)
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.blue, .purple],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                }
-                
+            HStack(spacing: 12) {
+                Image(systemName: "sun.max.fill")
+                    .font(.title2)
+                    .foregroundStyle(.blue)
+
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 0) {
-                        Text("Seu daily dev briefing está pronto")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.primary)
-                    }
-                    
-                    Text("Veja os destaques de hoje")
+                    Text("Briefing Diário")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+
+                    Text(currentMessage)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
                 }
-                
+
                 Spacer()
-                
-                Image(systemName: "arrow.right.circle.fill")
-                    .font(.title3)
-                    .foregroundStyle(.blue)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            .padding(16)
+            .padding()
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(.systemGray6))
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color.blue.opacity(0.1))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [.blue.opacity(0.3), .purple.opacity(0.2)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                ),
-                                lineWidth: 1.5
-                            )
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(Color.blue.opacity(0.3), lineWidth: 1)
                     )
             )
-            .shadow(color: .blue.opacity(0.1), radius: 8, x: 0, y: 4)
         }
         .buttonStyle(.plain)
+        .onAppear {
+            currentMessage = messages.randomElement() ?? messages[0]
+        }
     }
 }
 

@@ -67,6 +67,23 @@ struct MainView: View {
                     .padding(.top, 4)
                     .padding(.bottom, 2)
 
+                    if let banner = newPuzzleBanner {
+                        RestGamesNewPuzzleBanner(
+                            state: banner,
+                            onTap: {
+                                NotificationCenter.default.post(name: .showRestGamesHub, object: nil)
+                            },
+                            onDismiss: {
+                                RestGamesNewPuzzlePrompt.dismiss(banner)
+                                withAnimation(.easeOut(duration: 0.2)) {
+                                    newPuzzleBanner = RestGamesNewPuzzlePrompt.current()
+                                }
+                            }
+                        )
+                        .padding(.horizontal)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+
                     if shouldShowDailyDigestBanner {
                         DailyDigestBanner {
                             dailyDigestManager.markAsViewed()
@@ -91,23 +108,6 @@ struct MainView: View {
             }
             .refreshable {
                 await refreshContent()
-            }
-            .safeAreaInset(edge: .top, spacing: 0) {
-                if let banner = newPuzzleBanner {
-                    RestGamesNewPuzzleBanner(
-                        state: banner,
-                        onTap: {
-                            NotificationCenter.default.post(name: .showRestGamesHub, object: nil)
-                        },
-                        onDismiss: {
-                            RestGamesNewPuzzlePrompt.dismiss(banner)
-                            withAnimation(.easeOut(duration: 0.2)) {
-                                newPuzzleBanner = RestGamesNewPuzzlePrompt.current()
-                            }
-                        }
-                    )
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                }
             }
             .animation(.easeOut(duration: 0.25), value: newPuzzleBanner)
             .animation(.spring(), value: shouldShowDigestBanner)

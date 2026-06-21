@@ -14,7 +14,7 @@ struct SoundRibbonVisualProfile: Equatable {
     static let interactive = SoundRibbonVisualProfile(
         amplitudeScale: 1,
         wavelengthScale: 1,
-        speedScale: 0.11,
+        speedScale: 0.16,
         spreadScale: 1,
         envelopeCycles: 2.1,
         phaseOffset: 0,
@@ -25,7 +25,7 @@ struct SoundRibbonVisualProfile: Equatable {
         SoundRibbonVisualProfile(
             amplitudeScale: Double.random(in: 0.45...1.65),
             wavelengthScale: Double.random(in: 0.5...1.75),
-            speedScale: Double.random(in: 0.04...0.13),
+            speedScale: Double.random(in: 0.12...0.28),
             spreadScale: Double.random(in: 0.6...1.45),
             envelopeCycles: Double.random(in: 1.1...3.8),
             phaseOffset: Double.random(in: 0...(2 * .pi)),
@@ -43,13 +43,13 @@ struct SoundRibbonView: View {
     var visualProfile: SoundRibbonVisualProfile = .interactive
     var showHint: Bool = true
 
-    @State private var renderFrequency: Double = 440
-    @State private var dragStretch: Double = 0
+    @State private var visualNorm: Double = 0.5
     @State private var dragAnchorY: CGFloat?
     @State private var dragAnchorFrequency: Double?
 
     private let minFrequency = RestGameScoring.frequencyRange.lowerBound
     private let maxFrequency = RestGameScoring.frequencyRange.upperBound
+    private var isDragging: Bool { dragAnchorY != nil }
 
     var body: some View {
         GeometryReader { geo in
@@ -58,16 +58,23 @@ struct SoundRibbonView: View {
                     Color.black.ignoresSafeArea()
                 }
 
-                TimelineView(.animation(minimumInterval: 1 / 30)) { timeline in
+                TimelineView(.animation(minimumInterval: 1 / 60)) { timeline in
+                    SoundRibbonSmoothingTick(
+                        targetNorm: normalizedFrequency(frequency),
+                        isDragging: isDragging,
+                        visualNorm: $visualNorm,
+                        tick: timeline.date.timeIntervalSinceReferenceDate
+                    )
+
                     Canvas { context, size in
                         SoundRibbonRenderer.draw(
                             context: &context,
                             size: size,
-                            frequency: renderFrequency,
+                            visualNorm: visualNorm,
                             time: timeline.date.timeIntervalSinceReferenceDate,
                             compact: compact,
                             profile: visualProfile,
-                            dragStretch: dragStretch
+                            isInteractive: isInteractive
                         )
                     }
                 }
@@ -97,13 +104,11 @@ struct SoundRibbonView: View {
 
                             let deltaY = value.location.y - anchorY
                             let startNorm = normalizedFrequency(anchorFrequency)
-                            let deltaNorm = Double(-deltaY / geo.size.height) * 1.15
+                            let deltaNorm = Double(-deltaY / geo.size.height) * 0.82
                             let newNorm = min(1, max(0, startNorm + deltaNorm))
                             let newFrequency = frequencyFromNormalized(newNorm)
 
                             frequency = newFrequency
-                            renderFrequency = newFrequency
-                            dragStretch = newNorm - startNorm
 
                             if isInteractive && !compact {
                                 ToneGenerator.shared.sustain(frequency: newFrequency)
@@ -113,8 +118,6 @@ struct SoundRibbonView: View {
                         .onEnded { _ in
                             dragAnchorY = nil
                             dragAnchorFrequency = nil
-                            renderFrequency = frequency
-                            dragStretch = 0
                         }
                     : nil
             )
@@ -122,21 +125,18 @@ struct SoundRibbonView: View {
         .frame(height: compact ? 72 : nil)
         .frame(maxHeight: compact ? 72 : .infinity)
         .onAppear {
-            renderFrequency = frequency
+            visualNorm = normalizedFrequency(frequency)
             if isInteractive && !compact {
                 ToneGenerator.shared.sustain(frequency: frequency)
             }
         }
         .onChange(of: frequency) { _, newValue in
-            guard !isInteractive || dragAnchorY == nil else { return }
-            renderFrequency = newValue
-
             if isInteractive && !compact {
                 ToneGenerator.shared.sustain(frequency: newValue)
             }
         }
         .onChange(of: visualProfile) { _, _ in
-            renderFrequency = frequency
+            visualNorm = normalizedFrequency(frequency)
         }
     }
 
@@ -150,6 +150,22 @@ struct SoundRibbonView: View {
         let minLog = log2(minFrequency)
         let maxLog = log2(maxFrequency)
         return (log2(value) - minLog) / (maxLog - minLog)
+    }
+}
+
+private struct SoundRibbonSmoothingTick: View {
+    let targetNorm: Double
+    let isDragging: Bool
+    @Binding var visualNorm: Double
+    let tick: TimeInterval
+
+    var body: some View {
+        Color.clear
+            .frame(width: 0, height: 0)
+            .onChange(of: tick) { _, _ in
+                let rate = isDragging ? 0.065 : 0.12
+                visualNorm += (targetNorm - visualNorm) * rate
+            }
     }
 }
 
@@ -201,20 +217,24 @@ private enum SoundRibbonRenderer {
     static func draw(
         context: inout GraphicsContext,
         size: CGSize,
-        frequency: Double,
+        visualNorm: Double,
         time: TimeInterval,
         compact: Bool,
         profile: SoundRibbonVisualProfile,
-        dragStretch: Double = 0
+        isInteractive: Bool = false
     ) {
         let strands = compact ? compactStrands : fullStrands
         let centerX = size.width * 0.5
-        let norm = normalizedFrequency(frequency)
-        let wavelength = max(compact ? 36 : 44, (compact ? 4600 : 8200) / frequency) * profile.wavelengthScale
-        let baseAmplitude = compact ? 6.5 : min(46, size.width * 0.13)
-        let amplitude = baseAmplitude * (0.5 + (1 - norm) * 0.85) * profile.amplitudeScale
-        let drift = time * profile.speedScale
-        let stretchBoost = 1 + abs(dragStretch) * (compact ? 0.06 : 0.14)
+        let deform = frequencyDeformation(norm: visualNorm, compact: compact)
+        let visualFrequency = frequencyFromNormalized(visualNorm)
+
+        let wavelength = max(compact ? 28 : 32, (compact ? 5200 : 11500) / visualFrequency)
+            * profile.wavelengthScale
+            * deform.wavelengthScale
+        let baseAmplitude = compact ? 6.5 : min(52, size.width * 0.14)
+        let amplitude = baseAmplitude * deform.amplitudeScale * profile.amplitudeScale
+        let driftSpeed = isInteractive && !compact ? profile.speedScale * 0.82 : profile.speedScale * deform.animSpeed
+        let drift = time * driftSpeed
 
         drawStrands(
             context: &context,
@@ -222,11 +242,43 @@ private enum SoundRibbonRenderer {
             strands: strands,
             centerX: centerX,
             wavelength: wavelength,
-            amplitude: amplitude * stretchBoost,
+            amplitude: amplitude,
             drift: drift,
+            time: time,
             compact: compact,
             profile: profile,
-            dragStretch: dragStretch
+            deform: deform
+        )
+    }
+
+    private static func frequencyFromNormalized(_ norm: Double) -> Double {
+        let minLog = log2(RestGameScoring.frequencyRange.lowerBound)
+        let maxLog = log2(RestGameScoring.frequencyRange.upperBound)
+        return pow(2, minLog + norm * (maxLog - minLog))
+    }
+
+    private struct FrequencyDeformation {
+        let spreadScale: Double
+        let amplitudeScale: Double
+        let wavelengthScale: Double
+        let lineScale: Double
+        let bulgeScale: Double
+        let animSpeed: Double
+        let pinch: Double
+    }
+
+    private static func frequencyDeformation(norm: Double, compact: Bool) -> FrequencyDeformation {
+        let low = 1 - norm
+        let boost = compact ? 0.75 : 1.0
+
+        return FrequencyDeformation(
+            spreadScale: (0.28 + low * 1.05) * boost,
+            amplitudeScale: 0.22 + low * 1.45,
+            wavelengthScale: 0.55 + low * 0.75,
+            lineScale: 0.35 + low * 0.95,
+            bulgeScale: 0.18 + low * 1.12,
+            animSpeed: 0.75 + norm * 0.85,
+            pinch: 0.12 + norm * 0.72
         )
     }
 
@@ -238,12 +290,13 @@ private enum SoundRibbonRenderer {
         wavelength: Double,
         amplitude: Double,
         drift: Double,
+        time: TimeInterval,
         compact: Bool,
         profile: SoundRibbonVisualProfile,
-        dragStretch: Double
+        deform: FrequencyDeformation
     ) {
-        let step = compact ? 2.8 : 2.2
-        let liveTension = dragStretch * (compact ? 0.06 : 0.1)
+        let step = compact ? 2.6 : 2.0
+        let breathe = sin(time * 0.85) * 0.045
 
         for strand in strands {
             var path = Path()
@@ -252,17 +305,15 @@ private enum SoundRibbonRenderer {
             for y in stride(from: 0.0, through: Double(size.height), by: step) {
                 let progress = y / max(Double(size.height), 1)
                 let edgeFade = sin(progress * .pi)
-                let bulge = 0.28 + 0.72 * pow(
-                    sin(progress * .pi * profile.envelopeCycles + profile.phaseOffset + strand.phase * 0.08),
-                    2
-                )
-                let tension = 1 - liveTension * sin(progress * .pi * 2 + strand.phase)
-                let phase = (y / (wavelength * tension) + drift + strand.phase * 0.04) * .pi * 2
+                let bulgeWave = sin(progress * .pi * profile.envelopeCycles + profile.phaseOffset + strand.phase * 0.08)
+                let bulge = (0.12 + deform.bulgeScale * pow(bulgeWave, 2)) * (1 - deform.pinch * pow(abs(bulgeWave), 1.4))
+                let strandDrift = drift + sin(time * 0.55 + strand.phase) * 0.045
+                let phase = (y / wavelength + strandDrift + strand.phase * 0.05) * .pi * 2
                 let primary = sin(phase)
-                let silk = sin(phase * 0.5 + strand.harmonicPhase) * strand.harmonic * 0.35
-                let wave = (primary + silk) * amplitude * bulge * edgeFade
+                let silk = sin(phase * 0.5 + strand.harmonicPhase) * strand.harmonic * 0.32
+                let wave = (primary + silk) * amplitude * bulge * edgeFade * (1 + breathe)
 
-                let spread = strand.spread * profile.spreadScale
+                let spread = strand.spread * profile.spreadScale * deform.spreadScale
                 let point = CGPoint(x: centerX + spread + wave, y: y)
                 if started {
                     path.addLine(to: point)
@@ -274,13 +325,18 @@ private enum SoundRibbonRenderer {
 
             let colorT = strand.colorBias * 0.7 + profile.phaseOffset.truncatingRemainder(dividingBy: 1) * 0.3
             let color = paletteColor(at: colorT)
-                .opacity(strand.opacity * (compact ? 0.9 : 0.72))
+                .opacity(strand.opacity * (compact ? 0.9 : 0.74))
+
+            let lineWidth = max(
+                0.45,
+                strand.width * profile.lineThinning * deform.lineScale * (compact ? 0.85 : 0.72)
+            )
 
             context.stroke(
                 path,
                 with: .color(color),
                 style: StrokeStyle(
-                    lineWidth: max(0.6, strand.width * profile.lineThinning * (compact ? 0.85 : 0.7)),
+                    lineWidth: lineWidth,
                     lineCap: .round,
                     lineJoin: .round
                 )

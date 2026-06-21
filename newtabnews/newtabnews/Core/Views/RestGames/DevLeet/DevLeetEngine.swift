@@ -183,12 +183,20 @@ struct DevLeetCatalog {
 
     private static func loadFromBundle() -> DevLeetCatalog? {
         guard let url = Bundle.main.url(forResource: "dev_leet_problems", withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let payload = try? JSONDecoder().decode(ProblemPayload.self, from: data),
-              !payload.problems.isEmpty else {
+              let data = try? Data(contentsOf: url) else {
             return nil
         }
-        return DevLeetCatalog(problems: payload.problems)
+
+        do {
+            let payload = try JSONDecoder().decode(ProblemPayload.self, from: data)
+            guard !payload.problems.isEmpty else { return nil }
+            return DevLeetCatalog(problems: payload.problems)
+        } catch {
+            #if DEBUG
+            print("DevLeet catalog decode failed:", error)
+            #endif
+            return nil
+        }
     }
 
     private static let fallback = DevLeetCatalog(problems: [
