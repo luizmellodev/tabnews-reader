@@ -21,8 +21,12 @@ class MockContentService: ContentServiceProtocol {
         if shouldFail {
             throw NSError(domain: "MockError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Mock error"])
         }
-        
-        return mockPosts.isEmpty ? createMockPosts() : mockPosts
+
+        if !mockPosts.isEmpty {
+            return mockPosts
+        }
+
+        return createMockDiscoverPosts(page: Int(page) ?? 1, strategy: strategy)
     }
     
     func getPost(user: String, slug: String) async throws -> PostRequest {
@@ -107,7 +111,9 @@ class MockContentService: ContentServiceProtocol {
         owner: String,
         slug: String,
         title: String = "Mock Post",
-        body: String = "Mock body content"
+        body: String = "Mock body content",
+        createdAt: String = "2025-12-24T00:00:00.000Z",
+        tabcoins: Int = 10
     ) -> PostRequest {
         return PostRequest(
             id: id,
@@ -119,16 +125,46 @@ class MockContentService: ContentServiceProtocol {
             status: "published",
             type: "content",
             sourceUrl: nil,
-            createdAt: "2025-12-24T00:00:00.000Z",
-            updatedAt: "2025-12-24T00:00:00.000Z",
-            publishedAt: "2025-12-24T00:00:00.000Z",
+            createdAt: createdAt,
+            updatedAt: createdAt,
+            publishedAt: createdAt,
             deletedAt: nil,
             ownerUsername: owner,
-            tabcoins: 10,
-            tabcoinsCredit: 10,
+            tabcoins: tabcoins,
+            tabcoinsCredit: tabcoins,
             tabcoinsDebit: 0,
             childrenDeepCount: 0
         )
+    }
+
+    private func createMockDiscoverPosts(page: Int, strategy: String) -> [PostRequest] {
+        let baseDate: TimeInterval
+        switch strategy {
+        case "old":
+            baseDate = TimeInterval(-86400 * (120 + (page * 7)))
+        case "new":
+            baseDate = TimeInterval(-86400 * min(90, max(7, page / 2)))
+        case "relevant":
+            baseDate = TimeInterval(-86400 * page)
+        default:
+            baseDate = TimeInterval(-86400 * 3)
+        }
+
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let createdAt = formatter.string(from: Date().addingTimeInterval(baseDate))
+
+        return (1...6).map { index in
+            createMockPost(
+                id: "discover-\(strategy)-\(page)-\(index)",
+                owner: "autor\(index)",
+                slug: "post-\(strategy)-\(page)-\(index)",
+                title: "Post \(strategy.capitalized) \(page).\(index)",
+                body: "Conteúdo de exemplo para descobertas.",
+                createdAt: createdAt,
+                tabcoins: max(4, 20 - index + page)
+            )
+        }
     }
 }
 

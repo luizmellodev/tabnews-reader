@@ -197,10 +197,29 @@ enum ContentStrategy: String, CaseIterable, Hashable {
 
 extension Array where Element == PostRequest {
     func filtered(by query: String) -> [PostRequest] {
-        guard !query.isEmpty else { return self }
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return self }
+
+        let normalizedQuery = trimmed
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .lowercased()
+
         return filter { post in
-            guard let title = post.title else { return false }
-            return title.localizedCaseInsensitiveContains(query)
+            guard post.isRootPost else { return false }
+
+            let title = post.title?
+                .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+                .lowercased() ?? ""
+            let author = post.ownerUsername?
+                .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+                .lowercased() ?? ""
+            let body = post.body?
+                .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+                .lowercased() ?? ""
+
+            return title.contains(normalizedQuery)
+                || author.contains(normalizedQuery)
+                || body.contains(normalizedQuery)
         }
     }
 }

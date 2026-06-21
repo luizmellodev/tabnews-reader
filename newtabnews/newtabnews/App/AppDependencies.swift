@@ -27,6 +27,14 @@ class AppDependencies {
     func makeDigestViewModel() -> DigestViewModel {
         return DigestViewModel(service: contentService)
     }
+
+    func makeDiscoverViewModel() -> DiscoverViewModel {
+        return DiscoverViewModel(service: DiscoverService(contentService: contentService))
+    }
+
+    func makeSearchViewModel() -> SearchViewModel {
+        return SearchViewModel(contentService: contentService)
+    }
 }
 
 extension AppDependencies {

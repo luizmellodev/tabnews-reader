@@ -62,7 +62,8 @@ struct MainTabView: View {
             Tab(AppTab.search.title, systemImage: AppTab.search.icon, value: AppTab.search, role: .search) {
                 SearchView(
                     searchText: $searchText,
-                    isViewInApp: $isViewInApp
+                    isViewInApp: $isViewInApp,
+                    isTabActive: selectedTab == .search
                 )
             }
         }

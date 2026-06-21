@@ -69,6 +69,14 @@
 		794863862B5B55ED009AA720 /* GameController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794863852B5B55ED009AA720 /* GameController.swift */; };
 		794C1A212FE723A00058C778 /* NotificationPayloadParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794C1A202FE723A00058C778 /* NotificationPayloadParser.swift */; };
 		794C1A222FE723A00058C778 /* NotificationPayloadParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794C1A202FE723A00058C778 /* NotificationPayloadParser.swift */; };
+		79F200022F6000020068804C /* PostRequest+Discover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200012F6000010068804C /* PostRequest+Discover.swift */; };
+		79F200062F6000060068804C /* DiscoverService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200052F6000050068804C /* DiscoverService.swift */; };
+		79F200082F6000080068804C /* DiscoverViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200072F6000070068804C /* DiscoverViewModel.swift */; };
+		79F2000A2F60000A0068804C /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200092F6000090068804C /* SearchViewModel.swift */; };
+		79F2000C2F60000C0068804C /* SearchQueryParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F2000B2F60000B0068804C /* SearchQueryParser.swift */; };
+		79F2000E2F60000E0068804C /* DiscoverHeroCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F2000D2F60000D0068804C /* DiscoverHeroCard.swift */; };
+		79F200102F6000100068804C /* DiscoverPostCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F2000F2F60000F0068804C /* DiscoverPostCard.swift */; };
+		79F200122F6000120068804C /* DiscoverSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200112F6000110068804C /* DiscoverSectionView.swift */; };
 		795261722A7B0B6D001FD010 /* NewsletterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795261712A7B0B6D001FD010 /* NewsletterView.swift */; };
 		796D05B22F0AC28C0064A2BC /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796D05B12F0AC28C0064A2BC /* WidgetKit.framework */; };
 		796D05B42F0AC28C0064A2BC /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796D05B32F0AC28C0064A2BC /* SwiftUI.framework */; };
@@ -336,6 +344,14 @@
 		79E728002EFB9FCC007BF27A /* NotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationHandler.swift; sourceTree = "<group>"; };
 		79F100032F5000020068804C /* ContentStrategyPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentStrategyPicker.swift; sourceTree = "<group>"; };
 		79F100052F5000030068804C /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		79F200012F6000010068804C /* PostRequest+Discover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PostRequest+Discover.swift"; sourceTree = "<group>"; };
+		79F200052F6000050068804C /* DiscoverService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverService.swift; sourceTree = "<group>"; };
+		79F200072F6000070068804C /* DiscoverViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewModel.swift; sourceTree = "<group>"; };
+		79F200092F6000090068804C /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
+		79F2000B2F60000B0068804C /* SearchQueryParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchQueryParser.swift; sourceTree = "<group>"; };
+		79F2000D2F60000D0068804C /* DiscoverHeroCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverHeroCard.swift; sourceTree = "<group>"; };
+		79F2000F2F60000F0068804C /* DiscoverPostCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverPostCard.swift; sourceTree = "<group>"; };
+		79F200112F6000110068804C /* DiscoverSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverSectionView.swift; sourceTree = "<group>"; };
 		79F468812F21286F00EFF64F /* LoginWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -736,6 +752,7 @@
 				794C1A202FE723A00058C778 /* NotificationPayloadParser.swift */,
 				799CC4632F489A6C0059BB51 /* DailyDigestManager.swift */,
 				799CC4642F489A6C0059BB51 /* GamificationManager.swift */,
+				79F200052F6000050068804C /* DiscoverService.swift */,
 				796D06452F0AE5B10064A2BC /* KeychainManager.swift */,
 				796D05D82F0AC5610064A2BC /* WidgetSyncManager.swift */,
 				790AB11B2ECF811F00E443E6 /* WatchSyncManager.swift */,
@@ -762,6 +779,7 @@
 				799CC46B2F489AC90059BB51 /* WeeklyChallenge.swift */,
 				790AB0CA2ECEAF0500E443E6 /* Folder.swift */,
 				79C706392D95E766005C26A7 /* PostRequest.swift */,
+				79F200012F6000010068804C /* PostRequest+Discover.swift */,
 				7915848C2EFC903C00C69745 /* SavedPost.swift */,
 				796D064A2F0AE61C0064A2BC /* User.swift */,
 			);
@@ -799,6 +817,12 @@
 		79F100072F5000040068804C /* Search */ = {
 			isa = PBXGroup;
 			children = (
+				79F2000D2F60000D0068804C /* DiscoverHeroCard.swift */,
+				79F2000F2F60000F0068804C /* DiscoverPostCard.swift */,
+				79F200112F6000110068804C /* DiscoverSectionView.swift */,
+				79F200072F6000070068804C /* DiscoverViewModel.swift */,
+				79F200092F6000090068804C /* SearchViewModel.swift */,
+				79F2000B2F60000B0068804C /* SearchQueryParser.swift */,
 				79F100052F5000030068804C /* SearchView.swift */,
 			);
 			path = Search;
@@ -1068,6 +1092,14 @@
 				799049E62A6C93D30050240C /* MainView.swift in Sources */,
 				79F100042F5000020068804C /* ContentStrategyPicker.swift in Sources */,
 				79F100062F5000030068804C /* SearchView.swift in Sources */,
+				79F200022F6000020068804C /* PostRequest+Discover.swift in Sources */,
+				79F200062F6000060068804C /* DiscoverService.swift in Sources */,
+				79F200082F6000080068804C /* DiscoverViewModel.swift in Sources */,
+				79F2000A2F60000A0068804C /* SearchViewModel.swift in Sources */,
+				79F2000C2F60000C0068804C /* SearchQueryParser.swift in Sources */,
+				79F2000E2F60000E0068804C /* DiscoverHeroCard.swift in Sources */,
+				79F200102F6000100068804C /* DiscoverPostCard.swift in Sources */,
+				79F200122F6000120068804C /* DiscoverSectionView.swift in Sources */,
 				796D06492F0AE5F30064A2BC /* CommentComposeSheet.swift in Sources */,
 				796D064D2F0AE8920064A2BC /* FloatingCommentInput.swift in Sources */,
 				79C7062F2D95E5E6005C26A7 /* ContentService.swift in Sources */,
