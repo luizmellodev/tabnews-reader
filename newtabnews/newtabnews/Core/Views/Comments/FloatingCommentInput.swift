@@ -118,6 +118,7 @@ struct FloatingCommentInput: View {
             .padding(.top, 4)
             .padding(.bottom, 10)
         }
+        .padding(.top, 12)
         .background {
             Color(.systemBackground)
                 .ignoresSafeArea()

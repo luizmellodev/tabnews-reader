@@ -13,6 +13,8 @@ class CommentsViewModel {
     private let service: ContentServiceProtocol
     
     var comments: [Comment] = []
+    var threadItems: [CommentThreadItem] = []
+    var rootParentID: String = ""
     var state: DefaultViewState = .started
     var errorMessage: String?
     
@@ -21,15 +23,24 @@ class CommentsViewModel {
     }
     
     @MainActor
-    func fetchComments(user: String, slug: String) async {
+    func fetchComments(user: String, slug: String, postId: String) async {
         self.state = .loading
         
         do {
             let fetchedComments = try await service.getComments(user: user, slug: slug)
-            self.comments = fetchedComments
+            let thread = CommentTreeBuilder.buildThread(
+                from: fetchedComments,
+                fallbackRootParentID: postId
+            )
+            self.rootParentID = thread.rootParentID
+            self.threadItems = thread.items
+            self.comments = thread.items.filter { $0.depth == 0 }.map(\.comment)
             self.state = .requestSucceeded
             
-            print("✅ [CommentsViewModel] Carregados \(fetchedComments.count) comentários")
+            print("✅ [CommentsViewModel] \(self.comments.count) comentários raiz (postId: \(thread.rootParentID.prefix(8))…)")
+            for item in thread.items {
+                print("   depth=\(item.depth) @\(item.comment.ownerUsername ?? "?")")
+            }
         } catch {
             self.state = .requestFailed
             self.errorMessage = error.localizedDescription
@@ -38,37 +49,38 @@ class CommentsViewModel {
     }
     
     @MainActor
-    func refresh(user: String, slug: String) async {
-        await fetchComments(user: user, slug: slug)
+    func refresh(user: String, slug: String, postId: String) async {
+        await fetchComments(user: user, slug: slug, postId: postId)
     }
     
-    // Helper para contar total de comentários (incluindo respostas)
     func totalCommentsCount() -> Int {
-        return countComments(in: comments)
+        threadItems.count
+    }
+    
+    func visibleThreadItems(isExpanded: Bool, previewCount: Int) -> [CommentThreadItem] {
+        guard !isExpanded else { return threadItems }
+        
+        let previewRootIDs = Set(comments.prefix(previewCount).compactMap(\.id))
+        guard !previewRootIDs.isEmpty else { return [] }
+        
+        return threadItems.filter { item in
+            rootAncestorID(for: item, among: previewRootIDs) != nil
+        }
     }
     
     /// IDs dos comentários ancestrais (para expandir a thread até um comentário).
     func ancestorIds(for commentId: String?) -> Set<String> {
         guard let commentId else { return [] }
-        var ancestors: Set<String> = []
         
-        func search(_ items: [Comment], path: [String]) -> Bool {
-            for item in items {
-                let currentPath = path + (item.id.map { [$0] } ?? [])
-                
-                if item.id == commentId {
-                    ancestors = Set(path)
-                    return true
-                }
-                
-                if let children = item.children, search(children, path: currentPath) {
-                    return true
-                }
-            }
-            return false
+        var ancestors: Set<String> = []
+        var currentParentID = threadItems.first(where: { $0.id == commentId })?.comment.parentID
+        
+        while let parentID = currentParentID,
+              let parentItem = threadItems.first(where: { $0.id == parentID }) {
+            ancestors.insert(parentID)
+            currentParentID = parentItem.comment.parentID
         }
         
-        search(comments, path: [])
         return ancestors
     }
     
@@ -81,14 +93,20 @@ class CommentsViewModel {
         return ids
     }
     
-    private func countComments(in comments: [Comment]) -> Int {
-        var count = comments.count
-        for comment in comments {
-            if let children = comment.children {
-                count += countComments(in: children)
-            }
+    private func rootAncestorID(for item: CommentThreadItem, among previewRootIDs: Set<String>) -> String? {
+        if item.depth == 0 {
+            return previewRootIDs.contains(item.id) ? item.id : nil
         }
-        return count
+        
+        var currentParentID = item.comment.parentID
+        
+        while let parentID = currentParentID {
+            if previewRootIDs.contains(parentID) {
+                return parentID
+            }
+            currentParentID = threadItems.first(where: { $0.id == parentID })?.comment.parentID
+        }
+        
+        return nil
     }
 }
-

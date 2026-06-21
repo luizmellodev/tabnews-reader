@@ -89,6 +89,7 @@
 		796D06332F0ADCA40064A2BC /* WidgetPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D06302F0ADCA40064A2BC /* WidgetPost.swift */; };
 		796D06382F0AE4390064A2BC /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D06372F0AE4390064A2BC /* Comment.swift */; };
 		796D06392F0AE4760064A2BC /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D06372F0AE4390064A2BC /* Comment.swift */; };
+		79A1C0022F7000020068804C /* CommentTreeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A1C0012F7000020068804C /* CommentTreeBuilder.swift */; };
 		796D063E2F0AE4C50064A2BC /* CommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D063B2F0AE4C50064A2BC /* CommentsView.swift */; };
 		796D063F2F0AE4C50064A2BC /* CommentsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D063C2F0AE4C50064A2BC /* CommentsViewModel.swift */; };
 		796D06402F0AE4C50064A2BC /* CommentRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796D063A2F0AE4C50064A2BC /* CommentRow.swift */; };
@@ -274,6 +275,7 @@
 		796D06122F0AC8830064A2BC /* TabNewsWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TabNewsWidgetsExtension.entitlements; sourceTree = "<group>"; };
 		796D06302F0ADCA40064A2BC /* WidgetPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPost.swift; sourceTree = "<group>"; };
 		796D06372F0AE4390064A2BC /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
+		79A1C0012F7000020068804C /* CommentTreeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTreeBuilder.swift; sourceTree = "<group>"; };
 		796D063A2F0AE4C50064A2BC /* CommentRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentRow.swift; sourceTree = "<group>"; };
 		79CB0B002F2A20060064A2BC /* CommentBodyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentBodyView.swift; sourceTree = "<group>"; };
 		79CB0B022F2A31060064A2BC /* MarkdownFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFormatting.swift; sourceTree = "<group>"; };
@@ -771,6 +773,7 @@
 			children = (
 				79E727F32EFB9D25007BF27A /* AppTab.swift */,
 				796D06372F0AE4390064A2BC /* Comment.swift */,
+				79A1C0012F7000020068804C /* CommentTreeBuilder.swift */,
 				796D06302F0ADCA40064A2BC /* WidgetPost.swift */,
 				790AB0CE2ECEAF2B00E443E6 /* Note.swift */,
 				790AB0CC2ECEAF1300E443E6 /* Highlight.swift */,
@@ -1065,6 +1068,7 @@
 				79C706122D95E485005C26A7 /* NetworkManager.swift in Sources */,
 				79C706462D9AE157005C26A7 /* NewsletterCard.swift in Sources */,
 				796D06382F0AE4390064A2BC /* Comment.swift in Sources */,
+				79A1C0022F7000020068804C /* CommentTreeBuilder.swift in Sources */,
 				791E87D82A4FD99B00C2F0B4 /* newtabnewsApp.swift in Sources */,
 				796D064F2F0AF3960064A2BC /* ParticleSystem.swift in Sources */,
 				79E727F72EFB9DA2007BF27A /* MainTabView.swift in Sources */,

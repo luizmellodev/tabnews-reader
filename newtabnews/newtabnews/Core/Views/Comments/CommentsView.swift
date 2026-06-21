@@ -15,11 +15,11 @@ struct CommentsView: View {
     @State private var viewModel = CommentsViewModel()
     @State private var isExpanded: Bool = false
     @State private var replyingToComment: Comment?
-    @State private var expandedThreadIDs: Set<String> = []
     @State private var showAuthSheet = false
     @StateObject private var authService = AuthService.shared
     
     private let previewCount = 2
+    private let commentsToggleAnimation = Animation.spring(response: 0.3, dampingFraction: 0.8)
     
     private func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -47,25 +47,18 @@ struct CommentsView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .scrollDismissesKeyboard(.interactively)
-        .task {
-            await viewModel.fetchComments(user: user, slug: slug)
+        .task(id: postId) {
+            isExpanded = false
+            replyingToComment = nil
+            await viewModel.fetchComments(user: user, slug: slug, postId: postId)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             FloatingCommentInput(
                 parentId: replyingToComment?.id ?? postId,
                 replyingTo: replyingToComment?.ownerUsername,
                 onCommentPosted: {
-                    let replyTarget = replyingToComment
-                    
-                    if let replyTarget {
-                        withAnimation(.easeInOut(duration: 0.25)) {
-                            expandedThreadIDs.formUnion(viewModel.threadIdsToExpand(for: replyTarget))
-                            isExpanded = true
-                        }
-                    }
-                    
                     Task {
-                        await viewModel.refresh(user: user, slug: slug)
+                        await viewModel.refresh(user: user, slug: slug, postId: postId)
                     }
                     replyingToComment = nil
                 },
@@ -128,7 +121,7 @@ struct CommentsView: View {
             
             Button {
                 Task {
-                    await viewModel.refresh(user: user, slug: slug)
+                    await viewModel.refresh(user: user, slug: slug, postId: postId)
                 }
             } label: {
                 Label("Tentar novamente", systemImage: "arrow.clockwise")
@@ -160,7 +153,7 @@ struct CommentsView: View {
                 
                 Button {
                     Task {
-                        await viewModel.refresh(user: user, slug: slug)
+                        await viewModel.refresh(user: user, slug: slug, postId: postId)
                     }
                 } label: {
                     Image(systemName: "arrow.clockwise")
@@ -170,90 +163,42 @@ struct CommentsView: View {
             }
             
             // Lista de comentários (colapsada ou expandida)
-            VStack(spacing: 0) {
-                let displayedComments = isExpanded ? viewModel.comments : Array(viewModel.comments.prefix(previewCount))
+            VStack(alignment: .leading, spacing: 0) {
+                let displayedItems = viewModel.visibleThreadItems(
+                    isExpanded: isExpanded,
+                    previewCount: previewCount
+                )
                 
-                ForEach(displayedComments) { comment in
-                    VStack(spacing: 0) {
-                        CommentRow(
-                            comment: comment,
-                            depth: 0,
-                            expandedThreadIDs: $expandedThreadIDs,
-                            onReply: { replyComment in
-                                withAnimation {
-                                    replyingToComment = replyComment
-                                }
-                            },
-                            onVote: { comment, transactionType, completion in
-                                handleVote(comment: comment, transactionType: transactionType, completion: completion)
+                ForEach(displayedItems, id: \.id) { item in
+                    CommentRow(
+                        itemID: item.id,
+                        comment: item.comment,
+                        depth: item.depth,
+                        onReply: { replyComment in
+                            withAnimation {
+                                replyingToComment = replyComment
                             }
-                        )
-                        
-                        if comment.id != displayedComments.last?.id {
-                            commentSeparator
+                        },
+                        onVote: { comment, transactionType, completion in
+                            handleVote(comment: comment, transactionType: transactionType, completion: completion)
                         }
+                    )
+                    .id("\(item.id)-depth-\(item.depth)")
+                    .transition(.opacity)
+                    
+                    if item.id != displayedItems.last?.id {
+                        commentSeparator
                     }
                 }
                 
-                // Botão "Ver todos" com gradiente
                 if !isExpanded && viewModel.comments.count > previewCount {
-                    VStack(spacing: 0) {
-                        // Gradiente fade
-                        LinearGradient(
-                            colors: [
-                                Color(.systemBackground).opacity(0),
-                                Color(.systemBackground).opacity(0.8),
-                                Color(.systemBackground)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        .frame(height: 40)
-                        
-                        // Botão
-                        Button {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                isExpanded = true
-                            }
-                        } label: {
-                            HStack(spacing: 8) {
-                                Text("Ver todos os \(viewModel.totalCommentsCount()) comentários")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                Image(systemName: "chevron.down")
-                                    .font(.caption)
-                            }
-                            .foregroundStyle(.blue)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
-                        }
-                    }
-                    .padding(.top, -20) // Sobrepor um pouco o último comentário
+                    expandCommentsButton
+                        .transition(.opacity)
                 }
                 
-                // Botão "Recolher"
                 if isExpanded && viewModel.comments.count > previewCount {
-                    Button {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            isExpanded = false
-                        }
-                    } label: {
-                        HStack(spacing: 8) {
-                            Text("Recolher comentários")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            Image(systemName: "chevron.up")
-                                .font(.caption)
-                        }
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
-                    }
-                    .padding(.top, 8)
+                    collapseCommentsButton
+                        .transition(.opacity)
                 }
             }
         }
@@ -268,6 +213,65 @@ struct CommentsView: View {
             .fill(.separator.opacity(0.22))
             .frame(height: 1)
             .padding(.vertical, 14)
+    }
+    
+    private var expandCommentsButton: some View {
+        VStack(spacing: 0) {
+            LinearGradient(
+                colors: [
+                    Color(.systemBackground).opacity(0),
+                    Color(.systemBackground).opacity(0.8),
+                    Color(.systemBackground)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 32)
+            
+            Button {
+                withAnimation(commentsToggleAnimation) {
+                    isExpanded = true
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Text("Ver todos os \(viewModel.totalCommentsCount()) comentários")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Image(systemName: "chevron.down")
+                        .font(.caption)
+                }
+                .foregroundStyle(.blue)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+            }
+        }
+        .padding(.top, 8)
+        .padding(.bottom, 24)
+    }
+    
+    private var collapseCommentsButton: some View {
+        Button {
+            withAnimation(commentsToggleAnimation) {
+                isExpanded = false
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Text("Recolher comentários")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Image(systemName: "chevron.up")
+                    .font(.caption)
+            }
+            .foregroundStyle(.blue)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
+        }
+        .padding(.top, 8)
+        .padding(.bottom, 24)
     }
     
     // MARK: - Actions
@@ -306,7 +310,7 @@ struct CommentsView: View {
                 try? await Task.sleep(nanoseconds: 2_000_000_000)
                 
                 // DEPOIS recarregar comentários
-                await viewModel.refresh(user: user, slug: slug)
+                await viewModel.refresh(user: user, slug: slug, postId: postId)
             } catch {
                 print("❌ [CommentsView] Erro ao votar: \(error)")
                 

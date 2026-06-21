@@ -162,7 +162,7 @@ struct ListDetailView: View {
                     .padding(.vertical, 16)
                 
                 CommentsView(user: username, slug: slug, postId: postId)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding(.bottom, 80)
