@@ -3,7 +3,7 @@ import SwiftUI
 enum RestGamesAnnouncement {
     static let storageKey = "hasSeenRestGamesAnnouncement"
     static let seenVersionKey = "restGamesAnnouncementSeenVersion"
-    static let introVersion = "2.0"
+    static let introVersion = "3.0"
 
     static var shouldShow: Bool {
         UserDefaults.standard.string(forKey: seenVersionKey) != introVersion

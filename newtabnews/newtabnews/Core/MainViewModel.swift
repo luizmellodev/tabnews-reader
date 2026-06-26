@@ -59,7 +59,9 @@ extension MainViewModel {
             if content.isEmpty {
                 self.state = .requestFailed
             }
+            #if DEBUG
             print(error)
+            #endif
         }
     }
     
@@ -102,7 +104,9 @@ extension MainViewModel {
                 )
                 content[index] = response
             } catch {
+                #if DEBUG
                 print("Erro ao buscar post [\(content[index].slug ?? "unknown")]: \(error)")
+                #endif
             }
         }
         
@@ -143,7 +147,9 @@ extension MainViewModel {
             let digests = try await service.getDigest(page: "1", perPage: "1", strategy: "new")
             
             guard let latestDigest = digests.first else {
+                #if DEBUG
                 print("⚠️ [MainViewModel] Nenhum digest encontrado")
+                #endif
                 return
             }
             
@@ -155,10 +161,14 @@ extension MainViewModel {
             
             // Sincronizar com widgets
             WidgetSyncManager.shared.syncWeekDigest(fullDigest)
+            #if DEBUG
             print("✅ [MainViewModel] Digest sincronizado automaticamente para widgets")
+            #endif
             
         } catch {
+            #if DEBUG
             print("⚠️ [MainViewModel] Erro ao sincronizar digest: \(error)")
+            #endif
         }
     }
     
@@ -189,14 +199,18 @@ extension MainViewModel {
                     )
                     self.content.append(response)
                 } catch {
+                    #if DEBUG
                     print("Error fetching post details: \(error)")
+                    #endif
                 }
             }
             
             saveCachedContent(page: currentPage)
             isLoadingMore = false
         } catch {
+            #if DEBUG
             print("Error fetching next page: \(error)")
+            #endif
             currentPage -= 1
             isLoadingMore = false
         }

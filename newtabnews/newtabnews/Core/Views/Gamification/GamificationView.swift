@@ -266,12 +266,14 @@ struct GamificationView: View {
             return stats.nightOwlReads
         case .weekendReader, .weekendWarrior:
             return stats.weekendReads
-        case .speedReader, .perfectWeek:
-            return 0 // TODO: implementar tracking específico
+        case .speedReader:
+            return stats.todayReadCount
+        case .perfectWeek:
+            return min(stats.perfectWeeks, 1)
         case .socialButterfly:
             return stats.postsLiked + stats.commentsPosted
         case .knowledgeSeeker:
-            return 0 // TODO: implementar tracking específico
+            return stats.knowledgeSeekerPosts
         case .masterCurator:
             return stats.foldersCreated
         case .firstWordle, .wordleWins5, .wordleWins10, .wordleWins25, .wordleWins50:

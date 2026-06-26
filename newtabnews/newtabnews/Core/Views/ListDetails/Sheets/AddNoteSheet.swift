@@ -63,7 +63,7 @@ struct AddNoteSheet: View {
         
         NotificationCenter.default.post(name: .notesUpdated, object: nil)
         
-        GamificationManager.shared.trackNoteCreated()
+        GamificationManager.shared.trackNoteCreated(postId: post.stableKey)
         
         dismiss()
     }

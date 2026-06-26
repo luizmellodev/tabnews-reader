@@ -77,6 +77,11 @@ class GamificationManager: ObservableObject {
     }
     
     private func resetWeeklyChallenges() {
+        if !weeklyChallenges.isEmpty, weeklyChallenges.allSatisfy(\.isCompleted) {
+            stats.perfectWeeks += 1
+            checkAndUnlockBadge(.perfectWeek)
+        }
+
         let calendar = Calendar.current
         let startOfWeek = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())
         guard let weekStart = calendar.date(from: startOfWeek) else { return }
@@ -177,10 +182,10 @@ class GamificationManager: ObservableObject {
         case .nightOwl: shouldUnlock = stats.nightOwlReads >= 1
         case .weekendReader: shouldUnlock = stats.weekendReads >= 5
         case .weekendWarrior: shouldUnlock = stats.weekendReads >= 10
-        case .speedReader: shouldUnlock = false // TODO: track daily reads
-        case .perfectWeek: shouldUnlock = false // TODO: track perfect weeks
+        case .speedReader: shouldUnlock = stats.todayReadCount >= 10
+        case .perfectWeek: shouldUnlock = stats.perfectWeeks >= 1
         case .socialButterfly: shouldUnlock = (stats.postsLiked + stats.commentsPosted) >= 20
-        case .knowledgeSeeker: shouldUnlock = false // TODO: track read+highlight+note
+        case .knowledgeSeeker: shouldUnlock = stats.knowledgeSeekerPosts >= 10
         case .masterCurator: shouldUnlock = stats.foldersCreated >= 50
         case .firstWordle: shouldUnlock = stats.devWordleWins >= 1
         case .wordleWins5: shouldUnlock = stats.devWordleWins >= 5
@@ -226,8 +231,12 @@ class GamificationManager: ObservableObject {
     
     // MARK: - Stats Tracking
     
-    func trackPostRead() {
+    func trackPostRead(postId: String? = nil) {
         stats.postsRead += 1
+        incrementDailyReadCount()
+        if let postId {
+            markPostEngagement(postId: postId, read: true)
+        }
         checkTimeOfDayBadges()
         checkWeekendBadge()
         updateChallengeProgress(type: .readPosts)
@@ -240,6 +249,8 @@ class GamificationManager: ObservableObject {
         checkAndUnlockBadge(.reader100)
         checkAndUnlockBadge(.reader250)
         checkAndUnlockBadge(.reader500)
+        checkAndUnlockBadge(.speedReader)
+        checkAndUnlockBadge(.knowledgeSeeker)
         
         saveData()
     }
@@ -272,26 +283,34 @@ class GamificationManager: ObservableObject {
         saveData()
     }
     
-    func trackHighlightCreated() {
+    func trackHighlightCreated(postId: String? = nil) {
         stats.highlightsCreated += 1
+        if let postId {
+            markPostEngagement(postId: postId, highlighted: true)
+        }
         updateChallengeProgress(type: .createHighlights)
         
         checkAndUnlockBadge(.firstHighlight)
         checkAndUnlockBadge(.highlighter10)
         checkAndUnlockBadge(.highlighter25)
         checkAndUnlockBadge(.highlighter50)
+        checkAndUnlockBadge(.knowledgeSeeker)
         
         saveData()
     }
     
-    func trackNoteCreated() {
+    func trackNoteCreated(postId: String? = nil) {
         stats.notesCreated += 1
+        if let postId {
+            markPostEngagement(postId: postId, noted: true)
+        }
         updateChallengeProgress(type: .createNotes)
         
         checkAndUnlockBadge(.firstNote)
         checkAndUnlockBadge(.writer5)
         checkAndUnlockBadge(.writer10)
         checkAndUnlockBadge(.writer25)
+        checkAndUnlockBadge(.knowledgeSeeker)
         
         saveData()
     }
@@ -408,6 +427,31 @@ class GamificationManager: ObservableObject {
         checkAndUnlockBadge(.leetStreak10)
         checkAndUnlockBadge(.leetHardMode)
     }
+
+    private static var todayKey: String {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar.current
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
+    }
+
+    private func incrementDailyReadCount() {
+        let today = Self.todayKey
+        if stats.todayReadDate != today {
+            stats.todayReadDate = today
+            stats.todayReadCount = 0
+        }
+        stats.todayReadCount += 1
+    }
+
+    private func markPostEngagement(postId: String, read: Bool = false, highlighted: Bool = false, noted: Bool = false) {
+        var engagement = stats.postEngagement[postId] ?? PostEngagement()
+        if read { engagement.read = true }
+        if highlighted { engagement.highlighted = true }
+        if noted { engagement.noted = true }
+        stats.postEngagement[postId] = engagement
+    }
     
     // MARK: - Progress Info
     
@@ -431,6 +475,10 @@ struct GamificationStats: Codable {
     var earlyBirdReads: Int = 0
     var nightOwlReads: Int = 0
     var weekendReads: Int = 0
+    var todayReadDate: String?
+    var todayReadCount: Int = 0
+    var perfectWeeks: Int = 0
+    var postEngagement: [String: PostEngagement] = [:]
     var devWordleWins: Int = 0
     var devWordlePlays: Int = 0
     var devWordleFirstTryWins: Int = 0
@@ -439,4 +487,14 @@ struct GamificationStats: Codable {
     var devLeetSolves: Int = 0
     var devLeetHardSolves: Int = 0
     var devLeetStreak: Int = 0
+
+    var knowledgeSeekerPosts: Int {
+        postEngagement.values.filter { $0.read && $0.highlighted && $0.noted }.count
+    }
+}
+
+struct PostEngagement: Codable, Equatable {
+    var read: Bool = false
+    var highlighted: Bool = false
+    var noted: Bool = false
 }

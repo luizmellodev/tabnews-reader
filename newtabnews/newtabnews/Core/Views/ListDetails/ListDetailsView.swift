@@ -92,7 +92,7 @@ struct ListDetailView: View {
                 .presentationDragIndicator(.hidden)
         }
         .onAppear {
-            GamificationManager.shared.trackPostRead()
+            GamificationManager.shared.trackPostRead(postId: post.stableKey)
         }
         .task(id: post.stableKey) {
             guard needsBodyLoad else { return }
@@ -213,7 +213,7 @@ struct ListDetailView: View {
         
         NotificationCenter.default.post(name: .highlightsUpdated, object: nil)
         
-        GamificationManager.shared.trackHighlightCreated()
+        GamificationManager.shared.trackHighlightCreated(postId: post.stableKey)
     }
     
     private func removeHighlight(_ highlight: Highlight) {

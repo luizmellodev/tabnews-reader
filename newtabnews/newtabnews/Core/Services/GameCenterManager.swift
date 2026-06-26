@@ -127,7 +127,7 @@ enum RestGameLeaderboard: String, CaseIterable, Identifiable {
 final class GameCenterManager: ObservableObject {
     static let shared = GameCenterManager()
     /// Flip to `true` after achievements are configured in App Store Connect.
-    static let achievementsEnabled = false
+    static let achievementsEnabled = true
 
     @Published private(set) var isAuthenticated = false
     @Published private(set) var authenticationError: String?
@@ -170,9 +170,11 @@ final class GameCenterManager: ObservableObject {
         guard !achievements.isEmpty else { return }
 
         GKAchievement.report(achievements) { error in
+            #if DEBUG
             if let error {
                 print("Game Center achievements sync failed: \(error.localizedDescription)")
             }
+            #endif
         }
     }
 
@@ -185,9 +187,11 @@ final class GameCenterManager: ObservableObject {
             player: GKLocalPlayer.local,
             leaderboardIDs: [leaderboard.rawValue]
         ) { error in
+            #if DEBUG
             if let error {
                 print("Game Center score submit failed (\(leaderboard.rawValue)): \(error.localizedDescription)")
             }
+            #endif
         }
     }
 

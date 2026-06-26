@@ -143,16 +143,24 @@ class AuthService: ObservableObject {
                 // Tem token e usuário, está autenticado
                 self.isAuthenticated = true
                 self.currentUser = user
+                #if DEBUG
                 print("✅ [AuthService] Usuário autenticado: @\(user.username)")
+                #endif
             } else {
                 // Tem token mas não tem usuário, buscar da API
+                #if DEBUG
                 print("⚠️ [AuthService] Token encontrado mas usuário ausente, buscando da API...")
+                #endif
                 Task {
                     do {
                         try await fetchCurrentUser(token: token)
+                        #if DEBUG
                         print("✅ [AuthService] Usuário recuperado da API")
+                        #endif
                     } catch {
+                        #if DEBUG
                         print("❌ [AuthService] Erro ao recuperar usuário, limpando token: \(error)")
+                        #endif
                         // Token inválido, limpar tudo
                         logout()
                     }
@@ -243,7 +251,9 @@ class AuthService: ObservableObject {
             let tabnewsRecords = records.filter { $0.displayName.contains("tabnews.com.br") }
             
             dataStore.removeData(ofTypes: dataTypes, for: tabnewsRecords) {
+                #if DEBUG
                 print("🍪 [AuthService] Cookies da WebView limpos")
+                #endif
             }
         }
     }

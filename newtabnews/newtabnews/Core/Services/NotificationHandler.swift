@@ -17,7 +17,9 @@ class NotificationHandler {
     func handleNotificationTap(userInfo: [AnyHashable: Any]) {
         guard let typeString = userInfo["type"] as? String,
               let notificationType = NotificationType(rawValue: typeString) else {
+            #if DEBUG
             print("⚠️ Tipo de notificação inválido ou não encontrado")
+            #endif
             return
         }
         
@@ -42,6 +44,7 @@ class NotificationHandler {
     
     /// Abre um post específico via deep link
     private func openPost(owner: String, slug: String, type: NotificationType) {
+        #if DEBUG
         let icon: String
         let destination: String
         
@@ -57,6 +60,7 @@ class NotificationHandler {
         }
         
         print("\(icon) Abrindo post em \(destination): \(owner)/\(slug)")
+        #endif
         
         let postData = PostDeepLinkData(owner: owner, slug: slug, type: type)
         
@@ -70,7 +74,9 @@ class NotificationHandler {
     
     /// Abre apenas a aba Newsletter (sem post específico)
     private func openNewsletterTab() {
+        #if DEBUG
         print("📰 Abrindo aba Newsletter")
+        #endif
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             NotificationCenter.default.post(name: .openNewsletterTab, object: nil)
@@ -79,7 +85,9 @@ class NotificationHandler {
     
     /// Abre apenas a aba Digest (sem post específico)
     private func openDigestTab() {
+        #if DEBUG
         print("🔥 Abrindo aba Resumo")
+        #endif
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             NotificationCenter.default.post(name: .navigateToDigest, object: nil)

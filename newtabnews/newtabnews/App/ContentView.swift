@@ -399,17 +399,23 @@ struct ContentView: View {
     
     /// Handler para URLs do tipo tabnews://
     private func handleDeepLink(url: URL) {
+        #if DEBUG
         print("🔗 Deep link recebido: \(url)")
+        #endif
         
         guard url.scheme == "tabnews" else {
+            #if DEBUG
             print("⚠️ Scheme inválido: \(url.scheme ?? "nil")")
+            #endif
             return
         }
         
         let host = url.host ?? ""
         let pathComponents = url.pathComponents.filter { $0 != "/" }
         
+        #if DEBUG
         print("📍 Host: \(host), Path: \(pathComponents)")
+        #endif
         
         switch host {
         case "home":
@@ -424,14 +430,18 @@ struct ContentView: View {
         case "post":
             // URL: tabnews://post/username/slug
             guard pathComponents.count >= 2 else {
+                #if DEBUG
                 print("⚠️ URL de post inválida: faltam parâmetros")
+                #endif
                 return
             }
             
             let owner = pathComponents[0]
             let slug = pathComponents[1]
             
+            #if DEBUG
             print("📰 Abrindo post: \(owner)/\(slug)")
+            #endif
             
             selectedTab = .home
             Task {
@@ -439,7 +449,9 @@ struct ContentView: View {
             }
             
         default:
+            #if DEBUG
             print("⚠️ Host desconhecido: \(host)")
+            #endif
         }
     }
     
@@ -493,11 +505,13 @@ struct ContentView: View {
     /// Limpa o badge de notificações quando o app abre
     private func clearBadge() {
         UNUserNotificationCenter.current().setBadgeCount(0) { error in
-            if let error = error {
+            #if DEBUG
+            if let error {
                 print("❌ Erro ao limpar badge: \(error.localizedDescription)")
             } else {
                 print("✅ Badge limpo ao abrir o app")
             }
+            #endif
         }
     }
 }

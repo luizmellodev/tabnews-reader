@@ -58,7 +58,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         print("📱 APNs token registrado (sandbox): \(deviceToken.map { String(format: "%02x", $0) }.joined())")
         #else
         Messaging.messaging().setAPNSToken(deviceToken, type: .prod)
-        print("📱 APNs token registrado (production)")
         #endif
 
         refreshFCMTokenAfterAPNS()
@@ -67,9 +66,11 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     private func refreshFCMTokenAfterAPNS() {
         Messaging.messaging().token { token, error in
             guard let token, error == nil else {
+                #if DEBUG
                 if let error {
                     print("❌ Erro ao atualizar FCM token: \(error.localizedDescription)")
                 }
+                #endif
                 return
             }
 
@@ -80,9 +81,11 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 #endif
                 FirebasePushNotificationService.shared.saveDeviceToken(token)
                 Messaging.messaging().subscribe(toTopic: "all_users") { error in
+                    #if DEBUG
                     if let error {
                         print("❌ Erro ao inscrever no tópico: \(error.localizedDescription)")
                     }
+                    #endif
                 }
             }
         }
@@ -90,7 +93,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     
     func application(_ application: UIApplication,
                      didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        #if DEBUG
         print("❌ Falha ao registrar para notificações: \(error.localizedDescription)")
+        #endif
     }
     
     func application(_ application: UIApplication,
@@ -124,9 +129,11 @@ extension AppDelegate: MessagingDelegate {
         FirebasePushNotificationService.shared.saveDeviceToken(token)
 
         Messaging.messaging().subscribe(toTopic: "all_users") { error in
+            #if DEBUG
             if let error {
                 print("❌ Erro ao inscrever no tópico: \(error.localizedDescription)")
             }
+            #endif
         }
     }
 }
@@ -158,9 +165,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     private func clearBadge() {
         UNUserNotificationCenter.current().setBadgeCount(0) { error in
-            if let error = error {
+            #if DEBUG
+            if let error {
                 print("❌ Erro ao limpar badge: \(error.localizedDescription)")
             }
+            #endif
         }
     }
 }

@@ -9,18 +9,25 @@ import Foundation
 
 class Logger {
     static func info(_ message: String) {
+        #if DEBUG
         print("\n\("🌟".greenColor) \(message)\n")
+        #endif
     }
     
     static func error(_ message: String) {
+        #if DEBUG
         print("\n\("🚨".redColor) \(message)\n")
+        #endif
     }
     
     static func separator() {
+        #if DEBUG
         print("\n\("-----------------------------".yellowColor)\n")
+        #endif
     }
     
     static func prettyPrintJSON(from data: Data) {
+        #if DEBUG
         if let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
            let prettyData = try? JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted),
            let prettyString = String(data: prettyData, encoding: .utf8) {
@@ -29,6 +36,7 @@ class Logger {
             info("✅ Response received (raw):\n\(String(data: data, encoding: .utf8) ?? "❌ Invalid UTF-8")")
         }
         separator()
+        #endif
     }
 }
 
