@@ -26,353 +26,52 @@ struct SettingsView: View {
     @State private var showingGames = false
     @State private var showingRankings = false
     @StateObject private var authService = AuthService.shared
-    @AppStorage("debugShowDigestBanner") private var debugShowDigestBanner = false
-    @AppStorage("debugShowDailyDigestBanner") private var appStorage_debugShowDailyDigestBanner = false
     @AppStorage("showReadOnTabNewsButton") private var showReadOnTabNewsButton = false
     @AppStorage("isBetaTester") private var isBetaTester = false
     @State private var isRefreshing = false
     @State private var userPublicationsCount: Int?
+    #if DEBUG
+    @AppStorage("debugShowDigestBanner") private var debugShowDigestBanner = false
+    @AppStorage("debugShowDailyDigestBanner") private var appStorage_debugShowDailyDigestBanner = false
     @State private var pushTokenDebugInfo: FirebasePushNotificationService.DebugInfo?
     @State private var isLoadingPushTokenDebug = false
     @State private var pushDebugMessage: String?
+    #endif
     
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    VStack(spacing: 12) {
-                        profileSection
+            settingsModals(settingsChrome(settingsList))
+        }
+    }
 
-                        RestGamesHubBanner(onTap: { showingGames = true })
-                        RestGamesRankingsBanner(onTap: { showingRankings = true })
-                    }
+    private var settingsList: some View {
+        List {
+            Section {
+                VStack(spacing: 12) {
+                    profileSection
+
+                    RestGamesHubBanner(onTap: { showingGames = true })
+                    RestGamesRankingsBanner(onTap: { showingRankings = true })
                 }
-                .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 16, trailing: 0))
-                .listRowSeparator(.hidden)
-
-                Section {
-                    NavigationLink {
-                        GamificationView()
-                    } label: {
-                        HStack(spacing: 12) {
-                            ZStack {
-                                Circle()
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [.purple, .blue],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
-                                    .frame(width: 32, height: 32)
-                                
-                                Image(systemName: "star.fill")
-                                    .font(.system(size: 16))
-                                    .foregroundStyle(.white)
-                            }
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Badges & Desafios")
-                                    .font(.headline)
-                                Text("Veja suas conquistas e desafios semanais")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            
-                            Spacer()
-                        }
-                    }
-                } header: {
-                    Label("Gamificação", systemImage: "trophy.fill")
-                }
-                
-                Section {
-                    HStack {
-                        Label("Posts Curtidos", systemImage: "heart")
-                        Spacer()
-                        Text("\(viewModel.likedList.count)")
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    HStack {
-                        Label("Destaques", systemImage: "highlighter")
-                        Spacer()
-                        Text("\(highlights.count)")
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    HStack {
-                        Label("Anotações", systemImage: "note.text")
-                        Spacer()
-                        Text("\(notes.count)")
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    HStack {
-                        Label("Pastas Criadas", systemImage: "folder")
-                        Spacer()
-                        Text("\(folders.count)")
-                            .foregroundStyle(.secondary)
-                    }
-                } header: {
-                    Label("Sua Biblioteca", systemImage: "chart.bar")
-                }
-
-                Section {
-                    Picker("Tema", selection: $currentTheme) {
-                        Label("Sistema", systemImage: "iphone").tag(Theme.system)
-                        Label("Claro", systemImage: "sun.max").tag(Theme.light)
-                        Label("Escuro", systemImage: "moon").tag(Theme.dark)
-                    }
-                    .pickerStyle(.menu)
-
-                    Toggle("Visualizar no App", isOn: $isViewInApp)
-
-                    Toggle("Botão 'Ler no TabNews'", isOn: $showReadOnTabNewsButton)
-
-                    HStack {
-                        Label("Notificações", systemImage: "bell.badge")
-                        Spacer()
-                        Text(NotificationManager.shared.isPermissionGranted ? "Ativadas" : "Desativadas")
-                            .foregroundStyle(NotificationManager.shared.isPermissionGranted ? .green : .secondary)
-                    }
-
-                    if !NotificationManager.shared.isPermissionGranted {
-                        Button {
-                            if let url = URL(string: UIApplication.openSettingsURLString) {
-                                UIApplication.shared.open(url)
-                            }
-                        } label: {
-                            Label("Abrir Ajustes do Sistema", systemImage: "gear")
-                        }
-                    }
-                } header: {
-                    Label("Preferências", systemImage: "slider.horizontal.3")
-                } footer: {
-                    Text("Leitura no app, botão Safari nos posts e alertas de newsletter e resumo semanal.")
-                }
-
-                Section {
-                    Button {
-                        AppReviewManager.shared.openAppStoreReviewPage()
-                    } label: {
-                        HStack(spacing: 12) {
-                            Label("Avaliar o App", systemImage: "star.bubble.fill")
-                            Spacer()
-                            Image(systemName: "arrow.up.right")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    NavigationLink {
-                        aboutAppView
-                    } label: {
-                        Label("Sobre o TabNews Reader", systemImage: "info.circle")
-                    }
-
-                    Button {
-                        UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
-                        NotificationCenter.default.post(name: .showTipsOnboarding, object: nil)
-                    } label: {
-                        Label("Ver Dicas Novamente", systemImage: "lightbulb.fill")
-                    }
-
-                    Button(role: .destructive) {
-                        showingClearCache = true
-                    } label: {
-                        Label("Limpar Cache da API", systemImage: "arrow.clockwise.circle")
-                    }
-                    
-                    Button(role: .destructive) {
-                        showingClearLibrary = true
-                    } label: {
-                        Label("Limpar Biblioteca Completa", systemImage: "trash.fill")
-                    }
-
-                    HStack {
-                        Text("Versão")
-                        Spacer()
-                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
-                            .foregroundStyle(.secondary)
-                    }
-                } header: {
-                    Label("Mais", systemImage: "ellipsis.circle")
-                } footer: {
-                    Text("Limpar cache força posts atualizados. Limpar biblioteca remove curtidas, destaques, anotações e pastas.")
-                }
-                
-                #if DEBUG
-                Section {
-                    Button {
-                        RestGamesAnnouncement.resetForTesting()
-                        NotificationCenter.default.post(name: .showRestGamesAnnouncement, object: nil)
-                    } label: {
-                        Label("Mostrar Novidade dos Jogos", systemImage: "gamecontroller.fill")
-                    }
-
-                    Button {
-                        UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
-                        UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
-                        exit(0)
-                    } label: {
-                        Label("Resetar Onboarding Completo", systemImage: "arrow.counterclockwise.circle")
-                    }
-
-                    Button {
-                        syncWithWatchManually()
-                    } label: {
-                        HStack {
-                            Label("⌚ Sincronizar com Watch", systemImage: "applewatch")
-                            Spacer()
-                            Text("\(viewModel.content.count) posts")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    Button {
-                        isLoadingPushTokenDebug = true
-                        FirebasePushNotificationService.shared.fetchDebugInfo { info in
-                            isLoadingPushTokenDebug = false
-                            pushTokenDebugInfo = info
-                        }
-                    } label: {
-                        HStack {
-                            Label("Ver FCM Token deste device", systemImage: "bell.badge")
-                            Spacer()
-                            if isLoadingPushTokenDebug {
-                                ProgressView()
-                            }
-                        }
-                    }
-                    .disabled(isLoadingPushTokenDebug)
-
-                    Button {
-                        FirebasePushNotificationService.shared.sendLocalTestNotification { message in
-                            pushDebugMessage = message
-                        }
-                    } label: {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Label("Testar notificação local", systemImage: "bell.and.waves.left.and.right")
-                            Text("Confirma se o iOS exibe notificações deste app")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    if let pushDebugMessage {
-                        Text(pushDebugMessage)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Toggle(isOn: $debugShowDigestBanner) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("🔥 Mostrar Banner Weekly Digest")
-                            Text("Simula fim de semana para testar o banner")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    
-                    Toggle(isOn: $appStorage_debugShowDailyDigestBanner) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("🧭 Mostrar Banner Daily Digest")
-                            Text("Força o Daily Digest aparecer sempre")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    
-                    Button {
-                        UserDefaults.standard.removeObject(forKey: "last_daily_digest_date")
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("🗑️ Resetar Daily Digest")
-                                Text("Remove flag de 'já visto hoje'")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            Image(systemName: "arrow.clockwise.circle")
-                        }
-                    }
-                    
-                    Button {
-                        #if DEBUG
-                        AppReviewManager.shared.resetForTesting()
-                        #else
-                        UserDefaults.standard.set(0, forKey: "newsletterOpenCount")
-                        UserDefaults.standard.set(0, forKey: "lastReviewPrePromptDate")
-                        UserDefaults.standard.set(0, forKey: "lastReviewRequestDate")
-                        UserDefaults.standard.set(0, forKey: "appReviewSessionCount")
-                        #endif
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("⭐ Resetar Review Request")
-                                Text("Força o pre-prompt de avaliação aparecer de novo")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            Image(systemName: "arrow.clockwise.circle")
-                        }
-                    }
-                    
-                    Button {
-                        withAnimation {
-                            isBetaTester.toggle()
-                            BetaTesterService.shared.forceBetaTesterStatus(isBetaTester)
-                        }
-                    } label: {
-                        HStack {
-                            HStack(spacing: 8) {
-                                Image(systemName: "trophy.fill")
-                                    .foregroundStyle(
-                                        LinearGradient(
-                                            colors: [.purple, .blue],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                Text(isBetaTester ? "Remover Badge Beta" : "Ativar Badge Beta")
-                            }
-                            
-                            Spacer()
-                            
-                            if isBetaTester {
-                                HStack(spacing: 3) {
-                                    Image(systemName: "trophy.fill")
-                                        .font(.system(size: 9))
-                                    Text("BETA")
-                                        .font(.system(size: 8, weight: .bold))
-                                        .tracking(0.5)
-                                }
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 3)
-                                .background(
-                                    LinearGradient(
-                                        colors: [.purple, .blue],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .cornerRadius(6)
-                            }
-                        }
-                    }
-                } header: {
-                    Label("Debug", systemImage: "hammer.fill")
-                } footer: {
-                    Text("Ferramentas de desenvolvimento para testes. Push remoto: olhe o console do Xcode por 📬 ao enviar o curl. O banner de Digest normalmente só aparece nos fins de semana.")
-                }
-                #endif
             }
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 16, trailing: 0))
+            .listRowSeparator(.hidden)
+
+            gamificationSection
+            libraryStatsSection
+            preferencesSection
+            moreSection
+
+            #if DEBUG
+            debugSection
+            #endif
+        }
+    }
+
+    @ViewBuilder
+    private func settingsChrome<Content: View>(_ content: Content) -> some View {
+        content
             .scrollContentBackground(.hidden)
             .navigationTitle("Perfil")
             .navigationBarTitleDisplayMode(.large)
@@ -408,6 +107,11 @@ struct SettingsView: View {
                         .ignoresSafeArea()
                 }
             }
+    }
+
+    @ViewBuilder
+    private func settingsModals<Content: View>(_ content: Content) -> some View {
+        content
             .sheet(isPresented: $showLoginSheet) {
                 NativeLoginView()
             }
@@ -417,9 +121,11 @@ struct SettingsView: View {
             .sheet(isPresented: $showingRankings) {
                 RestGameLeaderboardsSheet()
             }
+            #if DEBUG
             .sheet(item: $pushTokenDebugInfo) { info in
                 PushTokenDebugSheet(info: info)
             }
+            #endif
             .alert("Limpar Cache da API", isPresented: $showingClearCache) {
                 Button("Cancelar", role: .cancel) { }
                 Button("Limpar", role: .destructive) {
@@ -449,11 +155,335 @@ struct SettingsView: View {
                     await loadPublicationsCount(username: username)
                 }
             }
+    }
+
+    private var gamificationSection: some View {
+        Section {
+            NavigationLink {
+                GamificationView()
+            } label: {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [.purple, .blue],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 32, height: 32)
+
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 16))
+                            .foregroundStyle(.white)
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Badges & Desafios")
+                            .font(.headline)
+                        Text("Veja suas conquistas e desafios semanais")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+                }
+            }
+        } header: {
+            Label("Gamificação", systemImage: "trophy.fill")
         }
     }
-    
+
+    private var libraryStatsSection: some View {
+        Section {
+            HStack {
+                Label("Posts Curtidos", systemImage: "heart")
+                Spacer()
+                Text("\(viewModel.likedList.count)")
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack {
+                Label("Destaques", systemImage: "highlighter")
+                Spacer()
+                Text("\(highlights.count)")
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack {
+                Label("Anotações", systemImage: "note.text")
+                Spacer()
+                Text("\(notes.count)")
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack {
+                Label("Pastas Criadas", systemImage: "folder")
+                Spacer()
+                Text("\(folders.count)")
+                    .foregroundStyle(.secondary)
+            }
+        } header: {
+            Label("Sua Biblioteca", systemImage: "chart.bar")
+        }
+    }
+
+    private var preferencesSection: some View {
+        Section {
+            Picker("Tema", selection: $currentTheme) {
+                Label("Sistema", systemImage: "iphone").tag(Theme.system)
+                Label("Claro", systemImage: "sun.max").tag(Theme.light)
+                Label("Escuro", systemImage: "moon").tag(Theme.dark)
+            }
+            .pickerStyle(.menu)
+
+            Toggle("Visualizar no App", isOn: $isViewInApp)
+
+            Toggle("Botão 'Ler no TabNews'", isOn: $showReadOnTabNewsButton)
+
+            HStack {
+                Label("Notificações", systemImage: "bell.badge")
+                Spacer()
+                Text(NotificationManager.shared.isPermissionGranted ? "Ativadas" : "Desativadas")
+                    .foregroundStyle(NotificationManager.shared.isPermissionGranted ? .green : .secondary)
+            }
+
+            if !NotificationManager.shared.isPermissionGranted {
+                Button {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
+                    Label("Abrir Ajustes do Sistema", systemImage: "gear")
+                }
+            }
+        } header: {
+            Label("Preferências", systemImage: "slider.horizontal.3")
+        } footer: {
+            Text("Leitura no app, botão Safari nos posts e alertas de newsletter e resumo semanal.")
+        }
+    }
+
+    private var moreSection: some View {
+        Section {
+            Button {
+                AppReviewManager.shared.openAppStoreReviewPage()
+            } label: {
+                HStack(spacing: 12) {
+                    Label("Avaliar o App", systemImage: "star.bubble.fill")
+                    Spacer()
+                    Image(systemName: "arrow.up.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            NavigationLink {
+                aboutAppView
+            } label: {
+                Label("Sobre o TabNews Reader", systemImage: "info.circle")
+            }
+
+            Button {
+                UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
+                NotificationCenter.default.post(name: .showTipsOnboarding, object: nil)
+            } label: {
+                Label("Ver Dicas Novamente", systemImage: "lightbulb.fill")
+            }
+
+            Button(role: .destructive) {
+                showingClearCache = true
+            } label: {
+                Label("Limpar Cache da API", systemImage: "arrow.clockwise.circle")
+            }
+
+            Button(role: .destructive) {
+                showingClearLibrary = true
+            } label: {
+                Label("Limpar Biblioteca Completa", systemImage: "trash.fill")
+            }
+
+            HStack {
+                Text("Versão")
+                Spacer()
+                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
+                    .foregroundStyle(.secondary)
+            }
+        } header: {
+            Label("Mais", systemImage: "ellipsis.circle")
+        } footer: {
+            Text("Limpar cache força posts atualizados. Limpar biblioteca remove curtidas, destaques, anotações e pastas.")
+        }
+    }
+
+    #if DEBUG
+    private var debugSection: some View {
+        Section {
+            Button {
+                RestGamesAnnouncement.resetForTesting()
+                NotificationCenter.default.post(name: .showRestGamesAnnouncement, object: nil)
+            } label: {
+                Label("Mostrar Novidade dos Jogos", systemImage: "gamecontroller.fill")
+            }
+
+            Button {
+                UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
+                UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
+                exit(0)
+            } label: {
+                Label("Resetar Onboarding Completo", systemImage: "arrow.counterclockwise.circle")
+            }
+
+            Button {
+                syncWithWatchManually()
+            } label: {
+                HStack {
+                    Label("⌚ Sincronizar com Watch", systemImage: "applewatch")
+                    Spacer()
+                    Text("\(viewModel.content.count) posts")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Button {
+                isLoadingPushTokenDebug = true
+                FirebasePushNotificationService.shared.fetchDebugInfo { info in
+                    isLoadingPushTokenDebug = false
+                    pushTokenDebugInfo = info
+                }
+            } label: {
+                HStack {
+                    Label("Ver FCM Token deste device", systemImage: "bell.badge")
+                    Spacer()
+                    if isLoadingPushTokenDebug {
+                        ProgressView()
+                    }
+                }
+            }
+            .disabled(isLoadingPushTokenDebug)
+
+            Button {
+                FirebasePushNotificationService.shared.sendLocalTestNotification { message in
+                    pushDebugMessage = message
+                }
+            } label: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Label("Testar notificação local", systemImage: "bell.and.waves.left.and.right")
+                    Text("Confirma se o iOS exibe notificações deste app")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            if let pushDebugMessage {
+                Text(pushDebugMessage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Toggle(isOn: $debugShowDigestBanner) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("🔥 Mostrar Banner Weekly Digest")
+                    Text("Simula fim de semana para testar o banner")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Toggle(isOn: $appStorage_debugShowDailyDigestBanner) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("🧭 Mostrar Banner Daily Digest")
+                    Text("Força o Daily Digest aparecer sempre")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Button {
+                UserDefaults.standard.removeObject(forKey: "last_daily_digest_date")
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("🗑️ Resetar Daily Digest")
+                        Text("Remove flag de 'já visto hoje'")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "arrow.clockwise.circle")
+                }
+            }
+
+            Button {
+                AppReviewManager.shared.resetForTesting()
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("⭐ Resetar Review Request")
+                        Text("Força o pre-prompt de avaliação aparecer de novo")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "arrow.clockwise.circle")
+                }
+            }
+
+            Button {
+                withAnimation {
+                    isBetaTester.toggle()
+                    BetaTesterService.shared.forceBetaTesterStatus(isBetaTester)
+                }
+            } label: {
+                HStack {
+                    HStack(spacing: 8) {
+                        Image(systemName: "trophy.fill")
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [.purple, .blue],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                        Text(isBetaTester ? "Remover Badge Beta" : "Ativar Badge Beta")
+                    }
+
+                    Spacer()
+
+                    if isBetaTester {
+                        HStack(spacing: 3) {
+                            Image(systemName: "trophy.fill")
+                                .font(.system(size: 9))
+                            Text("BETA")
+                                .font(.system(size: 8, weight: .bold))
+                                .tracking(0.5)
+                        }
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(
+                            LinearGradient(
+                                colors: [.purple, .blue],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(6)
+                    }
+                }
+            }
+        } header: {
+            Label("Debug", systemImage: "hammer.fill")
+        } footer: {
+            Text("Ferramentas de desenvolvimento para testes. Push remoto: olhe o console do Xcode por 📬 ao enviar o curl. O banner de Digest normalmente só aparece nos fins de semana.")
+        }
+    }
+    #endif
+
     // MARK: - About
-    
+
     private var aboutAppView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
