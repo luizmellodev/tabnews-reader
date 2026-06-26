@@ -412,23 +412,193 @@ private struct HubGameTileBackground: View {
 }
 
 private struct DevWordleHubPreview: View {
+    private struct Tile: Equatable {
+        var letter: Character?
+        var result: DevWordleLetterResult?
+    }
+
+    @State private var tiles = Array(repeating: Tile(letter: nil, result: nil), count: 5)
+    @State private var shake = false
+
+    private let prefix: [Character] = Array("CODE")
+    private let swapLetters: [Character] = ["T", "Z", "Q", "J", "V", "W", "Y", "H", "G", "B"]
+    private let prefixResults: [DevWordleLetterResult] = [.correct, .present, .absent, .present]
+
     var body: some View {
-        HStack(spacing: 7) {
-            ForEach(["R", "E", "A", "C", "T"], id: \.self) { letter in
-                let color: Color = switch letter {
-                case "E": .yellow
-                case "A": .gray
-                default: .green
+        GeometryReader { geo in
+            let spacing = max(geo.size.width * 0.02, 8)
+            let maxTileWidth = min((geo.size.width - spacing * 4) / 5, geo.size.height * 0.88)
+            let tileWidth = maxTileWidth * 0.729
+            let tileHeight = tileWidth * 1.12
+            let fontSize = tileWidth * 0.42
+            let cornerRadius = tileWidth * 0.2
+
+            HStack(spacing: spacing) {
+                ForEach(0..<5, id: \.self) { index in
+                    hubTile(
+                        letter: tiles[index].letter,
+                        result: tiles[index].result,
+                        tileWidth: tileWidth,
+                        tileHeight: tileHeight,
+                        fontSize: fontSize,
+                        cornerRadius: cornerRadius
+                    )
+                }
+            }
+            .modifier(HubPreviewShakeEffect(animating: shake))
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .task { await runLoop() }
+    }
+
+    @ViewBuilder
+    private func hubTile(
+        letter: Character?,
+        result: DevWordleLetterResult?,
+        tileWidth: CGFloat,
+        tileHeight: CGFloat,
+        fontSize: CGFloat,
+        cornerRadius: CGFloat
+    ) -> some View {
+        let background = tileBackground(for: result)
+        let foreground: Color = result == nil ? .white : .white
+        let border = result == nil
+            ? Color.white.opacity(letter == nil ? 0.18 : 0.35)
+            : background
+
+        ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(background)
+                .overlay {
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .stroke(border, lineWidth: max(1.5, tileWidth * 0.04))
                 }
 
-                Text(letter)
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .frame(width: 34, height: 38)
-                    .background(color.opacity(color == .gray ? 0.25 : 0.75), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+            if let letter {
+                Text(String(letter))
+                    .font(.system(size: fontSize, weight: .bold, design: .rounded))
+                    .foregroundStyle(foreground)
+                    .transition(.scale.combined(with: .opacity))
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .frame(width: tileWidth, height: tileHeight)
+        .animation(.spring(response: 0.28, dampingFraction: 0.76), value: letter)
+        .animation(.easeInOut(duration: 0.22), value: result)
+    }
+
+    private func tileBackground(for result: DevWordleLetterResult?) -> Color {
+        guard let result else {
+            return Color.white.opacity(0.06)
+        }
+        switch result {
+        case .correct: return Color(red: 0.42, green: 0.67, blue: 0.36).opacity(0.85)
+        case .present: return Color(red: 0.78, green: 0.68, blue: 0.30).opacity(0.85)
+        case .absent: return Color.white.opacity(0.14)
+        }
+    }
+
+    @MainActor
+    private func resetTiles() {
+        withAnimation(.easeOut(duration: 0.2)) {
+            tiles = Array(repeating: Tile(letter: nil, result: nil), count: 5)
+        }
+    }
+
+    @MainActor
+    private func typeLetter(at index: Int, _ letter: Character) {
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.72)) {
+            tiles[index].letter = letter
+            tiles[index].result = nil
+        }
+    }
+
+    @MainActor
+    private func removeLastLetter() {
+        guard tiles[4].letter != nil else { return }
+        withAnimation(.easeOut(duration: 0.18)) {
+            tiles[4].letter = nil
+            tiles[4].result = nil
+        }
+    }
+
+    @MainActor
+    private func revealPrefixColors() {
+        withAnimation(.easeInOut(duration: 0.24)) {
+            for index in 0..<prefixResults.count {
+                tiles[index].result = prefixResults[index]
+            }
+        }
+    }
+
+    @MainActor
+    private func revealLastLetter(_ result: DevWordleLetterResult) {
+        withAnimation(.easeInOut(duration: 0.22)) {
+            tiles[4].result = result
+        }
+    }
+
+    @MainActor
+    private func performShake() async {
+        shake = true
+        try? await Task.sleep(for: .milliseconds(380))
+        shake = false
+    }
+
+    private func runLoop() async {
+        while !Task.isCancelled {
+            await resetTiles()
+            try? await Task.sleep(for: .milliseconds(450))
+
+            for (index, letter) in prefix.enumerated() {
+                await typeLetter(at: index, letter)
+                try? await Task.sleep(for: .milliseconds(260))
+            }
+
+            await typeLetter(at: 4, swapLetters[0])
+            try? await Task.sleep(for: .milliseconds(320))
+            await revealPrefixColors()
+            await revealLastLetter(.absent)
+            try? await Task.sleep(for: .milliseconds(380))
+            await performShake()
+            try? await Task.sleep(for: .milliseconds(520))
+
+            for letter in swapLetters.dropFirst() {
+                await removeLastLetter()
+                try? await Task.sleep(for: .milliseconds(200))
+                await typeLetter(at: 4, letter)
+                try? await Task.sleep(for: .milliseconds(240))
+                await revealLastLetter(.absent)
+                try? await Task.sleep(for: .milliseconds(220))
+                await performShake()
+                try? await Task.sleep(for: .milliseconds(420))
+            }
+
+            try? await Task.sleep(for: .milliseconds(700))
+        }
+    }
+}
+
+private struct HubPreviewShakeEffect: ViewModifier {
+    var animating: Bool
+
+    @State private var shakeOffset: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .offset(x: shakeOffset)
+            .onChange(of: animating) { _, shouldShake in
+                guard shouldShake else {
+                    shakeOffset = 0
+                    return
+                }
+                withAnimation(.linear(duration: 0.06).repeatCount(5, autoreverses: true)) {
+                    shakeOffset = 4
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.32) {
+                    shakeOffset = 0
+                }
+            }
     }
 }
 
