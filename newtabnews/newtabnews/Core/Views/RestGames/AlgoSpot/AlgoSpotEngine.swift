@@ -1,6 +1,6 @@
 import Foundation
 
-enum AlgoSpotPlayMode: Equatable, Hashable {
+enum AlgoSpotPlayMode: Equatable, Hashable, RestGamePlayMode {
     case daily
     case free
 

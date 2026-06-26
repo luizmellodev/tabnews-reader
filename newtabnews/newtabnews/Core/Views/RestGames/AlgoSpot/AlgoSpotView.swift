@@ -18,35 +18,25 @@ struct AlgoSpotView: View {
     @State private var showIntroLearn = false
     @State private var showRevealLearn = false
     @State private var revealSnapshot: AlgoSpotRevealSnapshot?
+    @State private var showFreeModeLockedHint = false
 
     var body: some View {
         @Bindable var activeVM = activeViewModel
 
         ZStack {
-            RestGameBackground()
+            RestGameBackground(animated: false)
 
-            switch activeViewModel.phase {
-            case .playing, .revealing:
+            if playMode == .free, freeViewModel.phase == .finished {
+                AlgoSpotFreeResultsView(
+                    correctCount: freeViewModel.correctCount,
+                    totalRounds: freeViewModel.totalRounds,
+                    bestStreak: freeViewModel.bestStreak,
+                    roundResults: freeViewModel.roundResults,
+                    onPlayAgain: restartFree,
+                    onClose: { dismiss() }
+                )
+            } else {
                 playingBody(viewModel: activeVM)
-            case .finished:
-                if playMode == .daily {
-                    AlgoSpotDailyResultsView(
-                        viewModel: dailyViewModel,
-                        isFreeModeUnlocked: isFreeModeUnlocked,
-                        isAllowed: restGamesAllowFreeMode,
-                        onPlayFree: { selectMode(.free) },
-                        onClose: { dismiss() }
-                    )
-                } else {
-                    AlgoSpotFreeResultsView(
-                        correctCount: freeViewModel.correctCount,
-                        totalRounds: freeViewModel.totalRounds,
-                        bestStreak: freeViewModel.bestStreak,
-                        roundResults: freeViewModel.roundResults,
-                        onPlayAgain: restartFree,
-                        onClose: { dismiss() }
-                    )
-                }
             }
 
             if showOnboarding {
@@ -57,7 +47,6 @@ struct AlgoSpotView: View {
                 }
             }
         }
-        .animation(RestGameTheme.spring, value: activeViewModel.phase)
         .animation(RestGameTheme.spring, value: playMode)
         .onAppear {
             RestFeedbackManager.shared.prepare()
@@ -113,6 +102,10 @@ struct AlgoSpotView: View {
         )
     }
 
+    private var showDailyCompleteEmptyState: Bool {
+        playMode == .daily && dailyViewModel.isDailyComplete && dailyViewModel.phase == .finished
+    }
+
     private func startIfReady() {
         guard !showOnboarding else { return }
         if playMode == .daily, !dailyViewModel.isDailyComplete, dailyViewModel.phase != .finished {
@@ -127,12 +120,16 @@ struct AlgoSpotView: View {
     private func selectMode(_ mode: AlgoSpotPlayMode) {
         guard playMode != mode else { return }
         guard mode != .free || isFreeModeUnlocked else {
+            withAnimation(.easeOut(duration: 0.22)) {
+                showFreeModeLockedHint = true
+            }
             RestGameFreeModePolicy.handleLockedAttempt(
                 dailyComplete: dailyViewModel.isDailyComplete,
                 isAllowed: restGamesAllowFreeMode
             )
             return
         }
+        showFreeModeLockedHint = false
         showRevealLearn = false
         revealSnapshot = nil
         if mode == .free, !hasStartedFree {
@@ -156,96 +153,110 @@ struct AlgoSpotView: View {
         VStack(spacing: 0) {
             header
 
-            if playMode == .daily && dailyViewModel.isDailyComplete && dailyViewModel.phase == .playing {
-                AlgoSpotDailyCompleteEmptyState(
-                    isFreeModeUnlocked: isFreeModeUnlocked,
-                    dailyComplete: dailyViewModel.isDailyComplete,
-                    isAllowed: restGamesAllowFreeMode,
-                    onPlayFree: { selectMode(.free) }
-                )
-                    .padding(.horizontal, 24)
-                    .padding(.top, 24)
-                Spacer()
+            Spacer(minLength: 16)
+
+            dailyContentArea(viewModel: viewModel)
+                .padding(.horizontal, 16)
+
+            Spacer(minLength: 16)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    @ViewBuilder
+    private func dailyContentArea(viewModel: AlgoSpotViewModel) -> some View {
+        ZStack {
+            if showDailyCompleteEmptyState {
+                RestGameDailyCompleteEmptyState(wasCorrect: dailyViewModel.wasCorrect) {
+                    AlgoSpotCountdownLabel(prefix: "Próximo desafio em")
+                }
+                .transition(.opacity)
             } else if let round = viewModel.currentRoundData {
-                VStack(spacing: 0) {
-                    if playMode == .free {
-                        HStack {
-                            RoundIndicatorView(
-                                currentRound: viewModel.currentRound,
-                                totalRounds: viewModel.totalRounds
-                            )
-                            Spacer()
-                            Text("\(viewModel.correctCount) acertos")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.white.opacity(0.55))
-                                .monospacedDigit()
-                        }
-                        .padding(.horizontal, 24)
-                        .padding(.bottom, 12)
-                    }
+                dailyPlayingContent(viewModel: viewModel, round: round)
+                    .transition(.opacity)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .animation(.easeInOut(duration: 0.25), value: showDailyCompleteEmptyState)
+    }
 
-                    AlgoSpotCodeCardView(snippet: round.challenge.snippet)
-                        .padding(.horizontal, 20)
-                        .id("\(viewModel.currentRound)-\(round.challenge.id)")
-
-                    Text("Qual algoritmo é este?")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.white.opacity(0.55))
-                        .padding(.top, 20)
-                        .padding(.bottom, 12)
-
-                    AlgoSpotOptionsView(
-                        options: round.displayOptions,
-                        phase: viewModel.phase,
-                        selectedAnswer: viewModel.selectedAnswer,
-                        correctAnswer: round.correctAnswer,
-                        wasCorrect: viewModel.wasCorrect,
-                        onSelect: { viewModel.select($0) }
+    @ViewBuilder
+    private func dailyPlayingContent(viewModel: AlgoSpotViewModel, round: AlgoSpotRound) -> some View {
+        VStack(spacing: 0) {
+            if playMode == .free {
+                HStack {
+                    RoundIndicatorView(
+                        currentRound: viewModel.currentRound,
+                        totalRounds: viewModel.totalRounds
                     )
-                    .padding(.horizontal, 20)
-                    .disabled(viewModel.phase != .playing)
-
-                    if viewModel.phase == .revealing {
-                        Button {
-                            showRevealLearn = true
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: "lightbulb.fill")
-                                Text("Entender")
-                            }
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(AlgoSpotTheme.accentLight)
-                            .padding(.horizontal, 18)
-                            .padding(.vertical, 12)
-                            .background(AlgoSpotTheme.accent.opacity(0.18), in: Capsule())
-                        }
-                        .buttonStyle(RestGameScaleButtonStyle())
-                        .padding(.top, 16)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
+                    Spacer()
+                    Text("\(viewModel.correctCount) acertos")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.55))
+                        .monospacedDigit()
                 }
-                .padding(.top, 12)
-
-                Spacer(minLength: 16)
-
-                if viewModel.currentStreak >= 2 && viewModel.phase == .playing && playMode == .free {
-                    HStack(spacing: 6) {
-                        Image(systemName: "flame.fill")
-                            .foregroundStyle(.orange)
-                        Text("\(viewModel.currentStreak) seguidos")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(.orange)
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(.orange.opacity(0.15), in: Capsule())
-                    .padding(.bottom, 24)
-                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 12)
             }
 
-            Spacer(minLength: 0)
+            AlgoSpotCodeCardView(snippet: round.challenge.snippet)
+                .padding(.horizontal, 20)
+                .id("\(viewModel.currentRound)-\(round.challenge.id)")
+
+            Text("Qual algoritmo é este?")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.white.opacity(0.55))
+                .padding(.top, 20)
+                .padding(.bottom, 12)
+
+            AlgoSpotOptionsView(
+                options: round.displayOptions,
+                phase: viewModel.phase,
+                selectedAnswer: viewModel.selectedAnswer,
+                correctAnswer: round.correctAnswer,
+                wasCorrect: viewModel.wasCorrect,
+                onSelect: { viewModel.select($0) }
+            )
+            .padding(.horizontal, 20)
+            .disabled(viewModel.phase != .playing)
+
+            if viewModel.phase == .revealing {
+                Button {
+                    showRevealLearn = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "lightbulb.fill")
+                        Text("Entender")
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(AlgoSpotTheme.accentLight)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 12)
+                    .background(AlgoSpotTheme.accent.opacity(0.18), in: Capsule())
+                }
+                .buttonStyle(RestGameScaleButtonStyle())
+                .padding(.top, 16)
+                .transition(.opacity)
+            }
+
+            Spacer(minLength: 16)
+
+            if viewModel.currentStreak >= 2 && viewModel.phase == .playing && playMode == .free {
+                HStack(spacing: 6) {
+                    Image(systemName: "flame.fill")
+                        .foregroundStyle(.orange)
+                    Text("\(viewModel.currentStreak) seguidos")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.orange)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(.orange.opacity(0.15), in: Capsule())
+                .padding(.bottom, 24)
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding(.top, 12)
+        .animation(RestGameTheme.spring, value: viewModel.phase)
     }
 
     private var header: some View {
@@ -270,18 +281,23 @@ struct AlgoSpotView: View {
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
 
-            AlgoSpotModeToggle(
+            RestGameModeToggle(
                 selection: playMode,
                 isFreeUnlocked: isFreeModeUnlocked,
+                daily: .daily,
+                free: .free,
                 onSelect: selectMode
             )
             .padding(.horizontal, 32)
 
-            Text(modeSubtitle)
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.55))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 24)
+            if !modeSubtitle.isEmpty {
+                Text(modeSubtitle)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.55))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
         }
         .padding(.top, 8)
     }
@@ -289,81 +305,12 @@ struct AlgoSpotView: View {
     private var modeSubtitle: String {
         RestGameFreeModePolicy.modeSubtitle(
             isFreeModeActive: playMode == .free,
-            dailyComplete: dailyViewModel.isDailyComplete,
+            dailyComplete: showDailyCompleteEmptyState || dailyViewModel.isDailyComplete,
             isAllowed: restGamesAllowFreeMode,
             freeModeDetail: "10 desafios · lista separada do diário",
-            dailyCompleteDetail: "Desafio de hoje concluído · modo livre liberado"
+            dailyCompleteDetail: "Desafio de hoje concluído · modo livre liberado",
+            showLockedHint: showFreeModeLockedHint
         )
-    }
-}
-
-private struct AlgoSpotModeToggle: View {
-    let selection: AlgoSpotPlayMode
-    let isFreeUnlocked: Bool
-    let onSelect: (AlgoSpotPlayMode) -> Void
-
-    var body: some View {
-        HStack(spacing: 0) {
-            modeButton(.daily)
-            modeButton(.free)
-        }
-        .padding(4)
-        .background(.white.opacity(0.08), in: Capsule())
-    }
-
-    private func modeButton(_ mode: AlgoSpotPlayMode) -> some View {
-        let isSelected = selection == mode
-        let isLocked = mode == .free && !isFreeUnlocked
-
-        return Button {
-            onSelect(mode)
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: mode.iconName)
-                Text(mode.title)
-                if isLocked {
-                    Image(systemName: "lock.fill")
-                        .font(.caption2)
-                }
-            }
-            .font(.caption.weight(.bold))
-            .foregroundStyle(isSelected ? .black : .white.opacity(isLocked ? 0.35 : 0.7))
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-            .background(isSelected ? Color.white : Color.clear, in: Capsule())
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-private struct AlgoSpotDailyCompleteEmptyState: View {
-    let isFreeModeUnlocked: Bool
-    let dailyComplete: Bool
-    let isAllowed: Bool
-    let onPlayFree: () -> Void
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "checkmark.seal.fill")
-                .font(.system(size: 48))
-                .foregroundStyle(AlgoSpotTheme.accent)
-
-            Text("Você já jogou o desafio de hoje")
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-
-            AlgoSpotCountdownLabel(prefix: "Próximo em")
-
-            RestGameFreeModeButton(
-                isUnlocked: isFreeModeUnlocked,
-                dailyComplete: dailyComplete,
-                isAllowed: isAllowed,
-                onPlay: onPlayFree
-            )
-        }
-        .padding(24)
-        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 }
 
@@ -377,51 +324,9 @@ struct AlgoSpotCountdownLabel: View {
                 .font(.caption2.weight(.semibold))
                 .monospacedDigit()
                 .foregroundStyle(onDarkBackground ? .white.opacity(0.72) : .secondary)
+                .frame(minWidth: 210, alignment: .center)
+                .multilineTextAlignment(.center)
         }
-    }
-}
-
-private struct AlgoSpotDailyResultsView: View {
-    let viewModel: AlgoSpotViewModel
-    let isFreeModeUnlocked: Bool
-    let isAllowed: Bool
-    let onPlayFree: () -> Void
-    let onClose: () -> Void
-
-    var body: some View {
-        VStack(spacing: 24) {
-            RestGamePhaseLabel(text: "Diário")
-
-            Image(systemName: viewModel.wasCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .font(.system(size: 72))
-                .foregroundStyle(viewModel.wasCorrect ? .green : .orange)
-
-            Text(viewModel.wasCorrect ? "Algoritmo certo!" : "Amanhã tem mais")
-                .font(.title3.weight(.bold))
-                .foregroundStyle(.white)
-
-            if let challenge = viewModel.currentRoundData?.challenge {
-                Text(challenge.answer)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(AlgoSpotTheme.accentLight)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-            }
-
-            AlgoSpotCountdownLabel(prefix: "Próximo desafio em")
-
-            VStack(spacing: 12) {
-                RestGameFreeModeButton(
-                    isUnlocked: isFreeModeUnlocked,
-                    dailyComplete: viewModel.isDailyComplete,
-                    isAllowed: isAllowed,
-                    onPlay: onPlayFree
-                )
-                RestGameSecondaryButton(title: "Voltar", action: onClose)
-            }
-            .padding(.horizontal, 24)
-        }
-        .padding(.vertical, 32)
     }
 }
 
@@ -567,8 +472,8 @@ struct AlgoSpotPreview: View {
         .frame(height: expanded ? nil : 72)
         .task {
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(1.4))
-                withAnimation(.easeInOut(duration: 0.5)) {
+                try? await Task.sleep(for: .seconds(3.2))
+                withAnimation(.easeInOut(duration: 0.7)) {
                     highlightIndex = (highlightIndex + 1) % options.count
                 }
             }

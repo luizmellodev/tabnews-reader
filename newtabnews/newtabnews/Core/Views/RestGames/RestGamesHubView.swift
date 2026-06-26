@@ -35,6 +35,8 @@ struct RestGamesHubView: View {
                         }
                         .padding(.top, 8)
 
+                        RestGameFreeModeHubSetting()
+
                         VStack(alignment: .leading, spacing: 14) {
                             sectionTitle("Hoje")
 
@@ -59,7 +61,6 @@ struct RestGamesHubView: View {
                                         title: "Big O",
                                         accent: BigOTheme.accent,
                                         destination: .bigO,
-                                        previewAlignment: .bottom,
                                         badge: { bigODailyBadge }
                                     ) {
                                         BigOHubPreview()
@@ -84,7 +85,7 @@ struct RestGamesHubView: View {
                                 title: "DevLeet",
                                 accent: .orange,
                                 destination: .devLeet,
-                                aspectRatio: 1.15,
+                                aspectRatio: 2,
                                 badge: { devLeetStatusBadge },
                                 footer: {
                                     if weeklySummary.solved {
@@ -421,13 +422,13 @@ private struct DevWordleHubPreview: View {
                 }
 
                 Text(letter)
-                    .font(.title3.weight(.bold))
+                    .font(.caption.weight(.bold))
                     .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(color.opacity(color == .gray ? 0.25 : 0.75), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .frame(width: 28, height: 32)
+                    .background(color.opacity(color == .gray ? 0.25 : 0.75), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
 }
 
@@ -435,8 +436,8 @@ private struct DevLeetHubPreview: View {
     let summary: DevLeetWeeklySummary
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 8) {
+        HStack(alignment: .center, spacing: 14) {
+            VStack(alignment: .leading, spacing: 7) {
                 Text(summary.problemTitle)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.white)
@@ -463,27 +464,65 @@ private struct DevLeetHubPreview: View {
                     }
                 }
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("function solve(_ nums: [Int]) {")
-                    Text("  // papel e caneta")
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("class Solution {")
+                    Text("  func solve(_ nums: [Int]) -> [Int] {")
+                    Text("    // hash map")
+                    Text("  }")
                     Text("}")
                 }
-                .font(.system(size: 9.5, weight: .medium, design: .monospaced))
-                .foregroundStyle(.white.opacity(0.32))
+                .font(.system(size: 9, weight: .medium, design: .monospaced))
+                .foregroundStyle(.white.opacity(0.34))
+
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("IN")
+                            .font(.system(size: 7, weight: .black, design: .rounded))
+                            .foregroundStyle(.orange.opacity(0.55))
+                        Text("[2, 7, 11, 15]")
+                            .font(.system(size: 8.5, weight: .semibold, design: .monospaced))
+                            .foregroundStyle(.white.opacity(0.45))
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("OUT")
+                            .font(.system(size: 7, weight: .black, design: .rounded))
+                            .foregroundStyle(.orange.opacity(0.55))
+                        Text("[0, 1]")
+                            .font(.system(size: 8.5, weight: .semibold, design: .monospaced))
+                            .foregroundStyle(.white.opacity(0.45))
+                    }
+                }
             }
 
             Spacer(minLength: 0)
 
-            VStack(spacing: 6) {
-                Image(systemName: "pencil.and.outline")
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(.orange)
-                    .frame(width: 40, height: 40)
-                    .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            VStack(spacing: 8) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Color.orange.opacity(0.08))
+                        .frame(width: 52, height: 64)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(Color.orange.opacity(0.2), lineWidth: 1)
+                        }
 
-                Text("semanal")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.4))
+                    VStack(spacing: 5) {
+                        ForEach(0..<4, id: \.self) { _ in
+                            RoundedRectangle(cornerRadius: 2)
+                                .fill(Color.white.opacity(0.12))
+                                .frame(width: 28, height: 3)
+                        }
+                    }
+                }
+
+                HStack(spacing: 4) {
+                    Image(systemName: "pencil.and.outline")
+                        .font(.caption2.weight(.semibold))
+                    Text("papel")
+                        .font(.caption2.weight(.semibold))
+                }
+                .foregroundStyle(.orange.opacity(0.75))
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
@@ -520,36 +559,41 @@ private struct BigOHubPreview: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .task {
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(1.4))
+                try? await Task.sleep(for: .seconds(3.2))
                 highlightIndex = (highlightIndex + 1) % options.count
             }
         }
-        .animation(.easeInOut(duration: 0.45), value: highlightIndex)
+        .animation(.easeInOut(duration: 0.7), value: highlightIndex)
     }
 }
 
 private struct AlgoSpotHubPreview: View {
     var body: some View {
-        ZStack {
-            VStack(alignment: .leading, spacing: 7) {
-                HubShineCodeLine(text: "for u in graph:", fontSize: 11)
-                HubShineCodeLine(text: "  dist[u] = inf", fontSize: 11)
-                HubShineCodeLine(text: "  heap.push(u)", fontSize: 10.5, dimmed: true)
-                HubShineCodeLine(text: "return path", fontSize: 10.5, dimmed: true)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-            .padding(.bottom, 2)
+        GeometryReader { geo in
+            let fontSize = min(max(geo.size.width * 0.085, 10), geo.size.height * 0.13)
+            let lineSpacing = max(geo.size.height * 0.045, 5)
+            let questionSize = min(geo.size.width * 0.42, geo.size.height * 0.72)
 
-            Text("?")
-                .font(.system(size: 58, weight: .black, design: .rounded))
-                .foregroundStyle(AlgoSpotTheme.accentLight.opacity(0.92))
-                .shadow(color: AlgoSpotTheme.accent.opacity(0.5), radius: 14)
-                .shadow(color: .black.opacity(0.35), radius: 6, y: 2)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                .offset(y: 4)
+            ZStack {
+                VStack(alignment: .leading, spacing: lineSpacing) {
+                    HubShineCodeLine(text: "for u in graph:", fontSize: fontSize)
+                    HubShineCodeLine(text: "  dist[u] = inf", fontSize: fontSize)
+                    HubShineCodeLine(text: "  heap.push(u)", fontSize: fontSize * 0.92, dimmed: true)
+                    HubShineCodeLine(text: "return path", fontSize: fontSize * 0.92, dimmed: true)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+
+                Text("?")
+                    .font(.system(size: questionSize, weight: .black, design: .rounded))
+                    .foregroundStyle(AlgoSpotTheme.accentLight.opacity(0.9))
+                    .shadow(color: AlgoSpotTheme.accent.opacity(0.5), radius: 14)
+                    .shadow(color: .black.opacity(0.35), radius: 6, y: 2)
+                    .rotationEffect(.degrees(-12))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -561,9 +605,9 @@ private struct HubShineCodeLine: View {
     var dimmed = false
 
     var body: some View {
-        TimelineView(.animation) { timeline in
+        TimelineView(.animation(minimumInterval: 1 / 20)) { timeline in
             let phase = timeline.date.timeIntervalSinceReferenceDate
-                .truncatingRemainder(dividingBy: 2.4) / 2.4
+                .truncatingRemainder(dividingBy: 6.5) / 6.5
 
             Text(text)
                 .font(.system(size: fontSize, weight: .medium, design: .monospaced))
@@ -730,13 +774,15 @@ private struct SoundMatchHubPreview: View {
                 endPoint: .bottomTrailing
             )
 
-            TimelineView(.animation(minimumInterval: 1 / 30)) { timeline in
+            TimelineView(.animation(minimumInterval: 1 / 24)) { timeline in
+                let time = timeline.date.timeIntervalSinceReferenceDate
+
                 Canvas { context, size in
                     SoundRibbonRenderer.draw(
                         context: &context,
                         size: size,
-                        visualNorm: 0.52,
-                        time: timeline.date.timeIntervalSinceReferenceDate,
+                        visualNorm: 0.5,
+                        time: time,
                         compact: false,
                         profile: .hubBanner,
                         isInteractive: false

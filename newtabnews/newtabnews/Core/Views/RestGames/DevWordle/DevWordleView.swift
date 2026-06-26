@@ -10,6 +10,7 @@ struct DevWordleView: View {
     @State private var showFreeSessionSummary = false
     @State private var showConfetti = false
     @State private var showOnboarding = !RestGameOnboarding.hasSeen(.devWordle)
+    @State private var showFreeModeLockedHint = false
 
     var body: some View {
         ZStack {
@@ -165,11 +166,8 @@ struct DevWordleView: View {
     private var bottomArea: some View {
         ZStack {
             if showDailyCompleteEmptyState {
-                DevWordleDailyCompleteFooter(
-                    viewModel: dailyViewModel,
-                    onPlayFree: { selectMode(.free) }
-                )
-                .transition(Self.bottomSlideTransition)
+                DevWordleDailyCompleteFooter(viewModel: dailyViewModel)
+                    .transition(Self.bottomSlideTransition)
             }
 
             if !showDailyCompleteEmptyState {
@@ -203,12 +201,16 @@ struct DevWordleView: View {
     private func selectMode(_ mode: DevWordlePlayMode) {
         guard playMode != mode else { return }
         guard mode != .free || isFreeModeUnlocked else {
+            withAnimation(.easeOut(duration: 0.22)) {
+                showFreeModeLockedHint = true
+            }
             RestGameFreeModePolicy.handleLockedAttempt(
                 dailyComplete: dailyViewModel.isRoundComplete,
                 isAllowed: restGamesAllowFreeMode
             )
             return
         }
+        showFreeModeLockedHint = false
         showResultSheet = false
         showConfetti = false
         if mode == .free {
@@ -310,17 +312,22 @@ struct DevWordleView: View {
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
 
-            DevWordleModeToggle(
+            RestGameModeToggle(
                 selection: playMode,
                 isFreeUnlocked: isFreeModeUnlocked,
+                daily: .daily,
+                free: .free,
                 onSelect: selectMode
             )
             .padding(.horizontal, 32)
 
-            Text(modeSubtitle)
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.55))
-                .animation(.easeInOut(duration: 0.25), value: modeSubtitle)
+            if !modeSubtitle.isEmpty {
+                Text(modeSubtitle)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.55))
+                    .animation(.easeInOut(duration: 0.25), value: modeSubtitle)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
 
             if playMode == .free, let freeSession {
                 HStack(spacing: 16) {
@@ -341,57 +348,9 @@ struct DevWordleView: View {
             dailyComplete: showDailyCompleteEmptyState,
             isAllowed: restGamesAllowFreeMode,
             freeModeDetail: "Termos de programação · lista separada do diário",
-            dailyCompleteDetail: "Desafio de hoje concluído · modo livre liberado"
+            dailyCompleteDetail: "Desafio de hoje concluído · modo livre liberado",
+            showLockedHint: showFreeModeLockedHint
         )
-    }
-}
-
-private struct DevWordleModeToggle: View {
-    let selection: DevWordlePlayMode
-    let isFreeUnlocked: Bool
-    let onSelect: (DevWordlePlayMode) -> Void
-
-    var body: some View {
-        HStack(spacing: 4) {
-            segment(.daily, locked: false)
-            segment(.free, locked: !isFreeUnlocked)
-        }
-        .padding(4)
-        .background(Color.white.opacity(0.06), in: Capsule())
-        .overlay {
-            Capsule()
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
-        }
-    }
-
-    private func segment(_ mode: DevWordlePlayMode, locked: Bool) -> some View {
-        let isSelected = selection == mode
-        let isDisabled = locked && mode == .free
-
-        return Button {
-            onSelect(mode)
-            if !isDisabled {
-                RestFeedbackManager.shared.tapHaptic()
-            }
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: isDisabled ? "lock.fill" : mode.iconName)
-                    .font(.caption.weight(.bold))
-                Text(mode.title)
-                    .font(.subheadline.weight(.semibold))
-            }
-            .foregroundStyle(foregroundColor(isSelected: isSelected, isDisabled: isDisabled))
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: 40)
-            .background(isSelected ? Color.white.opacity(0.18) : Color.clear, in: Capsule())
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func foregroundColor(isSelected: Bool, isDisabled: Bool) -> Color {
-        if isDisabled { return .white.opacity(0.22) }
-        return isSelected ? .white : .white.opacity(0.42)
     }
 }
 
@@ -626,43 +585,27 @@ private struct DevWordleFeaturedWordView: View {
 
 private struct DevWordleDailyCompleteFooter: View {
     let viewModel: DevWordleViewModel
-    let onPlayFree: () -> Void
     @Environment(\.openURL) private var openURL
     @StateObject private var gameCenter = GameCenterManager.shared
 
     var body: some View {
-        VStack(spacing: 12) {
-            Button(action: onPlayFree) {
-                HStack(spacing: 8) {
-                    Image(systemName: "infinity")
-                    Text("Jogar modo livre")
-                }
-                .font(.headline)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(Color(red: 0.42, green: 0.67, blue: 0.36), in: Capsule())
+        HStack(spacing: 8) {
+            DevWordleFooterAction(
+                accessibilityLabel: "O que é \(viewModel.targetWord) na programação"
+            ) {
+                guard let url = RestGameProgrammingSearch.programmingSearchURL(for: viewModel.targetWord) else { return }
+                openURL(url)
+            } label: {
+                DevWordleFooterWhatIsLabel(word: viewModel.targetWord)
             }
-            .buttonStyle(RestGameScaleButtonStyle())
 
-            HStack(spacing: 8) {
-                DevWordleFooterAction(
-                    accessibilityLabel: "O que é \(viewModel.targetWord) na programação"
-                ) {
-                    guard let url = RestGameProgrammingSearch.programmingSearchURL(for: viewModel.targetWord) else { return }
-                    openURL(url)
-                } label: {
-                    DevWordleFooterWhatIsLabel(word: viewModel.targetWord)
-                }
+            ShareLink(item: viewModel.shareText) {
+                DevWordleFooterActionLabel(icon: "square.and.arrow.up", title: "Compartilhar")
+            }
 
-                ShareLink(item: viewModel.shareText) {
-                    DevWordleFooterActionLabel(icon: "square.and.arrow.up", title: "Compartilhar")
-                }
-
-                if viewModel.gameStatus == .won, gameCenter.isAuthenticated {
-                    DevWordleIconFooterAction(icon: "trophy.fill", title: "Ranking") {
-                        gameCenter.showLeaderboard(.devWordle)
-                    }
+            if viewModel.gameStatus == .won, gameCenter.isAuthenticated {
+                DevWordleIconFooterAction(icon: "trophy.fill", title: "Ranking") {
+                    gameCenter.showLeaderboard(.devWordle)
                 }
             }
         }

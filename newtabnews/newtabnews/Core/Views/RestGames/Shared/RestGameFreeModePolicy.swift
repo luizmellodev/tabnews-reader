@@ -13,17 +13,6 @@ enum RestGameFreeModePolicy {
 
     @MainActor
     static func handleLockedAttempt(dailyComplete: Bool, isAllowed: Bool = UserDefaults.standard.bool(forKey: storageKey)) {
-        if !isAllowed {
-            ToastManager.shared.show(
-                text: "Modo livre bloqueado por padrão para manter a diversão do diário. Ative em Ajustes se quiser.",
-                icon: "lock.fill"
-            )
-        } else if !dailyComplete {
-            ToastManager.shared.show(
-                text: "Complete o desafio diário para liberar o modo livre.",
-                icon: "calendar"
-            )
-        }
         RestFeedbackManager.shared.wrong()
     }
 
@@ -32,23 +21,24 @@ enum RestGameFreeModePolicy {
         dailyComplete: Bool,
         isAllowed: Bool,
         freeModeDetail: String,
-        dailyCompleteDetail: String
+        dailyCompleteDetail: String,
+        showLockedHint: Bool = false
     ) -> String {
         if isFreeModeActive {
             return freeModeDetail
         }
-        if !isAllowed {
-            return "Modo livre desativado · ative em Ajustes"
+        if showLockedHint {
+            return lockedCaption(dailyComplete: dailyComplete, isAllowed: isAllowed)
         }
-        if dailyComplete {
+        if dailyComplete && isAllowed {
             return dailyCompleteDetail
         }
-        return "Complete o diário para liberar o modo livre"
+        return ""
     }
 
     static func lockedCaption(dailyComplete: Bool, isAllowed: Bool) -> String {
         if !isAllowed {
-            return "Modo livre desativado · ative em Ajustes"
+            return "Modo livre desativado · ative na hub de jogos"
         }
         if !dailyComplete {
             return "Complete o desafio diário para liberar o modo livre"

@@ -24,7 +24,7 @@ enum DevWordleGameStatus: String, Codable, Equatable {
     case lost
 }
 
-enum DevWordlePlayMode: Equatable, Hashable {
+enum DevWordlePlayMode: Equatable, Hashable, RestGamePlayMode {
     case daily
     case free
 

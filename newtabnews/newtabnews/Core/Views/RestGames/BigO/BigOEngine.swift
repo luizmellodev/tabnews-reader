@@ -1,6 +1,6 @@
 import Foundation
 
-enum BigOPlayMode: Equatable, Hashable {
+enum BigOPlayMode: Equatable, Hashable, RestGamePlayMode {
     case daily
     case free
 

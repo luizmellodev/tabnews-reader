@@ -30,7 +30,6 @@ struct SettingsView: View {
     @AppStorage("debugShowDailyDigestBanner") private var appStorage_debugShowDailyDigestBanner = false
     @AppStorage("showReadOnTabNewsButton") private var showReadOnTabNewsButton = false
     @AppStorage("isBetaTester") private var isBetaTester = false
-    @AppStorage(RestGameFreeModePolicy.storageKey) private var restGamesAllowFreeMode = false
     @State private var isRefreshing = false
     @State private var userPublicationsCount: Int?
     @State private var pushTokenDebugInfo: FirebasePushNotificationService.DebugInfo?
@@ -52,21 +51,6 @@ struct SettingsView: View {
                 .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 16, trailing: 0))
                 .listRowSeparator(.hidden)
 
-                Section {
-                    Toggle(isOn: $restGamesAllowFreeMode) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Modo livre nos jogos")
-                            Text("Libera prática extra após o desafio diário")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                } header: {
-                    Label("Jogos Dev", systemImage: "gamecontroller.fill")
-                } footer: {
-                    Text("Desativado por padrão para manter a experiência diária. Afeta DevWordle, Big O e AlgoSpot.")
-                }
-                
                 Section {
                     NavigationLink {
                         GamificationView()

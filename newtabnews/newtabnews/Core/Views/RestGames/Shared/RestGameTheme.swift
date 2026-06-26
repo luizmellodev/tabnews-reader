@@ -14,6 +14,62 @@ enum RestGameTheme {
     }
 }
 
+protocol RestGamePlayMode: Equatable {
+    var title: String { get }
+    var iconName: String { get }
+}
+
+struct RestGameModeToggle<Mode: RestGamePlayMode>: View {
+    let selection: Mode
+    let isFreeUnlocked: Bool
+    let daily: Mode
+    let free: Mode
+    let onSelect: (Mode) -> Void
+
+    var body: some View {
+        HStack(spacing: 4) {
+            segment(daily, locked: false)
+            segment(free, locked: !isFreeUnlocked)
+        }
+        .padding(4)
+        .background(Color.white.opacity(0.06), in: Capsule())
+        .overlay {
+            Capsule()
+                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+        }
+    }
+
+    private func segment(_ mode: Mode, locked: Bool) -> some View {
+        let isSelected = selection == mode
+        let isDisabled = locked && mode == free
+
+        return Button {
+            onSelect(mode)
+            if !isDisabled {
+                RestFeedbackManager.shared.tapHaptic()
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: isDisabled ? "lock.fill" : mode.iconName)
+                    .font(.caption.weight(.bold))
+                Text(mode.title)
+                    .font(.subheadline.weight(.semibold))
+            }
+            .foregroundStyle(foregroundColor(isSelected: isSelected, isDisabled: isDisabled))
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: 40)
+            .background(isSelected ? Color.white.opacity(0.18) : Color.clear, in: Capsule())
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func foregroundColor(isSelected: Bool, isDisabled: Bool) -> Color {
+        if isDisabled { return .white.opacity(0.22) }
+        return isSelected ? .white : .white.opacity(0.42)
+    }
+}
+
 struct RestGameBackground: View {
     var animated: Bool = true
 
@@ -107,38 +163,65 @@ struct RestGameSecondaryButton: View {
     }
 }
 
-struct RestGameFreeModeButton: View {
-    let isUnlocked: Bool
-    let dailyComplete: Bool
-    let isAllowed: Bool
-    let onPlay: () -> Void
+struct RestGameDailyCompleteEmptyState<Countdown: View>: View {
+    let wasCorrect: Bool
+    @ViewBuilder let countdown: () -> Countdown
 
     var body: some View {
-        VStack(spacing: 10) {
-            if isUnlocked {
-                RestGamePrimaryButton(title: "Modo livre", action: onPlay)
-            } else {
-                HStack(spacing: 8) {
-                    Image(systemName: "lock.fill")
-                    Text("Modo livre")
-                }
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.35))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 17)
-                .background(.white.opacity(0.06), in: Capsule())
-                .overlay(Capsule().stroke(.white.opacity(0.1), lineWidth: 1))
+        VStack(spacing: 18) {
+            Image(systemName: wasCorrect ? "checkmark.circle" : "xmark.circle")
+                .font(.system(size: 52, weight: .light))
+                .foregroundStyle(wasCorrect
+                    ? Color(red: 0.42, green: 0.67, blue: 0.36)
+                    : .red)
 
-                Text(RestGameFreeModePolicy.lockedCaption(
-                    dailyComplete: dailyComplete,
-                    isAllowed: isAllowed
-                ))
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.45))
+            Text(wasCorrect ? "Boa!! Amanhã tem mais!" : "Relaxa.. amanhã tem mais!")
+                .font(.title2.weight(.bold))
+                .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 8)
-            }
+
+            countdown()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+    }
+}
+
+struct RestGameFreeModeHubSetting: View {
+    @AppStorage(RestGameFreeModePolicy.storageKey) private var restGamesAllowFreeMode = false
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: "infinity")
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.85))
+                .frame(width: 36, height: 36)
+                .background(.white.opacity(0.08), in: Circle())
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Modo livre")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+
+                Text("Prática extra após o desafio diário")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+
+            Spacer(minLength: 12)
+
+            Toggle("", isOn: $restGamesAllowFreeMode)
+                .labelsHidden()
+                .tint(Color(red: 0.42, green: 0.67, blue: 0.36))
+        }
+        .padding(14)
+        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(.white.opacity(0.1), lineWidth: 1)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Modo livre nos jogos")
+        .accessibilityValue(restGamesAllowFreeMode ? "Ativado" : "Desativado")
     }
 }
 

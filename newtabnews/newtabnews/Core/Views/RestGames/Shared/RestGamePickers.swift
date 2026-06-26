@@ -25,14 +25,14 @@ struct SoundRibbonVisualProfile: Equatable {
     )
 
     static let hubBanner = SoundRibbonVisualProfile(
-        amplitudeScale: 0.34,
+        amplitudeScale: 0.42,
         wavelengthScale: 0.82,
-        speedScale: 0.07,
-        spreadScale: 1.55,
-        envelopeCycles: 1.35,
+        speedScale: 0.05,
+        spreadScale: 1.45,
+        envelopeCycles: 1.2,
         phaseOffset: 0.35,
-        lineThinning: 0.48,
-        decoyVisualNorm: 0.5
+        lineThinning: 0.88,
+        decoyVisualNorm: nil
     )
 
     static func randomMemorize() -> SoundRibbonVisualProfile {
@@ -254,14 +254,21 @@ enum SoundRibbonRenderer {
             * deform.wavelengthScale
         let baseAmplitude: Double
         if profile == .hubBanner {
-            baseAmplitude = min(Double(size.width), Double(size.height)) * 0.2
+            baseAmplitude = min(Double(size.width), Double(size.height)) * 0.22
         } else if compact {
             baseAmplitude = 6.5
         } else {
             baseAmplitude = min(52, size.width * 0.14)
         }
         let amplitude = max(compact ? 4.8 : 14, baseAmplitude * deform.amplitudeScale * profile.amplitudeScale)
-        let driftSpeed = isInteractive && !compact ? profile.speedScale * 0.82 : profile.speedScale * deform.animSpeed
+        let driftSpeed: Double
+        if profile == .hubBanner {
+            driftSpeed = profile.speedScale
+        } else if isInteractive && !compact {
+            driftSpeed = profile.speedScale * 0.82
+        } else {
+            driftSpeed = profile.speedScale * deform.animSpeed
+        }
         let drift = time * driftSpeed
 
         drawStrands(
@@ -326,7 +333,9 @@ enum SoundRibbonRenderer {
         visualNorm: Double
     ) {
         let step = compact ? 2.6 : 2.0
-        let breathe = sin(time * 0.85) * 0.045
+        let breathe = sin(time * (profile == .hubBanner ? 0.42 : 0.85)) * (profile == .hubBanner ? 0.03 : 0.045)
+        let strandDriftSpeed = profile == .hubBanner ? 0.36 : 0.55
+        let strandDriftAmplitude = profile == .hubBanner ? 0.028 : 0.045
 
         for strand in strands {
             var path = Path()
@@ -337,7 +346,7 @@ enum SoundRibbonRenderer {
                 let edgeFade = sin(progress * .pi)
                 let bulgeWave = sin(progress * .pi * profile.envelopeCycles + profile.phaseOffset + strand.phase * 0.08)
                 let bulge = (0.12 + deform.bulgeScale * pow(bulgeWave, 2)) * (1 - deform.pinch * pow(abs(bulgeWave), 1.4))
-                let strandDrift = drift + sin(time * 0.55 + strand.phase) * 0.045
+                let strandDrift = drift + sin(time * strandDriftSpeed + strand.phase) * strandDriftAmplitude
                 let phase = (y / wavelength + strandDrift + strand.phase * 0.05) * .pi * 2
                 let primary = sin(phase)
                 let silk = sin(phase * 0.5 + strand.harmonicPhase) * strand.harmonic * (0.32 + visualNorm * 0.12)
@@ -359,7 +368,7 @@ enum SoundRibbonRenderer {
 
             let lineWidth = max(
                 0.45,
-                strand.width * profile.lineThinning * deform.lineScale * (compact ? 0.85 : 0.72)
+                strand.width * profile.lineThinning * deform.lineScale * (compact ? 0.85 : (profile == .hubBanner ? 1.05 : 0.72))
             )
 
             context.stroke(
