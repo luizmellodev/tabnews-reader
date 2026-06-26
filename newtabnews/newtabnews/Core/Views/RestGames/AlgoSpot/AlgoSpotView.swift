@@ -8,6 +8,7 @@ private struct AlgoSpotRevealSnapshot: Equatable {
 struct AlgoSpotView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @AppStorage(RestGameFreeModePolicy.storageKey) private var restGamesAllowFreeMode = false
 
     @State private var playMode: AlgoSpotPlayMode = .daily
     @State private var dailyViewModel = AlgoSpotViewModel(mode: .daily)
@@ -31,6 +32,8 @@ struct AlgoSpotView: View {
                 if playMode == .daily {
                     AlgoSpotDailyResultsView(
                         viewModel: dailyViewModel,
+                        isFreeModeUnlocked: isFreeModeUnlocked,
+                        isAllowed: restGamesAllowFreeMode,
                         onPlayFree: { selectMode(.free) },
                         onClose: { dismiss() }
                     )
@@ -62,6 +65,11 @@ struct AlgoSpotView: View {
                 playMode = .daily
             }
             startIfReady()
+        }
+        .onChange(of: restGamesAllowFreeMode) { _, _ in
+            if playMode == .free, !isFreeModeUnlocked {
+                playMode = .daily
+            }
         }
         .sheet(isPresented: $showIntroLearn) {
             AlgoSpotIntroLearnSheet { url in
@@ -99,7 +107,10 @@ struct AlgoSpotView: View {
     }
 
     private var isFreeModeUnlocked: Bool {
-        dailyViewModel.isDailyComplete
+        RestGameFreeModePolicy.isUnlocked(
+            dailyComplete: dailyViewModel.isDailyComplete,
+            isAllowed: restGamesAllowFreeMode
+        )
     }
 
     private func startIfReady() {
@@ -116,7 +127,10 @@ struct AlgoSpotView: View {
     private func selectMode(_ mode: AlgoSpotPlayMode) {
         guard playMode != mode else { return }
         guard mode != .free || isFreeModeUnlocked else {
-            RestFeedbackManager.shared.wrong()
+            RestGameFreeModePolicy.handleLockedAttempt(
+                dailyComplete: dailyViewModel.isDailyComplete,
+                isAllowed: restGamesAllowFreeMode
+            )
             return
         }
         showRevealLearn = false
@@ -143,7 +157,12 @@ struct AlgoSpotView: View {
             header
 
             if playMode == .daily && dailyViewModel.isDailyComplete && dailyViewModel.phase == .playing {
-                AlgoSpotDailyCompleteEmptyState(onPlayFree: { selectMode(.free) })
+                AlgoSpotDailyCompleteEmptyState(
+                    isFreeModeUnlocked: isFreeModeUnlocked,
+                    dailyComplete: dailyViewModel.isDailyComplete,
+                    isAllowed: restGamesAllowFreeMode,
+                    onPlayFree: { selectMode(.free) }
+                )
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
                 Spacer()
@@ -268,16 +287,13 @@ struct AlgoSpotView: View {
     }
 
     private var modeSubtitle: String {
-        if playMode == .free {
-            return "10 desafios · lista separada do diário"
-        }
-        if dailyViewModel.isDailyComplete {
-            return "Desafio de hoje concluído · modo livre liberado"
-        }
-        if isFreeModeUnlocked {
-            return "1 algoritmo por dia · reconheça o padrão"
-        }
-        return "Complete o diário para liberar o modo livre"
+        RestGameFreeModePolicy.modeSubtitle(
+            isFreeModeActive: playMode == .free,
+            dailyComplete: dailyViewModel.isDailyComplete,
+            isAllowed: restGamesAllowFreeMode,
+            freeModeDetail: "10 desafios · lista separada do diário",
+            dailyCompleteDetail: "Desafio de hoje concluído · modo livre liberado"
+        )
     }
 }
 
@@ -317,11 +333,13 @@ private struct AlgoSpotModeToggle: View {
             .background(isSelected ? Color.white : Color.clear, in: Capsule())
         }
         .buttonStyle(.plain)
-        .disabled(isLocked && !isSelected)
     }
 }
 
 private struct AlgoSpotDailyCompleteEmptyState: View {
+    let isFreeModeUnlocked: Bool
+    let dailyComplete: Bool
+    let isAllowed: Bool
     let onPlayFree: () -> Void
 
     var body: some View {
@@ -337,7 +355,12 @@ private struct AlgoSpotDailyCompleteEmptyState: View {
 
             AlgoSpotCountdownLabel(prefix: "Próximo em")
 
-            RestGamePrimaryButton(title: "Modo livre", action: onPlayFree)
+            RestGameFreeModeButton(
+                isUnlocked: isFreeModeUnlocked,
+                dailyComplete: dailyComplete,
+                isAllowed: isAllowed,
+                onPlay: onPlayFree
+            )
         }
         .padding(24)
         .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
@@ -360,6 +383,8 @@ struct AlgoSpotCountdownLabel: View {
 
 private struct AlgoSpotDailyResultsView: View {
     let viewModel: AlgoSpotViewModel
+    let isFreeModeUnlocked: Bool
+    let isAllowed: Bool
     let onPlayFree: () -> Void
     let onClose: () -> Void
 
@@ -386,7 +411,12 @@ private struct AlgoSpotDailyResultsView: View {
             AlgoSpotCountdownLabel(prefix: "Próximo desafio em")
 
             VStack(spacing: 12) {
-                RestGamePrimaryButton(title: "Modo livre", action: onPlayFree)
+                RestGameFreeModeButton(
+                    isUnlocked: isFreeModeUnlocked,
+                    dailyComplete: viewModel.isDailyComplete,
+                    isAllowed: isAllowed,
+                    onPlay: onPlayFree
+                )
                 RestGameSecondaryButton(title: "Voltar", action: onClose)
             }
             .padding(.horizontal, 24)
@@ -498,11 +528,12 @@ private struct AlgoSpotFreeResultsView: View {
 }
 
 struct AlgoSpotPreview: View {
+    var expanded = false
     @State private var highlightIndex = 0
     private let options = ["Dijkstra", "Bellman-Ford", "Floyd-Warshall", "BFS"]
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: expanded ? 12 : 10) {
             HStack(spacing: 8) {
                 RoundedRectangle(cornerRadius: 6)
                     .fill(.white.opacity(0.08))
@@ -519,12 +550,12 @@ struct AlgoSpotPreview: View {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                 ForEach(Array(options.enumerated()), id: \.offset) { index, option in
                     Text(option)
-                        .font(.caption2.weight(.bold))
+                        .font(expanded ? .caption.weight(.bold) : .caption2.weight(.bold))
                         .foregroundStyle(.white.opacity(index == highlightIndex ? 1 : 0.45))
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
+                        .padding(.vertical, expanded ? 12 : 10)
                         .background(
                             (index == highlightIndex ? AlgoSpotTheme.accent : Color.white).opacity(index == highlightIndex ? 0.25 : 0.06),
                             in: RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -532,7 +563,8 @@ struct AlgoSpotPreview: View {
                 }
             }
         }
-        .frame(height: 72)
+        .frame(maxWidth: .infinity, maxHeight: expanded ? .infinity : nil)
+        .frame(height: expanded ? nil : 72)
         .task {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1.4))

@@ -6,9 +6,13 @@
 import { writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import { sharedSnippetExtra } from "./content/shared-snippet-extra.mjs";
+import { algoSpotExclusiveExtra } from "./content/algo-spot-exclusive-extra.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, "../newtabnews/Core/Views/RestGames/AlgoSpot");
+
+const DAILY_COUNT = 35;
 
 /** Uma frase: categoria + para que serve o algoritmo. */
 const WHAT_IT_IS = {
@@ -80,6 +84,36 @@ const WHAT_IT_IS = {
   "Two pointers": "Técnica com dois índices que convergem ou avançam em ritmos diferentes no mesmo array.",
   "Two sum": "Encontra dois números que somam um alvo usando hash map em uma passagem.",
   "Union-Find": "Estrutura de conjuntos disjuntos para saber se dois elementos estão no mesmo grupo e unir grupos.",
+  "Encontrar mínimo": "Percorre o array uma vez para encontrar o menor elemento — o oposto de encontrar o máximo.",
+  "KMP": "Busca de padrão em texto em O(n) usando prefixo próprio mais longo (LPS).",
+  "Rabin-Karp": "Busca de padrão comparando hashes rolling — confirma colisões com comparação direta.",
+  "Monotonic stack": "Pilha que mantém elementos em ordem monótona para resolver próximo maior/menor em O(n).",
+  "Monotonic queue": "Fila dupla com ordem monótona para máximo/mínimo em janela deslizante.",
+  "Trie": "Árvore de prefixos: cada nível representa um caractere para busca/inserção de strings.",
+  "LRU cache": "Cache que remove o item menos recentemente usado ao atingir capacidade.",
+  "Two pointers (ordenado)": "Dois ponteiros nas extremidades de array ordenado para achar par com soma alvo.",
+  "Fisher-Yates": "Embaralha array em O(n) gerando permutação uniformemente aleatória.",
+  "Reservoir sampling": "Seleciona k elementos aleatórios de um fluxo de tamanho desconhecido em O(n) e uma passagem.",
+  "Kosaraju SCC": "Encontra componentes fortemente conexos com duas passagens DFS e grafo reverso.",
+  "Meet in the middle": "Divide problema exponencial ao meio, gera subconjuntos de cada metade e combina.",
+  "Ford-Fulkerson": "Calcula fluxo máximo repetindo caminhos aumentantes de fonte ao sumidouro.",
+  "Bucket sort": "Ordenação que distribui elementos em baldes por faixa e ordena cada balde.",
+  "Shell sort": "Ordenação por inserção com intervalos (gaps) que vão encolhendo até 1.",
+  "Pancake sort": "Ordena apenas com operações de reverter prefixo do array (panqueca).",
+  "BFS bidirecional": "BFS partindo simultaneamente de origem e destino até as fronteiras se encontrarem.",
+  "DFS iterativo aprofundando": "DFS com limite de profundidade crescente — combina memória baixa com completude.",
+  "Fenwick tree": "Árvore indexada binária para prefix sums e updates pontuais em O(log n).",
+  "Segment tree": "Árvore de segmentos para consultas e updates em intervalos em O(log n).",
+  "Manacher": "Encontra palíndromo mais longo em O(n) com expansão centrada e espelhamento.",
+  "Z-algorithm": "Constrói array Z de matches de prefixo em O(n) para busca de padrões.",
+  "Morris traversal": "Traversal in-order em árvore binária com O(1) espaço extra via links de predecessor.",
+  "Tarjan SCC": "Encontra SCCs em uma única DFS usando índices de descoberta e low-link.",
+  "A*": "Busca de caminho que usa custo real + heurística para priorizar nós promissores.",
+  "Comb sort": "Melhoria do bubble sort comparando elementos separados por gap decrescente.",
+  "Top K com heap": "Mantém heap de tamanho k para extrair os k maiores elementos eficientemente.",
+  "Dijkstra com heap": "Dijkstra com min-heap: O((V+E) log V) em vez de O(V²) com matriz.",
+  "Rope (corda)": "Estrutura de corda (rope) para manipular strings grandes com concatenação eficiente.",
+  "Greedy de moedas": "Algoritmo guloso que subtrai a maior moeda possível até zerar o valor.",
   "Verificar duplicata": "Detecta se há elementos repetidos em um array usando um conjunto (set).",
 };
 
@@ -159,8 +193,8 @@ const free = [
   c("free-as-edit-distance", "Edit distance", "function editDistance(a, b):\n  m = a.length\n  n = b.length\n  dp = matrix(m + 1, n + 1, 0)\n  for i in 0..m:\n    dp[i][0] = i\n  for j in 0..n:\n    dp[0][j] = j\n  for i in 1..m:\n    for j in 1..n:\n      cost = a[i-1] == b[j-1] ? 0 : 1\n      dp[i][j] = min(dp[i-1][j] + 1, dp[i][j-1] + 1, dp[i-1][j-1] + cost)\n  return dp[m][n]", ["Edit distance", "LCS", "LIS", "Busca de substring"], "Edit distance", "hard", "dp", "O(mn)", "Levenshtein: inserção, deleção ou substituição para transformar a em b.", "Três operações no min().", "https://www.geeksforgeeks.org/dsa/edit-distance-dp-5/"),
 ];
 
-function c(id, title, snippet, options, answer, difficulty, category, complexity, explanation, hint, reference) {
-  const whatItIs = WHAT_IT_IS[answer];
+function c(id, title, snippet, options, answer, difficulty, category, complexity, explanation, hint, reference, whatItIsOverride) {
+  const whatItIs = whatItIsOverride ?? WHAT_IT_IS[answer];
   if (!whatItIs) {
     throw new Error(`Missing whatItIs for answer "${answer}" in ${id}`);
   }
@@ -181,6 +215,62 @@ function c(id, title, snippet, options, answer, difficulty, category, complexity
   };
 }
 
-writeFileSync(join(OUT_DIR, "algo_spot_daily.json"), JSON.stringify({ challenges: daily }, null, 2) + "\n");
-writeFileSync(join(OUT_DIR, "algo_spot_free.json"), JSON.stringify({ challenges: free }, null, 2) + "\n");
-console.log(`Wrote ${daily.length} daily and ${free.length} free challenges`);
+function sharedAlgoSpotChallenge() {
+  const { snippet, algoSpot } = sharedSnippetExtra;
+  return c(
+    algoSpot.id,
+    algoSpot.title,
+    snippet,
+    algoSpot.options,
+    algoSpot.answer,
+    algoSpot.difficulty,
+    algoSpot.category,
+    algoSpot.complexity,
+    algoSpot.explanation,
+    algoSpot.hint,
+    algoSpot.reference,
+    algoSpot.whatItIs
+  );
+}
+
+const DAILY_IDS = new Set([
+  ...daily.map((item) => item.id),
+  "shared-as-find-min",
+  "free-as-two-sum",
+  "free-as-kadane",
+  "free-as-sieve",
+  "free-as-cycle-detection",
+]);
+
+const allChallenges = dedupeById([
+  ...daily,
+  ...free,
+  sharedAlgoSpotChallenge(),
+  ...algoSpotExclusiveExtra,
+]);
+
+const dailyChallenges = allChallenges.filter((item) => DAILY_IDS.has(item.id));
+const freeChallenges = allChallenges.filter((item) => !DAILY_IDS.has(item.id));
+
+if (dailyChallenges.length !== DAILY_COUNT) {
+  throw new Error(`Expected ${DAILY_COUNT} daily challenges, got ${dailyChallenges.length}`);
+}
+if (allChallenges.length !== 100) {
+  throw new Error(`Expected 100 total AlgoSpot challenges, got ${allChallenges.length}`);
+}
+if (dailyChallenges.length + freeChallenges.length !== 100) {
+  throw new Error("Daily/free split does not cover all challenges");
+}
+
+function dedupeById(challenges) {
+  const seen = new Set();
+  return challenges.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+}
+
+writeFileSync(join(OUT_DIR, "algo_spot_daily.json"), JSON.stringify({ challenges: dailyChallenges }, null, 2) + "\n");
+writeFileSync(join(OUT_DIR, "algo_spot_free.json"), JSON.stringify({ challenges: freeChallenges }, null, 2) + "\n");
+console.log(`Wrote ${dailyChallenges.length} daily and ${freeChallenges.length} free challenges (${allChallenges.length} total)`);

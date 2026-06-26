@@ -24,6 +24,17 @@ struct SoundRibbonVisualProfile: Equatable {
         decoyVisualNorm: nil
     )
 
+    static let hubBanner = SoundRibbonVisualProfile(
+        amplitudeScale: 0.34,
+        wavelengthScale: 0.82,
+        speedScale: 0.07,
+        spreadScale: 1.55,
+        envelopeCycles: 1.35,
+        phaseOffset: 0.35,
+        lineThinning: 0.48,
+        decoyVisualNorm: 0.5
+    )
+
     static func randomMemorize() -> SoundRibbonVisualProfile {
         SoundRibbonVisualProfile(
             amplitudeScale: Double.random(in: 0.45...1.65),
@@ -180,7 +191,7 @@ private struct SoundRibbonSmoothingTick: View {
 
 // MARK: - Renderer
 
-private enum SoundRibbonRenderer {
+enum SoundRibbonRenderer {
     private struct Strand {
         let phase: Double
         let spread: Double
@@ -232,7 +243,7 @@ private enum SoundRibbonRenderer {
         profile: SoundRibbonVisualProfile,
         isInteractive: Bool = false
     ) {
-        let strands = compact ? compactStrands : fullStrands
+        let strands = profile == .hubBanner ? fullStrands : (compact ? compactStrands : fullStrands)
         let centerX = size.width * 0.5
         let deform = frequencyDeformation(norm: visualNorm, compact: compact)
         let visualFrequency = frequencyFromNormalized(visualNorm)
@@ -241,7 +252,14 @@ private enum SoundRibbonRenderer {
         let wavelength = max(minWavelength, (compact ? 4800 : 9200) / visualFrequency)
             * profile.wavelengthScale
             * deform.wavelengthScale
-        let baseAmplitude = compact ? 6.5 : min(52, size.width * 0.14)
+        let baseAmplitude: Double
+        if profile == .hubBanner {
+            baseAmplitude = min(Double(size.width), Double(size.height)) * 0.2
+        } else if compact {
+            baseAmplitude = 6.5
+        } else {
+            baseAmplitude = min(52, size.width * 0.14)
+        }
         let amplitude = max(compact ? 4.8 : 14, baseAmplitude * deform.amplitudeScale * profile.amplitudeScale)
         let driftSpeed = isInteractive && !compact ? profile.speedScale * 0.82 : profile.speedScale * deform.animSpeed
         let drift = time * driftSpeed
@@ -337,7 +355,7 @@ private enum SoundRibbonRenderer {
 
             let colorT = strand.colorBias * 0.7 + profile.phaseOffset.truncatingRemainder(dividingBy: 1) * 0.3
             let color = paletteColor(at: colorT)
-                .opacity(strand.opacity * (compact ? 0.9 : 0.74))
+                .opacity(strand.opacity * (compact ? 0.9 : (profile == .hubBanner ? 0.42 : 0.74)))
 
             let lineWidth = max(
                 0.45,
@@ -398,9 +416,11 @@ private enum SoundRibbonRenderer {
 }
 
 struct SoundRibbonPreview: View {
+    var expanded = false
+
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: expanded ? 0 : 16, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [
@@ -417,13 +437,16 @@ struct SoundRibbonPreview: View {
                 isInteractive: false,
                 compact: true
             )
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: expanded ? 0 : 16, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(.white.opacity(0.08), lineWidth: 1)
+                if !expanded {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(.white.opacity(0.08), lineWidth: 1)
+                }
             }
         }
-        .frame(height: 72)
+        .frame(maxWidth: .infinity, maxHeight: expanded ? .infinity : nil)
+        .frame(height: expanded ? nil : 72)
     }
 }
 

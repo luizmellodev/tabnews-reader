@@ -6,14 +6,18 @@
 import { writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import { sharedSnippetExtra } from "./content/shared-snippet-extra.mjs";
+import { bigOExclusiveExtra } from "./content/big-o-exclusive-extra.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, "../newtabnews/Core/Views/RestGames/BigO");
 
+const DAILY_COUNT = 35;
+
 const daily = [
   c("daily-array-access", "Acesso por índice", "function get(arr, i):\n  return arr[i]", ["O(1)", "O(n)", "O(log n)", "O(n²)"], "O(1)", "easy", "pior caso", "Acessar um elemento por índice em array é operação direta, independente do tamanho.", "Quantas vezes o array é percorrido?", "https://www.geeksforgeeks.org/dsa/array-data-structure/"),
-  c("daily-hash-lookup", "Busca em hash map", "function lookup(map, key):\n  return map[key]", ["O(1)", "O(n)", "O(log n)", "O(n²)"], "O(1)", "easy", "pior caso (hash uniforme)", "Hash map com boa função hash oferece lookup em tempo constante no caso médio.", "É preciso percorrer toda a estrutura?", "https://www.geeksforgeeks.org/dsa/hashing-data-structure/"),
-  c("daily-stack-push", "Push na pilha", "function push(stack, value):\n  stack[stack.size] = value\n  stack.size = stack.size + 1", ["O(1)", "O(n)", "O(log n)", "O(n²)"], "O(1)", "easy", "pior caso", "Inserir no topo de uma pilha (array dinâmico amortizado) é O(1).", "A operação depende de quantos elementos já existem?", "https://www.geeksforgeeks.org/dsa/stack-data-structure/"),
+  c("daily-hash-lookup", "Busca em hash map", "function lookup(map, key):\n  return map[key]", ["O(1)", "O(n)", "O(log n)", "O(n²)"], "O(1)", "easy", "caso médio (hash uniforme)", "Hash map com boa função hash oferece lookup em O(1) no caso médio; com muitas colisões o pior caso é O(n).", "É preciso percorrer toda a estrutura?", "https://www.geeksforgeeks.org/dsa/hashing-data-structure/"),
+  c("daily-stack-push", "Push na pilha", "function push(stack, value):\n  stack[stack.size] = value\n  stack.size = stack.size + 1", ["O(1)", "O(n)", "O(log n)", "O(n²)"], "O(1)", "easy", "pior caso", "Gravar no topo e incrementar o tamanho são operações diretas — O(1).", "A operação depende de quantos elementos já existem?", "https://www.geeksforgeeks.org/dsa/stack-data-structure/"),
   c("daily-queue-enqueue", "Enqueue na fila", "function enqueue(queue, value):\n  queue.tail = (queue.tail + 1) % queue.capacity\n  queue.data[queue.tail] = value", ["O(1)", "O(n)", "O(log n)", "O(n²)"], "O(1)", "easy", "pior caso", "Enfileirar em fila circular é O(1) — só move o ponteiro e grava.", "Há loop sobre os elementos?", "https://www.geeksforgeeks.org/dsa/queue-data-structure/"),
   c("daily-constant-math", "Operação fixa", "function compute(x):\n  a = x * 2\n  b = a + 10\n  return b / 3", ["O(1)", "O(n)", "O(log n)", "O(n²)"], "O(1)", "easy", "pior caso", "Número fixo de operações aritméticas, sem loops — O(1).", "O tamanho da entrada influencia o número de passos?", "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"),
   c("daily-sum-array", "Soma do array", "function sum(arr):\n  total = 0\n  for i in 0..arr.length:\n    total = total + arr[i]\n  return total", ["O(1)", "O(n)", "O(n log n)", "O(n²)"], "O(n)", "easy", "pior caso", "Um loop visita cada um dos n elementos exatamente uma vez.", "Quantas iterações em função de n?", "https://www.geeksforgeeks.org/dsa/arrays/"),
@@ -102,6 +106,60 @@ function c(id, title, snippet, options, answer, difficulty, caseNote, explanatio
   };
 }
 
-writeFileSync(join(OUT_DIR, "big_o_daily.json"), JSON.stringify({ challenges: daily }, null, 2) + "\n");
-writeFileSync(join(OUT_DIR, "big_o_free.json"), JSON.stringify({ challenges: free }, null, 2) + "\n");
-console.log(`Wrote ${daily.length} daily and ${free.length} free challenges`);
+function sharedBigOChallenge() {
+  const { snippet, bigO } = sharedSnippetExtra;
+  return c(
+    bigO.id,
+    bigO.title,
+    snippet,
+    bigO.options,
+    bigO.answer,
+    bigO.difficulty,
+    bigO.caseNote,
+    bigO.explanation,
+    bigO.hint,
+    bigO.reference
+  );
+}
+
+const DAILY_IDS = new Set([
+  ...daily.map((item) => item.id),
+  "shared-find-min",
+  "free-gcd-euclidean",
+  "free-two-sum-hash",
+  "free-contains-duplicates",
+  "free-moore-voting",
+]);
+
+const allChallenges = dedupeById([
+  ...daily,
+  ...free,
+  sharedBigOChallenge(),
+  ...bigOExclusiveExtra,
+]);
+
+const dailyChallenges = allChallenges.filter((item) => DAILY_IDS.has(item.id));
+const freeChallenges = allChallenges.filter((item) => !DAILY_IDS.has(item.id));
+
+if (dailyChallenges.length !== DAILY_COUNT) {
+  throw new Error(`Expected ${DAILY_COUNT} daily challenges, got ${dailyChallenges.length}`);
+}
+if (allChallenges.length !== 100) {
+  throw new Error(`Expected 100 total Big O challenges, got ${allChallenges.length}`);
+}
+if (dailyChallenges.length + freeChallenges.length !== 100) {
+  throw new Error("Daily/free split does not cover all challenges");
+}
+
+function dedupeById(challenges) {
+  const seen = new Set();
+  return challenges.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+}
+
+writeFileSync(join(OUT_DIR, "big_o_daily.json"), JSON.stringify({ challenges: dailyChallenges }, null, 2) + "\n");
+writeFileSync(join(OUT_DIR, "big_o_free.json"), JSON.stringify({ challenges: freeChallenges }, null, 2) + "\n");
+console.log(`Wrote ${dailyChallenges.length} daily and ${freeChallenges.length} free challenges (${allChallenges.length} total)`);

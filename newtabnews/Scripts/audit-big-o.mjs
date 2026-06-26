@@ -12,8 +12,8 @@ const BIG_O_DIR = join(__dirname, "../newtabnews/Core/Views/RestGames/BigO");
 const DAILY_PATH = join(BIG_O_DIR, "big_o_daily.json");
 const FREE_PATH = join(BIG_O_DIR, "big_o_free.json");
 
-const MIN_DAILY = 30;
-const MIN_FREE = 40;
+const MIN_DAILY = 35;
+const MIN_FREE = 65;
 const VALID_DIFFICULTIES = new Set(["easy", "medium", "hard"]);
 const MAX_SNIPPET_LINES = 12;
 const ALLOWED_COMPLEXITY = /^O\((1|log n|n( log n|²|³)?|2\^n|n!)\)$/;

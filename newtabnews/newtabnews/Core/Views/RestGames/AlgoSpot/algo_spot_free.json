@@ -101,46 +101,6 @@
       "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
     },
     {
-      "id": "free-as-two-sum",
-      "title": "Two sum",
-      "snippet": "function twoSum(arr, target):\n  seen = map()\n  for i in 0..arr.length:\n    need = target - arr[i]\n    if need in seen:\n      return [seen[need], i]\n    seen[arr[i]] = i",
-      "options": [
-        "Two sum",
-        "Sliding window",
-        "Moore voting",
-        "Busca linear"
-      ],
-      "answer": "Two sum",
-      "difficulty": "medium",
-      "category": "padrao",
-      "caseNote": "O(n)",
-      "whatItIs": "Encontra dois números que somam um alvo usando hash map em uma passagem.",
-      "explanation": "Hash map guarda valores vistos; busca complemento target - arr[i].",
-      "hint": "Lookup O(1) no map.",
-      "reference": "https://www.geeksforgeeks.org/dsa/check-if-pair-with-given-sum-exists-in-array/",
-      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
-    },
-    {
-      "id": "free-as-cycle-detection",
-      "title": "Detecção de ciclo",
-      "snippet": "function hasCycle(head):\n  slow = head\n  fast = head\n  while fast != null and fast.next != null:\n    slow = slow.next\n    fast = fast.next.next\n    if slow == fast:\n      return true\n  return false",
-      "options": [
-        "Detecção de ciclo",
-        "Two pointers",
-        "DFS",
-        "BFS"
-      ],
-      "answer": "Detecção de ciclo",
-      "difficulty": "medium",
-      "category": "padrao",
-      "caseNote": "O(n)",
-      "whatItIs": "Detecta se uma lista ligada tem ciclo usando dois ponteiros (tartaruga e lebre).",
-      "explanation": "Algoritmo de Floyd (tortoise and hare) para ciclo em lista ligada.",
-      "hint": "fast avança 2x, slow 1x.",
-      "reference": "https://www.geeksforgeeks.org/dsa/detect-loop-in-a-linked-list/",
-      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
-    },
-    {
       "id": "free-as-dutch-flag",
       "title": "Dutch national flag",
       "snippet": "function sortColors(arr):\n  low = 0\n  mid = 0\n  high = arr.length - 1\n  while mid <= high:\n    if arr[mid] == 0:\n      swap(arr[low], arr[mid]); low++; mid++\n    else if arr[mid] == 2:\n      swap(arr[mid], arr[high]); high--\n    else:\n      mid++",
@@ -462,15 +422,15 @@
     },
     {
       "id": "free-as-pair-count",
-      "title": "Contar pares",
+      "title": "Contar pares de índices",
       "snippet": "function countPairs(arr):\n  count = 0\n  for i in 0..arr.length:\n    for j in i + 1..arr.length:\n      count = count + 1\n  return count",
       "options": [
-        "Contar pares",
+        "Contar pares de índices",
         "Three sum",
         "Bubble sort",
         "Triângulo de números"
       ],
-      "answer": "Contar pares",
+      "answer": "Contar pares de índices",
       "difficulty": "medium",
       "category": "forca-bruta",
       "caseNote": "O(n²)",
@@ -582,19 +542,19 @@
     },
     {
       "id": "free-as-count-evens",
-      "title": "Contar pares",
+      "title": "Contar números pares",
       "snippet": "function countEvens(arr):\n  count = 0\n  for x in arr:\n    if x % 2 == 0:\n      count = count + 1\n  return count",
       "options": [
-        "Contar pares",
+        "Contar números pares",
         "Soma do array",
         "Busca linear",
         "Moore voting"
       ],
-      "answer": "Contar pares",
+      "answer": "Contar números pares",
       "difficulty": "easy",
       "category": "basico",
       "caseNote": "O(n)",
-      "whatItIs": "Conta quantos pares de índices (i, j) existem — padrão de força bruta com dois loops.",
+      "whatItIs": "Percorre o array e conta quantos elementos são divisíveis por 2.",
       "explanation": "Itera e incrementa contador quando elemento é par.",
       "hint": "Condição x % 2 == 0.",
       "reference": "https://www.geeksforgeeks.org/dsa/arrays/",
@@ -701,46 +661,6 @@
       "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
     },
     {
-      "id": "free-as-sieve",
-      "title": "Crivo de Eratóstenes",
-      "snippet": "function sieve(n):\n  isPrime = array(n + 1, true)\n  isPrime[0] = false\n  isPrime[1] = false\n  for p in 2..sqrt(n):\n    if isPrime[p]:\n      for multiple in p*p..n step p:\n        isPrime[multiple] = false",
-      "options": [
-        "Crivo de Eratóstenes",
-        "MDC de Euclides",
-        "Counting sort",
-        "Soma do array"
-      ],
-      "answer": "Crivo de Eratóstenes",
-      "difficulty": "medium",
-      "category": "matematica",
-      "caseNote": "O(n log log n)",
-      "whatItIs": "Algoritmo para encontrar todos os números primos até n eliminando múltiplos de cada primo.",
-      "explanation": "Marca múltiplos de cada primo a partir de p².",
-      "hint": "Loop interno com step p.",
-      "reference": "https://www.geeksforgeeks.org/dsa/sieve-of-eratosthenes/",
-      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
-    },
-    {
-      "id": "free-as-kadane",
-      "title": "Kadane",
-      "snippet": "function maxSubarray(arr):\n  best = arr[0]\n  current = arr[0]\n  for i in 1..arr.length:\n    current = max(arr[i], current + arr[i])\n    best = max(best, current)\n  return best",
-      "options": [
-        "Kadane",
-        "Sliding window",
-        "Moore voting",
-        "Prefix sum"
-      ],
-      "answer": "Kadane",
-      "difficulty": "medium",
-      "category": "dp",
-      "caseNote": "O(n)",
-      "whatItIs": "Encontra a subarray contígua de soma máxima em um array.",
-      "explanation": "Algoritmo de Kadane para subarray de soma máxima.",
-      "hint": "current = max(arr[i], current + arr[i]).",
-      "reference": "https://www.geeksforgeeks.org/dsa/largest-sum-contiguous-subarray/",
-      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
-    },
-    {
       "id": "free-as-lis",
       "title": "LIS",
       "snippet": "function longestIncreasing(arr):\n  dp = newBuffer(arr.length, 1)\n  for i in 1..arr.length:\n    for j in 0..i - 1:\n      if arr[j] < arr[i]:\n        dp[i] = max(dp[i], dp[j] + 1)\n  return max(dp)",
@@ -798,6 +718,586 @@
       "explanation": "Levenshtein: inserção, deleção ou substituição para transformar a em b.",
       "hint": "Três operações no min().",
       "reference": "https://www.geeksforgeeks.org/dsa/edit-distance-dp-5/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-kmp",
+      "title": "KMP",
+      "snippet": "function kmpSearch(text, pattern):\n  lps = buildLPS(pattern)\n  i = 0; j = 0\n  while i < text.length:\n    if text[i] == pattern[j]:\n      i++; j++\n      if j == pattern.length: return i - j\n    else if j > 0: j = lps[j - 1]\n    else: i++\n  return -1",
+      "options": [
+        "KMP",
+        "Busca de substring",
+        "Rabin-Karp",
+        "Z-algorithm"
+      ],
+      "answer": "KMP",
+      "difficulty": "hard",
+      "category": "busca",
+      "caseNote": "O(n)",
+      "whatItIs": "Busca de padrão em texto em O(n) usando prefixo próprio mais longo (LPS).",
+      "explanation": "Usa tabela LPS para evitar retroceder no texto ao falhar o match.",
+      "hint": "lps[j-1] reaproveita prefixo.",
+      "reference": "https://www.geeksforgeeks.org/dsa/kmp-algorithm-for-pattern-searching/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-rabin-karp",
+      "title": "Rabin-Karp",
+      "snippet": "function rabinKarp(text, pattern):\n  pHash = 0; tHash = 0; h = 1\n  for i in 0..pattern.length - 1:\n    pHash = (pHash * 256 + pattern[i]) % 101\n    tHash = (tHash * 256 + text[i]) % 101\n    h = (h * 256) % 101\n  for i in 0..text.length - pattern.length:\n    if pHash == tHash and matchAt(text, i, pattern):\n      return i\n    tHash = rollHash(tHash, text, i, h, pattern.length)",
+      "options": [
+        "Rabin-Karp",
+        "KMP",
+        "Busca de substring",
+        "Z-algorithm"
+      ],
+      "answer": "Rabin-Karp",
+      "difficulty": "hard",
+      "category": "busca",
+      "caseNote": "O(n)",
+      "whatItIs": "Busca de padrão comparando hashes rolling — confirma colisões com comparação direta.",
+      "explanation": "Compara hashes de janelas deslizantes antes de confirmar match literal.",
+      "hint": "Rolling hash com h pré-calculado.",
+      "reference": "https://www.geeksforgeeks.org/dsa/rabin-karp-algorithm-for-pattern-searching/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-monotonic-stack",
+      "title": "Monotonic stack",
+      "snippet": "function nextGreater(arr):\n  result = array(arr.length, -1)\n  stack = []\n  for i in 0..arr.length:\n    while stack not empty and arr[i] > arr[stack.top]:\n      idx = stack.pop()\n      result[idx] = arr[i]\n    stack.push(i)\n  return result",
+      "options": [
+        "Monotonic stack",
+        "Monotonic queue",
+        "Sliding window",
+        "Heap push"
+      ],
+      "answer": "Monotonic stack",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Pilha que mantém elementos em ordem monótona para resolver próximo maior/menor em O(n).",
+      "explanation": "Pilha mantém índices em ordem decrescente para achar próximo maior.",
+      "hint": "Pop enquanto arr[i] é maior.",
+      "reference": "https://www.geeksforgeeks.org/dsa/next-greater-element/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-monotonic-queue",
+      "title": "Monotonic queue",
+      "snippet": "function slidingMax(arr, k):\n  deque = []\n  result = []\n  for i in 0..arr.length:\n    while deque not empty and arr[deque.back] <= arr[i]:\n      deque.popBack()\n    deque.pushBack(i)\n    if deque.front <= i - k:\n      deque.popFront()\n    if i >= k - 1:\n      result.push(arr[deque.front])\n  return result",
+      "options": [
+        "Monotonic queue",
+        "Monotonic stack",
+        "Sliding window",
+        "Heap pop"
+      ],
+      "answer": "Monotonic queue",
+      "difficulty": "hard",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Fila dupla com ordem monótona para máximo/mínimo em janela deslizante.",
+      "explanation": "Deque mantém candidatos ao máximo da janela em ordem decrescente.",
+      "hint": "Remove índices fora da janela.",
+      "reference": "https://www.geeksforgeeks.org/dsa/sliding-window-maximum-maximum-of-all-subarrays-of-size-k/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-trie-search",
+      "title": "Trie",
+      "snippet": "function trieSearch(root, word):\n  node = root\n  for ch in word:\n    if ch not in node.children:\n      return false\n    node = node.children[ch]\n  return node.isEnd",
+      "options": [
+        "Trie",
+        "Hash linear probing",
+        "Busca de substring",
+        "Busca em BST"
+      ],
+      "answer": "Trie",
+      "difficulty": "medium",
+      "category": "hash",
+      "caseNote": "O(m)",
+      "whatItIs": "Árvore de prefixos: cada nível representa um caractere para busca/inserção de strings.",
+      "explanation": "Desce um nível por caractere da palavra — O(m) para palavra de tamanho m.",
+      "hint": "children[ch] por letra.",
+      "reference": "https://www.geeksforgeeks.org/dsa/trie-insert-and-search/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-lru-cache",
+      "title": "LRU cache",
+      "snippet": "function lruGet(cache, key):\n  if key not in cache.map: return -1\n  node = cache.map[key]\n  moveToFront(cache, node)\n  return node.value\n\nfunction lruPut(cache, key, value):\n  if cache.size >= cache.capacity: evictTail(cache)\n  insertAtFront(cache, key, value)",
+      "options": [
+        "LRU cache",
+        "Hash linear probing",
+        "Trie",
+        "Union-Find"
+      ],
+      "answer": "LRU cache",
+      "difficulty": "hard",
+      "category": "padrao",
+      "caseNote": "O(1)",
+      "whatItIs": "Cache que remove o item menos recentemente usado ao atingir capacidade.",
+      "explanation": "Hash map + lista dupla para mover o mais recente e expulsar o menos usado.",
+      "hint": "moveToFront + evictTail.",
+      "reference": "https://www.geeksforgeeks.org/dsa/lru-cache-implementation/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-two-sum-sorted",
+      "title": "Two pointers (ordenado)",
+      "snippet": "function twoSumSorted(arr, target):\n  left = 0\n  right = arr.length - 1\n  while left < right:\n    sum = arr[left] + arr[right]\n    if sum == target:\n      return [left, right]\n    if sum < target:\n      left++\n    else:\n      right--\n  return []",
+      "options": [
+        "Two pointers (ordenado)",
+        "Two sum",
+        "Busca binária",
+        "Sliding window"
+      ],
+      "answer": "Two pointers (ordenado)",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Dois ponteiros nas extremidades de array ordenado para achar par com soma alvo.",
+      "explanation": "Em array ordenado, converge left/right conforme soma vs target.",
+      "hint": "Soma guia qual ponteiro mover.",
+      "reference": "https://www.geeksforgeeks.org/dsa/two-pointers-technique/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-fisher-yates",
+      "title": "Fisher-Yates",
+      "snippet": "function shuffle(arr):\n  for i in arr.length - 1 down to 1:\n    j = randomInt(0, i)\n    swap(arr[i], arr[j])\n  return arr",
+      "options": [
+        "Fisher-Yates",
+        "Permutações",
+        "Quick sort",
+        "Heap sort"
+      ],
+      "answer": "Fisher-Yates",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Embaralha array em O(n) gerando permutação uniformemente aleatória.",
+      "explanation": "Troca cada posição com índice aleatório à esquerda — permutação uniforme.",
+      "hint": "j em [0, i] a cada passo.",
+      "reference": "https://www.geeksforgeeks.org/dsa/shuffle-a-given-array-using-fisher-yates-shuffle-algorithm/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-reservoir",
+      "title": "Reservoir sampling",
+      "snippet": "function reservoirSample(stream, k):\n  reservoir = first k items of stream\n  for i in k..stream.length:\n    j = randomInt(0, i)\n    if j < k:\n      reservoir[j] = stream[i]\n  return reservoir",
+      "options": [
+        "Reservoir sampling",
+        "Fisher-Yates",
+        "Moore voting",
+        "Quickselect"
+      ],
+      "answer": "Reservoir sampling",
+      "difficulty": "hard",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Seleciona k elementos aleatórios de um fluxo de tamanho desconhecido em O(n) e uma passagem.",
+      "explanation": "Mantém amostra de tamanho k de fluxo desconhecido em uma passagem.",
+      "hint": "Substitui reservoir[j] com prob. k/i.",
+      "reference": "https://www.geeksforgeeks.org/dsa/reservoir-sampling/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-kosaraju",
+      "title": "Kosaraju SCC",
+      "snippet": "function kosaraju(adj, n):\n  order = []\n  dfsFillOrder(adj, order)\n  rev = reverseGraph(adj)\n  visited = set()\n  for u in reversed(order):\n    if u not in visited:\n      component = []\n      dfsCollect(rev, u, visited, component)",
+      "options": [
+        "Kosaraju SCC",
+        "Tarjan SCC",
+        "Ordenação topológica",
+        "DFS"
+      ],
+      "answer": "Kosaraju SCC",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n)",
+      "whatItIs": "Encontra componentes fortemente conexos com duas passagens DFS e grafo reverso.",
+      "explanation": "Duas DFS: ordem de término e componentes no grafo transposto.",
+      "hint": "reverseGraph + dfsCollect.",
+      "reference": "https://www.geeksforgeeks.org/dsa/strongly-connected-components/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-meet-middle",
+      "title": "Meet in the middle",
+      "snippet": "function subsetSumMiddle(arr, target):\n  left = allSubsetSums(arr[0..n/2])\n  right = allSubsetSums(arr[n/2..n])\n  sort(right)\n  for s in left:\n    if binarySearch(right, target - s):\n      return true\n  return false",
+      "options": [
+        "Meet in the middle",
+        "Power set (bitmask)",
+        "Subset sum",
+        "Three sum"
+      ],
+      "answer": "Meet in the middle",
+      "difficulty": "hard",
+      "category": "recursao",
+      "caseNote": "O(2^(n/2))",
+      "whatItIs": "Divide problema exponencial ao meio, gera subconjuntos de cada metade e combina.",
+      "explanation": "Divide o conjunto ao meio e combina somas de subconjuntos das metades.",
+      "hint": "2^(n/2) por lado.",
+      "reference": "https://www.geeksforgeeks.org/dsa/meet-in-the-middle/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-ford-fulkerson",
+      "title": "Ford-Fulkerson",
+      "snippet": "function maxFlow(graph, source, sink):\n  flow = 0\n  while true:\n    path = bfsAugmentingPath(graph, source, sink)\n    if path is empty:\n      break\n    bottleneck = minCapacity(path)\n    augment(path, bottleneck)\n    flow = flow + bottleneck\n  return flow",
+      "options": [
+        "Ford-Fulkerson",
+        "Dijkstra",
+        "Bellman-Ford",
+        "BFS caminho mínimo"
+      ],
+      "answer": "Ford-Fulkerson",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n²)",
+      "whatItIs": "Calcula fluxo máximo repetindo caminhos aumentantes de fonte ao sumidouro.",
+      "explanation": "Encontra caminhos aumentantes com BFS (Edmonds-Karp) até saturar.",
+      "hint": "bfsAugmentingPath + augment.",
+      "reference": "https://www.geeksforgeeks.org/dsa/ford-fulkerson-algorithm-for-maximum-flow-problem/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-bucket-sort",
+      "title": "Bucket sort",
+      "snippet": "function bucketSort(arr, bucketCount):\n  buckets = array(bucketCount, [])\n  minVal = min(arr)\n  maxVal = max(arr)\n  range = maxVal - minVal + 1\n  for x in arr:\n    idx = floor((x - minVal) / range * bucketCount)\n    buckets[idx].push(x)\n  for bucket in buckets:\n    sort(bucket)\n  return flatten(buckets)",
+      "options": [
+        "Bucket sort",
+        "Counting sort",
+        "Radix sort",
+        "Merge sort"
+      ],
+      "answer": "Bucket sort",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n)",
+      "whatItIs": "Ordenação que distribui elementos em baldes por faixa e ordena cada balde.",
+      "explanation": "Distribui em baldes e ordena cada balde — linear quando baldes são pequenos.",
+      "hint": "floor para índice do balde.",
+      "reference": "https://www.geeksforgeeks.org/dsa/bucket-sort-2/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-shell-sort",
+      "title": "Shell sort",
+      "snippet": "function shellSort(arr):\n  n = arr.length\n  gap = n / 2\n  while gap > 0:\n    for i in gap..n:\n      temp = arr[i]\n      j = i\n      while j >= gap and arr[j - gap] > temp:\n        arr[j] = arr[j - gap]\n        j = j - gap\n      arr[j] = temp\n    gap = gap / 2",
+      "options": [
+        "Shell sort",
+        "Insertion sort",
+        "Heap sort",
+        "Bubble sort"
+      ],
+      "answer": "Shell sort",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n log n)",
+      "whatItIs": "Ordenação por inserção com intervalos (gaps) que vão encolhendo até 1.",
+      "explanation": "Insertion sort com gaps decrescentes — melhora sobre O(n²) puro.",
+      "hint": "gap /= 2 a cada rodada.",
+      "reference": "https://www.geeksforgeeks.org/dsa/shellsort/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-pancake-sort",
+      "title": "Pancake sort",
+      "snippet": "function pancakeSort(arr):\n  for size in arr.length down to 2:\n    maxIdx = indexOfMax(arr, 0, size)\n    flip(arr, 0, maxIdx)\n    flip(arr, 0, size - 1)",
+      "options": [
+        "Pancake sort",
+        "Selection sort",
+        "Bubble sort",
+        "Heap sort"
+      ],
+      "answer": "Pancake sort",
+      "difficulty": "hard",
+      "category": "ordenacao",
+      "caseNote": "O(n²)",
+      "whatItIs": "Ordena apenas com operações de reverter prefixo do array (panqueca).",
+      "explanation": "Coloca o máximo no lugar com flip de prefixo — O(n) flips × n posições.",
+      "hint": "flip + indexOfMax.",
+      "reference": "https://www.geeksforgeeks.org/dsa/pancake-sorting/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-bidirectional-bfs",
+      "title": "BFS bidirecional",
+      "snippet": "function bidirectionalBFS(start, goal, neighbors):\n  front = set(start); back = set(goal)\n  depth = 0\n  while front not empty and back not empty:\n    if front.size > back.size: swap(front, back)\n    next = set()\n    for node in front:\n      for nb in neighbors(node):\n        if nb in back: return depth + 1\n        if nb not in visited: visited.add(nb); next.add(nb)\n    front = next; depth++",
+      "options": [
+        "BFS bidirecional",
+        "BFS caminho mínimo",
+        "Dijkstra",
+        "DFS"
+      ],
+      "answer": "BFS bidirecional",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n)",
+      "whatItIs": "BFS partindo simultaneamente de origem e destino até as fronteiras se encontrarem.",
+      "explanation": "Expande duas fronteiras até se encontrarem — metade da profundidade na prática.",
+      "hint": "front e back alternam.",
+      "reference": "https://www.geeksforgeeks.org/dsa/bidirectional-search/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-id-dfs",
+      "title": "DFS iterativo aprofundando",
+      "snippet": "function iterativeDeepening(root, maxDepth):\n  for depth in 0..maxDepth:\n    if dfsLimited(root, 0, depth):\n      return true\n  return false",
+      "options": [
+        "DFS iterativo aprofundando",
+        "DFS",
+        "BFS",
+        "Busca binária"
+      ],
+      "answer": "DFS iterativo aprofundando",
+      "difficulty": "medium",
+      "category": "grafos",
+      "caseNote": "O(n)",
+      "whatItIs": "DFS com limite de profundidade crescente — combina memória baixa com completude.",
+      "explanation": "Repete DFS com limite crescente de profundidade — completo como BFS em memória O(d).",
+      "hint": "dfsLimited até depth.",
+      "reference": "https://www.geeksforgeeks.org/dsa/iterative-deepening-searchids/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-fenwick",
+      "title": "Fenwick tree",
+      "snippet": "function prefixSum(tree, index):\n  total = 0\n  i = index\n  while i > 0:\n    total = total + tree[i]\n    i = i - (i & -i)\n  return total",
+      "options": [
+        "Fenwick tree",
+        "Prefix sum",
+        "Segment tree",
+        "Heap push"
+      ],
+      "answer": "Fenwick tree",
+      "difficulty": "hard",
+      "category": "arvore",
+      "caseNote": "O(log n)",
+      "whatItIs": "Árvore indexada binária para prefix sums e updates pontuais em O(log n).",
+      "explanation": "Soma prefixo em árvore binária indexada subindo com i - (i & -i).",
+      "hint": "i & -i isola bit mais baixo.",
+      "reference": "https://www.geeksforgeeks.org/dsa/binary-indexed-tree-or-fenwick-tree-2/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-segment-tree",
+      "title": "Segment tree",
+      "snippet": "function rangeQuery(tree, node, start, end, left, right):\n  if right < start or left > end:\n    return neutral\n  if left <= start and end <= right:\n    return tree[node]\n  mid = (start + end) / 2\n  return combine(\n    rangeQuery(tree, 2*node, start, mid, left, right),\n    rangeQuery(tree, 2*node+1, mid+1, end, left, right)\n  )",
+      "options": [
+        "Segment tree",
+        "Fenwick tree",
+        "Prefix sum",
+        "Merge sort"
+      ],
+      "answer": "Segment tree",
+      "difficulty": "hard",
+      "category": "arvore",
+      "caseNote": "O(log n)",
+      "whatItIs": "Árvore de segmentos para consultas e updates em intervalos em O(log n).",
+      "explanation": "Divide intervalo recursivamente para consulta em range.",
+      "hint": "Dois filhos 2*node.",
+      "reference": "https://www.geeksforgeeks.org/dsa/segment-tree-data-structure/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-manacher",
+      "title": "Manacher",
+      "snippet": "function longestPalindrome(s):\n  t = preprocess(s)\n  p = array(t.length, 0)\n  center = 0; right = 0\n  for i in 1..t.length - 1:\n    mirror = 2 * center - i\n    if i < right: p[i] = min(right - i, p[mirror])\n    while matchesPalindrome(t, i, p[i]): p[i]++\n    if i + p[i] > right: center = i; right = i + p[i]",
+      "options": [
+        "Manacher",
+        "Two pointers",
+        "KMP",
+        "Busca de substring"
+      ],
+      "answer": "Manacher",
+      "difficulty": "hard",
+      "category": "busca",
+      "caseNote": "O(n)",
+      "whatItIs": "Encontra palíndromo mais longo em O(n) com expansão centrada e espelhamento.",
+      "explanation": "Expande palíndromos reutilizando informação simétrica em O(n).",
+      "hint": "mirror = 2*center - i.",
+      "reference": "https://www.geeksforgeeks.org/dsa/manachers-algorithm-linear-time-longest-palindromic-substring-part-1/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-z-algorithm",
+      "title": "Z-algorithm",
+      "snippet": "function zAlgorithm(s):\n  z = array(s.length, 0)\n  l = 0\n  r = 0\n  for i in 1..s.length - 1:\n    if i <= r:\n      z[i] = min(r - i + 1, z[i - l])\n    while i + z[i] < s.length and s[z[i]] == s[i + z[i]]:\n      z[i]++\n    if i + z[i] - 1 > r:\n      l = i\n      r = i + z[i] - 1\n  return z",
+      "options": [
+        "Z-algorithm",
+        "KMP",
+        "Rabin-Karp",
+        "Busca de substring"
+      ],
+      "answer": "Z-algorithm",
+      "difficulty": "hard",
+      "category": "busca",
+      "caseNote": "O(n)",
+      "whatItIs": "Constrói array Z de matches de prefixo em O(n) para busca de padrões.",
+      "explanation": "Array Z de prefixos coincidentes com o início da string.",
+      "hint": "Janela [l,r] reaproveita valores.",
+      "reference": "https://www.geeksforgeeks.org/dsa/z-algorithm-linear-time-pattern-searching-algorithm/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-morris-inorder",
+      "title": "Morris traversal",
+      "snippet": "function morrisInorder(root):\n  current = root\n  while current != null:\n    if current.left == null:\n      visit(current); current = current.right\n    else:\n      pred = current.left\n      while pred.right != null and pred.right != current:\n        pred = pred.right\n      if pred.right == null:\n        pred.right = current; current = current.left\n      else:\n        pred.right = null; visit(current); current = current.right",
+      "options": [
+        "Morris traversal",
+        "Inorder DFS",
+        "DFS",
+        "Detecção de ciclo"
+      ],
+      "answer": "Morris traversal",
+      "difficulty": "hard",
+      "category": "arvore",
+      "caseNote": "O(n)",
+      "whatItIs": "Traversal in-order em árvore binária com O(1) espaço extra via links de predecessor.",
+      "explanation": "Percorre BST in-order sem stack extra usando links thread temporários.",
+      "hint": "pred.right = current como thread.",
+      "reference": "https://www.geeksforgeeks.org/dsa/inorder-tree-traversal-without-recursion-and-without-stack/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-tarjan",
+      "title": "Tarjan SCC",
+      "snippet": "function tarjan(adj, u, index, stack, onStack):\n  index[u] = currentIndex++\n  low[u] = index[u]\n  stack.push(u)\n  onStack.add(u)\n  for v in adj[u]:\n    if index[v] is undefined:\n      tarjan(adj, v, index, stack, onStack)\n      low[u] = min(low[u], low[v])\n    else if v in onStack:\n      low[u] = min(low[u], index[v])\n  if low[u] == index[u]:\n    pop component from stack",
+      "options": [
+        "Tarjan SCC",
+        "Kosaraju SCC",
+        "DFS",
+        "Union-Find"
+      ],
+      "answer": "Tarjan SCC",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n)",
+      "whatItIs": "Encontra SCCs em uma única DFS usando índices de descoberta e low-link.",
+      "explanation": "Uma DFS com low-link para extrair componentes fortemente conexos.",
+      "hint": "low[u] == index[u] fecha SCC.",
+      "reference": "https://www.geeksforgeeks.org/dsa/tarjan-algorithm-find-strongly-connected-components/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-astar",
+      "title": "A*",
+      "snippet": "function aStar(start, goal, heuristic):\n  open = priorityQueue([(heuristic(start, goal), start)])\n  gScore[start] = 0\n  while open not empty:\n    f, current = open.popMin()\n    if current == goal: return gScore[current]\n    for neighbor in neighbors(current):\n      tentative = gScore[current] + cost(current, neighbor)\n      if tentative < gScore.get(neighbor, infinity):\n        gScore[neighbor] = tentative\n        open.push((tentative + heuristic(neighbor, goal), neighbor))",
+      "options": [
+        "A*",
+        "Dijkstra",
+        "BFS caminho mínimo",
+        "Bellman-Ford"
+      ],
+      "answer": "A*",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n log n)",
+      "whatItIs": "Busca de caminho que usa custo real + heurística para priorizar nós promissores.",
+      "explanation": "Melhor-primeiro com f = g + heurística admissível.",
+      "hint": "open.popMin por f-score.",
+      "reference": "https://www.geeksforgeeks.org/dsa/a-search-algorithm/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-comb-sort",
+      "title": "Comb sort",
+      "snippet": "function combSort(arr):\n  n = arr.length\n  gap = n\n  shrink = 1.3\n  sorted = false\n  while not sorted:\n    gap = max(1, gap / shrink)\n    sorted = true\n    for i in 0..n - gap:\n      if arr[i] > arr[i + gap]:\n        swap(arr[i], arr[i + gap])\n        sorted = false",
+      "options": [
+        "Comb sort",
+        "Bubble sort",
+        "Shell sort",
+        "Insertion sort"
+      ],
+      "answer": "Comb sort",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n²)",
+      "whatItIs": "Melhoria do bubble sort comparando elementos separados por gap decrescente.",
+      "explanation": "Bubble sort com gap que encolhe por fator 1.3.",
+      "hint": "gap / shrink até 1.",
+      "reference": "https://www.geeksforgeeks.org/dsa/comb-sort/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-top-k-heap",
+      "title": "Top K com heap",
+      "snippet": "function topK(arr, k):\n  heap = minHeap()\n  for x in arr:\n    heap.push(x)\n    if heap.size > k:\n      heap.pop()\n  return heap.toArray()",
+      "options": [
+        "Top K com heap",
+        "Heap sort",
+        "Quickselect",
+        "Moore voting"
+      ],
+      "answer": "Top K com heap",
+      "difficulty": "medium",
+      "category": "heap",
+      "caseNote": "O(n log k)",
+      "whatItIs": "Mantém heap de tamanho k para extrair os k maiores elementos eficientemente.",
+      "explanation": "Min-heap de tamanho k mantém os k maiores vistos.",
+      "hint": "pop quando size > k.",
+      "reference": "https://www.geeksforgeeks.org/dsa/k-largestor-smallest-elements-in-an-array/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-dijkstra-heap",
+      "title": "Dijkstra com heap",
+      "snippet": "function dijkstraHeap(adj, source):\n  dist = map(source -> 0)\n  pq = minHeap([(0, source)])\n  while pq not empty:\n    d, u = pq.popMin()\n    if d > dist[u]:\n      continue\n    for edge in adj[u]:\n      nd = d + edge.weight\n      if nd < dist.get(edge.v, infinity):\n        dist[edge.v] = nd\n        pq.push((nd, edge.v))",
+      "options": [
+        "Dijkstra com heap",
+        "Dijkstra",
+        "Bellman-Ford",
+        "Prim MST"
+      ],
+      "answer": "Dijkstra com heap",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n log n)",
+      "whatItIs": "Dijkstra com min-heap: O((V+E) log V) em vez de O(V²) com matriz.",
+      "explanation": "Fila de prioridade extrai vértice com menor distância provisória.",
+      "hint": "pq.popMin + relaxação.",
+      "reference": "https://www.geeksforgeeks.org/dsa/dijkstras-shortest-path-algorithm-greedy-algo-7/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-rope-concat",
+      "title": "Rope concat",
+      "snippet": "function concatRope(left, right):\n  if left.weight < right.weight:\n    return new Node(left, right, left.length + right.length)\n  return new Node(right, left, left.length + right.length)\n\nfunction indexRope(node, i):\n  if i < node.left.length:\n    return indexRope(node.left, i)\n  return indexRope(node.right, i - node.left.length)",
+      "options": [
+        "Rope (corda)",
+        "Trie",
+        "Segment tree",
+        "Merge de ordenados"
+      ],
+      "answer": "Rope (corda)",
+      "difficulty": "hard",
+      "category": "arvore",
+      "caseNote": "O(log n)",
+      "whatItIs": "Estrutura de corda (rope) para manipular strings grandes com concatenação eficiente.",
+      "explanation": "Árvore balanceada de strings para concatenação e indexação logarítmica.",
+      "hint": "Desce left ou right por peso.",
+      "reference": "https://www.geeksforgeeks.org/dsa/rope-data-structure/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "exo-as-greedy-coins",
+      "title": "Greedy de moedas",
+      "snippet": "function minCoinsGreedy(coins, amount):\n  sort(coins descending)\n  count = 0\n  for coin in coins:\n    while amount >= coin:\n      amount = amount - coin\n      count = count + 1\n  return count",
+      "options": [
+        "Greedy de moedas",
+        "Coin change",
+        "Seleção de atividades",
+        "Counting sort"
+      ],
+      "answer": "Greedy de moedas",
+      "difficulty": "medium",
+      "category": "greedy",
+      "caseNote": "O(n)",
+      "whatItIs": "Algoritmo guloso que subtrai a maior moeda possível até zerar o valor.",
+      "explanation": "Pega sempre a maior moeda possível — funciona para sistemas canônicos.",
+      "hint": "while amount >= coin.",
+      "reference": "https://www.geeksforgeeks.org/dsa/greedy-algorithm-to-find-minimum-number-of-coins/",
       "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
     }
   ]

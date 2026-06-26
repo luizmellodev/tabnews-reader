@@ -30,8 +30,8 @@
       ],
       "answer": "O(1)",
       "difficulty": "easy",
-      "caseNote": "pior caso (hash uniforme)",
-      "explanation": "Hash map com boa função hash oferece lookup em tempo constante no caso médio.",
+      "caseNote": "caso médio (hash uniforme)",
+      "explanation": "Hash map com boa função hash oferece lookup em O(1) no caso médio; com muitas colisões o pior caso é O(n).",
       "hint": "É preciso percorrer toda a estrutura?",
       "reference": "https://www.geeksforgeeks.org/dsa/hashing-data-structure/",
       "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
@@ -49,7 +49,7 @@
       "answer": "O(1)",
       "difficulty": "easy",
       "caseNote": "pior caso",
-      "explanation": "Inserir no topo de uma pilha (array dinâmico amortizado) é O(1).",
+      "explanation": "Gravar no topo e incrementar o tamanho são operações diretas — O(1).",
       "hint": "A operação depende de quantos elementos já existem?",
       "reference": "https://www.geeksforgeeks.org/dsa/stack-data-structure/",
       "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
@@ -164,7 +164,7 @@
     },
     {
       "id": "daily-count-evens",
-      "title": "Contar pares",
+      "title": "Contar números pares",
       "snippet": "function countEvens(arr):\n  count = 0\n  for x in arr:\n    if x % 2 == 0:\n      count = count + 1\n  return count",
       "options": [
         "O(1)",
@@ -272,7 +272,7 @@
     },
     {
       "id": "daily-pair-count",
-      "title": "Contar pares",
+      "title": "Contar pares de índices",
       "snippet": "function countPairs(arr):\n  count = 0\n  for i in 0..arr.length:\n    for j in i + 1..arr.length:\n      count = count + 1\n  return count",
       "options": [
         "O(n)",
@@ -538,6 +538,96 @@
       "explanation": "Intervalo dividido em partes constantes a cada passo — O(log n).",
       "hint": "O intervalo encolhe proporcionalmente?",
       "reference": "https://www.geeksforgeeks.org/dsa/ternary-search/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-contains-duplicates",
+      "title": "Verificar duplicata",
+      "snippet": "function hasDuplicate(arr):\n  seen = set()\n  for x in arr:\n    if x in seen:\n      return true\n    seen.add(x)\n  return false",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(1)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Cada elemento: lookup/inserção O(1) no set — total O(n).",
+      "hint": "n operações em hash set.",
+      "reference": "https://www.geeksforgeeks.org/dsa/check-if-array-elements-are-distinct/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-two-sum-hash",
+      "title": "Two sum com hash",
+      "snippet": "function twoSum(arr, target):\n  seen = map()\n  for i in 0..arr.length:\n    need = target - arr[i]\n    if need in seen:\n      return [seen[need], i]\n    seen[arr[i]] = i",
+      "options": [
+        "O(n²)",
+        "O(n)",
+        "O(n log n)",
+        "O(1)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Um passe com lookup O(1) no map.",
+      "hint": "Uma passagem + hash map.",
+      "reference": "https://www.geeksforgeeks.org/dsa/check-if-pair-with-given-sum-exists-in-array/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-gcd-euclidean",
+      "title": "MDC de Euclides",
+      "snippet": "function gcd(a, b):\n  while b != 0:\n    temp = b\n    b = a % b\n    a = temp\n  return a",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(log n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Número de passos é O(log min(a,b)).",
+      "hint": "b diminui a cada iteração.",
+      "reference": "https://www.geeksforgeeks.org/dsa/euclidean-algorithms-basic-and-extended/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-moore-voting",
+      "title": "Majority element",
+      "snippet": "function majority(arr):\n  candidate = null\n  count = 0\n  for x in arr:\n    if count == 0:\n      candidate = x\n      count = 1\n    else if x == candidate:\n      count = count + 1\n    else:\n      count = count - 1\n  return candidate",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Boyer-Moore faz duas passagens lineares.",
+      "hint": "Uma passagem + verificação.",
+      "reference": "https://www.geeksforgeeks.org/dsa/majority-element/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "shared-find-min",
+      "title": "Encontrar mínimo",
+      "snippet": "function findMin(arr):\n  minVal = arr[0]\n  for i in 1..arr.length:\n    if arr[i] < minVal:\n      minVal = arr[i]\n  return minVal",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "easy",
+      "caseNote": "pior caso",
+      "explanation": "Compara cada elemento uma vez para achar o menor valor.",
+      "hint": "Um único loop sobre n elementos.",
+      "reference": "https://www.geeksforgeeks.org/dsa/minimum-element-in-an-array/",
       "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
     }
   ]

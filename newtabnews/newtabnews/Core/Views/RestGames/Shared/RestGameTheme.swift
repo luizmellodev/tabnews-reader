@@ -107,6 +107,41 @@ struct RestGameSecondaryButton: View {
     }
 }
 
+struct RestGameFreeModeButton: View {
+    let isUnlocked: Bool
+    let dailyComplete: Bool
+    let isAllowed: Bool
+    let onPlay: () -> Void
+
+    var body: some View {
+        VStack(spacing: 10) {
+            if isUnlocked {
+                RestGamePrimaryButton(title: "Modo livre", action: onPlay)
+            } else {
+                HStack(spacing: 8) {
+                    Image(systemName: "lock.fill")
+                    Text("Modo livre")
+                }
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.35))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 17)
+                .background(.white.opacity(0.06), in: Capsule())
+                .overlay(Capsule().stroke(.white.opacity(0.1), lineWidth: 1))
+
+                Text(RestGameFreeModePolicy.lockedCaption(
+                    dailyComplete: dailyComplete,
+                    isAllowed: isAllowed
+                ))
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.45))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 8)
+            }
+        }
+    }
+}
+
 struct RestGameConfirmFAB: View {
     let action: () -> Void
 

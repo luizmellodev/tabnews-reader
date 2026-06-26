@@ -599,6 +599,106 @@
       "hint": "Sempre pega a que termina mais cedo.",
       "reference": "https://www.geeksforgeeks.org/dsa/activity-selection-problem-greedy-algo-1/",
       "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-two-sum",
+      "title": "Two sum",
+      "snippet": "function twoSum(arr, target):\n  seen = map()\n  for i in 0..arr.length:\n    need = target - arr[i]\n    if need in seen:\n      return [seen[need], i]\n    seen[arr[i]] = i",
+      "options": [
+        "Two sum",
+        "Sliding window",
+        "Moore voting",
+        "Busca linear"
+      ],
+      "answer": "Two sum",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Encontra dois números que somam um alvo usando hash map em uma passagem.",
+      "explanation": "Hash map guarda valores vistos; busca complemento target - arr[i].",
+      "hint": "Lookup O(1) no map.",
+      "reference": "https://www.geeksforgeeks.org/dsa/check-if-pair-with-given-sum-exists-in-array/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-cycle-detection",
+      "title": "Detecção de ciclo",
+      "snippet": "function hasCycle(head):\n  slow = head\n  fast = head\n  while fast != null and fast.next != null:\n    slow = slow.next\n    fast = fast.next.next\n    if slow == fast:\n      return true\n  return false",
+      "options": [
+        "Detecção de ciclo",
+        "Two pointers",
+        "DFS",
+        "BFS"
+      ],
+      "answer": "Detecção de ciclo",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Detecta se uma lista ligada tem ciclo usando dois ponteiros (tartaruga e lebre).",
+      "explanation": "Algoritmo de Floyd (tortoise and hare) para ciclo em lista ligada.",
+      "hint": "fast avança 2x, slow 1x.",
+      "reference": "https://www.geeksforgeeks.org/dsa/detect-loop-in-a-linked-list/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-sieve",
+      "title": "Crivo de Eratóstenes",
+      "snippet": "function sieve(n):\n  isPrime = array(n + 1, true)\n  isPrime[0] = false\n  isPrime[1] = false\n  for p in 2..sqrt(n):\n    if isPrime[p]:\n      for multiple in p*p..n step p:\n        isPrime[multiple] = false",
+      "options": [
+        "Crivo de Eratóstenes",
+        "MDC de Euclides",
+        "Counting sort",
+        "Soma do array"
+      ],
+      "answer": "Crivo de Eratóstenes",
+      "difficulty": "medium",
+      "category": "matematica",
+      "caseNote": "O(n log log n)",
+      "whatItIs": "Algoritmo para encontrar todos os números primos até n eliminando múltiplos de cada primo.",
+      "explanation": "Marca múltiplos de cada primo a partir de p².",
+      "hint": "Loop interno com step p.",
+      "reference": "https://www.geeksforgeeks.org/dsa/sieve-of-eratosthenes/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-kadane",
+      "title": "Kadane",
+      "snippet": "function maxSubarray(arr):\n  best = arr[0]\n  current = arr[0]\n  for i in 1..arr.length:\n    current = max(arr[i], current + arr[i])\n    best = max(best, current)\n  return best",
+      "options": [
+        "Kadane",
+        "Sliding window",
+        "Moore voting",
+        "Prefix sum"
+      ],
+      "answer": "Kadane",
+      "difficulty": "medium",
+      "category": "dp",
+      "caseNote": "O(n)",
+      "whatItIs": "Encontra a subarray contígua de soma máxima em um array.",
+      "explanation": "Algoritmo de Kadane para subarray de soma máxima.",
+      "hint": "current = max(arr[i], current + arr[i]).",
+      "reference": "https://www.geeksforgeeks.org/dsa/largest-sum-contiguous-subarray/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "shared-as-find-min",
+      "title": "Encontrar mínimo",
+      "snippet": "function findMin(arr):\n  minVal = arr[0]\n  for i in 1..arr.length:\n    if arr[i] < minVal:\n      minVal = arr[i]\n  return minVal",
+      "options": [
+        "Encontrar mínimo",
+        "Encontrar máximo",
+        "Busca linear",
+        "Moore voting"
+      ],
+      "answer": "Encontrar mínimo",
+      "difficulty": "easy",
+      "category": "basico",
+      "caseNote": "O(n)",
+      "whatItIs": "Percorre o array uma vez para encontrar o menor elemento — o oposto de encontrar o máximo.",
+      "explanation": "Percorre o array mantendo o menor valor visto até o momento.",
+      "hint": "Compara arr[i] com minVal a cada passo.",
+      "reference": "https://www.geeksforgeeks.org/dsa/minimum-element-in-an-array/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
     }
   ]
 }

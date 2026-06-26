@@ -176,6 +176,7 @@
 		79F468822F21286F00EFF64F /* LoginWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F468812F21286F00EFF64F /* LoginWebView.swift */; };
 		81C4AB5AEDDE40B29674A67E /* DevWordleKeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5CCF96574748ECBF41FC31 /* DevWordleKeyboardView.swift */; };
 		8F73A988A8534556869B0CF5 /* RestFeedbackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3577F4A1EE7F48E5AC0735F4 /* RestFeedbackManager.swift */; };
+		9D3BE5498AD542A3A27AEE06 /* RestGameFreeModePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00BF01A61E64E60BBEA8B85 /* RestGameFreeModePolicy.swift */; };
 		B1C2D3E52F8000020068804C /* RestGameProgrammingSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E42F8000020068804C /* RestGameProgrammingSearch.swift */; };
 		985849525534425EACEA4E07 /* ToneGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87F7915FE654FB8BE6560FB /* ToneGenerator.swift */; };
 		A07F0161F91641B082A29BC9 /* DevWordleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3609D848BF2A48FEA008D3AD /* DevWordleViewModel.swift */; };
@@ -270,6 +271,7 @@
 		24C0EBF0FC18475F962933FF /* DevSpotEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevSpotEngine.swift; sourceTree = "<group>"; };
 		2688CAC2769D44D3BC9C39FA /* DevWordleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleView.swift; sourceTree = "<group>"; };
 		3577F4A1EE7F48E5AC0735F4 /* RestFeedbackManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestFeedbackManager.swift; sourceTree = "<group>"; };
+		D00BF01A61E64E60BBEA8B85 /* RestGameFreeModePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameFreeModePolicy.swift; sourceTree = "<group>"; };
 		B1C2D3E42F8000020068804C /* RestGameProgrammingSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameProgrammingSearch.swift; sourceTree = "<group>"; };
 		3609D848BF2A48FEA008D3AD /* DevWordleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleViewModel.swift; sourceTree = "<group>"; };
 		A1B2C3D42F9000010068804D /* DevWordDictionaryValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordDictionaryValidation.swift; sourceTree = "<group>"; };
@@ -524,6 +526,7 @@
 			children = (
 				D87F7915FE654FB8BE6560FB /* ToneGenerator.swift */,
 				3577F4A1EE7F48E5AC0735F4 /* RestFeedbackManager.swift */,
+				D00BF01A61E64E60BBEA8B85 /* RestGameFreeModePolicy.swift */,
 				B1C2D3E42F8000020068804C /* RestGameProgrammingSearch.swift */,
 				FBB2CD64BBD04D07906D36E4 /* RestGameScoring.swift */,
 				B2B2ED2A42984CDF98E2D6FE /* RestGameEngine.swift */,
@@ -1327,6 +1330,7 @@
 				B2D9826FE8EB4E6AB635C19F /* RestGamePlayView.swift in Sources */,
 				985849525534425EACEA4E07 /* ToneGenerator.swift in Sources */,
 				8F73A988A8534556869B0CF5 /* RestFeedbackManager.swift in Sources */,
+				9D3BE5498AD542A3A27AEE06 /* RestGameFreeModePolicy.swift in Sources */,
 				B1C2D3E52F8000020068804C /* RestGameProgrammingSearch.swift in Sources */,
 				55A05722FF634FA291B6F9D1 /* RestGameScoring.swift in Sources */,
 				C8EA0D7D9F4B44E2AC710283 /* RestGameEngine.swift in Sources */,

@@ -12,8 +12,8 @@ const ALGO_SPOT_DIR = join(__dirname, "../newtabnews/Core/Views/RestGames/AlgoSp
 const DAILY_PATH = join(ALGO_SPOT_DIR, "algo_spot_daily.json");
 const FREE_PATH = join(ALGO_SPOT_DIR, "algo_spot_free.json");
 
-const MIN_DAILY = 30;
-const MIN_FREE = 40;
+const MIN_DAILY = 35;
+const MIN_FREE = 65;
 const VALID_DIFFICULTIES = new Set(["easy", "medium", "hard"]);
 const MAX_SNIPPET_LINES = 12;
 const FUNCTION_LINE = /^function\s+\w+\s*\(/;

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct DevWordleView: View {
+    @AppStorage(RestGameFreeModePolicy.storageKey) private var restGamesAllowFreeMode = false
     @State private var playMode: DevWordlePlayMode = .daily
     @State private var dailyViewModel = DevWordleViewModel(mode: .daily)
     @State private var freeViewModel = DevWordleViewModel(mode: .free)
@@ -64,6 +65,11 @@ struct DevWordleView: View {
                 }
             }
         }
+        .onChange(of: restGamesAllowFreeMode) { _, _ in
+            if playMode == .free, !isFreeModeUnlocked {
+                playMode = .daily
+            }
+        }
         .onChange(of: dailyViewModel.gameStatus) { oldStatus, status in
             guard playMode == .daily, oldStatus == .playing, status == .won else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
@@ -106,7 +112,10 @@ struct DevWordleView: View {
     }
 
     private var isFreeModeUnlocked: Bool {
-        dailyViewModel.isRoundComplete
+        RestGameFreeModePolicy.isUnlocked(
+            dailyComplete: dailyViewModel.isRoundComplete,
+            isAllowed: restGamesAllowFreeMode
+        )
     }
 
     private var activeViewModel: DevWordleViewModel {
@@ -194,7 +203,10 @@ struct DevWordleView: View {
     private func selectMode(_ mode: DevWordlePlayMode) {
         guard playMode != mode else { return }
         guard mode != .free || isFreeModeUnlocked else {
-            RestFeedbackManager.shared.scoreReveal(score: 2)
+            RestGameFreeModePolicy.handleLockedAttempt(
+                dailyComplete: dailyViewModel.isRoundComplete,
+                isAllowed: restGamesAllowFreeMode
+            )
             return
         }
         showResultSheet = false
@@ -324,16 +336,13 @@ struct DevWordleView: View {
     }
 
     private var modeSubtitle: String {
-        if playMode == .free {
-            return "Termos de programação · lista separada do diário"
-        }
-        if showDailyCompleteEmptyState {
-            return "Desafio de hoje concluído · modo livre liberado"
-        }
-        if isFreeModeUnlocked {
-            return "Termos de programação · desafio do dia"
-        }
-        return "Complete o diário para liberar o modo livre"
+        RestGameFreeModePolicy.modeSubtitle(
+            isFreeModeActive: playMode == .free,
+            dailyComplete: showDailyCompleteEmptyState,
+            isAllowed: restGamesAllowFreeMode,
+            freeModeDetail: "Termos de programação · lista separada do diário",
+            dailyCompleteDetail: "Desafio de hoje concluído · modo livre liberado"
+        )
     }
 }
 
