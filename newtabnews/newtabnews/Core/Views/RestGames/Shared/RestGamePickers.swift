@@ -25,11 +25,11 @@ struct SoundRibbonVisualProfile: Equatable {
     )
 
     static let hubBanner = SoundRibbonVisualProfile(
-        amplitudeScale: 0.42,
+        amplitudeScale: 0.50,
         wavelengthScale: 0.82,
-        speedScale: 0.05,
-        spreadScale: 1.45,
-        envelopeCycles: 1.2,
+        speedScale: 0.1531,
+        spreadScale: 1.52,
+        envelopeCycles: 1.15,
         phaseOffset: 0.35,
         lineThinning: 0.88,
         decoyVisualNorm: nil
@@ -254,7 +254,7 @@ enum SoundRibbonRenderer {
             * deform.wavelengthScale
         let baseAmplitude: Double
         if profile == .hubBanner {
-            baseAmplitude = min(Double(size.width), Double(size.height)) * 0.22
+            baseAmplitude = min(Double(size.width), Double(size.height)) * 0.26
         } else if compact {
             baseAmplitude = 6.5
         } else {
@@ -333,9 +333,9 @@ enum SoundRibbonRenderer {
         visualNorm: Double
     ) {
         let step = compact ? 2.6 : 2.0
-        let breathe = sin(time * (profile == .hubBanner ? 0.42 : 0.85)) * (profile == .hubBanner ? 0.03 : 0.045)
-        let strandDriftSpeed = profile == .hubBanner ? 0.36 : 0.55
-        let strandDriftAmplitude = profile == .hubBanner ? 0.028 : 0.045
+        let breathe = sin(time * (profile == .hubBanner ? 0.923 : 0.85)) * (profile == .hubBanner ? 0.0497 : 0.045)
+        let strandDriftSpeed = profile == .hubBanner ? 0.793 : 0.55
+        let strandDriftAmplitude = profile == .hubBanner ? 0.0464 : 0.045
 
         for strand in strands {
             var path = Path()

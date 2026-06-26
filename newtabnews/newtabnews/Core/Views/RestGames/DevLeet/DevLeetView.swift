@@ -53,19 +53,6 @@ struct DevLeetView: View {
             RestFeedbackManager.shared.prepare()
             refreshState()
         }
-        .toolbar {
-            if problem.hasSolutions {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        RestFeedbackManager.shared.tap()
-                        showSolutionSheet = true
-                    } label: {
-                        Image(systemName: "chevron.left.forwardslash.chevron.right")
-                    }
-                    .accessibilityLabel("Ver solução de referência")
-                }
-            }
-        }
         .sheet(isPresented: $showHonorSheet) {
             DevLeetHonorSheet(
                 onConfirm: {

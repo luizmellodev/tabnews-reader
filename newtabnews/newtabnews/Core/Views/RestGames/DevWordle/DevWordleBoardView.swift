@@ -7,12 +7,12 @@ struct DevWordleBoardView: View {
     let revealedRows: Set<Int>
     let shakeRow: Bool
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: DevWordleEngine.wordLength)
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: DevWordleEngine.wordLength)
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             ForEach(0..<DevWordleEngine.maxAttempts, id: \.self) { rowIndex in
-                LazyVGrid(columns: columns, spacing: 8) {
+                LazyVGrid(columns: columns, spacing: 10) {
                     ForEach(0..<DevWordleEngine.wordLength, id: \.self) { column in
                         DevWordleTileView(
                             letter: letter(for: rowIndex, column: column),
@@ -51,20 +51,20 @@ private struct DevWordleTileView: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(backgroundColor)
                 .overlay {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .stroke(borderColor, lineWidth: 2)
                 }
 
             if let letter {
                 Text(String(letter))
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .font(.system(size: 29, weight: .bold, design: .rounded))
                     .foregroundStyle(foregroundColor)
             }
         }
-        .frame(height: 56)
+        .frame(height: 67)
         .scaleEffect(flipScale)
         .animation(flipAnimation, value: revealed)
         .animation(nil, value: letter)

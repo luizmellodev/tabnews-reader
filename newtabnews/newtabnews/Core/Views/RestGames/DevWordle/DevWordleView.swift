@@ -569,13 +569,13 @@ private struct DevWordleFeaturedWordView: View {
     private let tileColor = Color(red: 0.42, green: 0.67, blue: 0.36)
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             ForEach(Array(word.uppercased().enumerated()), id: \.offset) { _, letter in
                 Text(String(letter))
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                    .frame(width: 52, height: 56)
-                    .background(tileColor, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .frame(width: 62, height: 67)
+                    .background(tileColor, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
         }
         .accessibilityElement(children: .ignore)

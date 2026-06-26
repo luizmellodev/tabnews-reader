@@ -413,7 +413,7 @@ private struct HubGameTileBackground: View {
 
 private struct DevWordleHubPreview: View {
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 7) {
             ForEach(["R", "E", "A", "C", "T"], id: \.self) { letter in
                 let color: Color = switch letter {
                 case "E": .yellow
@@ -422,10 +422,10 @@ private struct DevWordleHubPreview: View {
                 }
 
                 Text(letter)
-                    .font(.caption.weight(.bold))
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                    .frame(width: 28, height: 32)
-                    .background(color.opacity(color == .gray ? 0.25 : 0.75), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    .frame(width: 34, height: 38)
+                    .background(color.opacity(color == .gray ? 0.25 : 0.75), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
