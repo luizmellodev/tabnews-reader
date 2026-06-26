@@ -32,6 +32,9 @@ struct SettingsView: View {
     @AppStorage("isBetaTester") private var isBetaTester = false
     @State private var isRefreshing = false
     @State private var userPublicationsCount: Int?
+    @State private var pushTokenDebugInfo: FirebasePushNotificationService.DebugInfo?
+    @State private var isLoadingPushTokenDebug = false
+    @State private var pushDebugMessage: String?
     
     var body: some View {
         NavigationStack {
@@ -228,7 +231,43 @@ struct SettingsView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
-                    
+
+                    Button {
+                        isLoadingPushTokenDebug = true
+                        FirebasePushNotificationService.shared.fetchDebugInfo { info in
+                            isLoadingPushTokenDebug = false
+                            pushTokenDebugInfo = info
+                        }
+                    } label: {
+                        HStack {
+                            Label("Ver FCM Token deste device", systemImage: "bell.badge")
+                            Spacer()
+                            if isLoadingPushTokenDebug {
+                                ProgressView()
+                            }
+                        }
+                    }
+                    .disabled(isLoadingPushTokenDebug)
+
+                    Button {
+                        FirebasePushNotificationService.shared.sendLocalTestNotification { message in
+                            pushDebugMessage = message
+                        }
+                    } label: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Label("Testar notificação local", systemImage: "bell.and.waves.left.and.right")
+                            Text("Confirma se o iOS exibe notificações deste app")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    if let pushDebugMessage {
+                        Text(pushDebugMessage)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
                     Toggle(isOn: $debugShowDigestBanner) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("🔥 Mostrar Banner Weekly Digest")
@@ -330,7 +369,7 @@ struct SettingsView: View {
                 } header: {
                     Label("Debug", systemImage: "hammer.fill")
                 } footer: {
-                    Text("Ferramentas de desenvolvimento para testes. O banner de Digest normalmente só aparece nos fins de semana (sábado e domingo).")
+                    Text("Ferramentas de desenvolvimento para testes. Push remoto: olhe o console do Xcode por 📬 ao enviar o curl. O banner de Digest normalmente só aparece nos fins de semana.")
                 }
                 #endif
             }
@@ -377,6 +416,9 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showingRankings) {
                 RestGameLeaderboardsSheet()
+            }
+            .sheet(item: $pushTokenDebugInfo) { info in
+                PushTokenDebugSheet(info: info)
             }
             .alert("Limpar Cache da API", isPresented: $showingClearCache) {
                 Button("Cancelar", role: .cancel) { }
@@ -826,6 +868,57 @@ struct SettingsView: View {
         try? modelContext.save()
     }
 }
+
+#if DEBUG
+private struct PushTokenDebugSheet: View {
+    let info: FirebasePushNotificationService.DebugInfo
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    GroupBox("Status") {
+                        VStack(alignment: .leading, spacing: 8) {
+                            LabeledContent("Permissão", value: info.permissionStatus)
+                            LabeledContent("APNs registrado", value: info.apnsTokenRegistered ? "sim" : "não")
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    GroupBox("Device ID") {
+                        Text(info.deviceId)
+                            .font(.caption.monospaced())
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    GroupBox("FCM Token") {
+                        Text(info.fcmToken)
+                            .font(.caption.monospaced())
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding()
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("Push Debug")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Fechar") { dismiss() }
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Copiar") {
+                        UIPasteboard.general.string = info.fcmToken
+                    }
+                }
+            }
+        }
+    }
+}
+#endif
 
 struct SettingsView_Previews: PreviewProvider {
     static var currentTheme: Theme = .light

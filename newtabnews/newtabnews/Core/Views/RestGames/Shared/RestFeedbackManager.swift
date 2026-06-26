@@ -28,6 +28,10 @@ final class RestFeedbackManager {
         AudioServicesPlaySystemSound(1104)
     }
 
+    func tapHaptic() {
+        impactLight.impactOccurred(intensity: 0.6)
+    }
+
     /// Rare tick while dragging sliders — haptic only, no sound.
     func sliderTick() {
         let now = ProcessInfo.processInfo.systemUptime
@@ -82,6 +86,10 @@ final class RestFeedbackManager {
     func confirm() {
         impactMedium.impactOccurred(intensity: 0.85)
         AudioServicesPlaySystemSound(1104)
+    }
+
+    func confirmHaptic() {
+        impactMedium.impactOccurred(intensity: 0.85)
     }
 
     func scoreReveal(score: Double) {

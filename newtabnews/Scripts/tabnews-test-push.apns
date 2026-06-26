@@ -1,0 +1,14 @@
+{
+  "Simulator Target Bundle": "dev.luizmello.newtabnews",
+  "aps": {
+    "alert": {
+      "title": "🧪 Teste Simulador",
+      "body": "Se você viu isso, o app recebe push!"
+    },
+    "sound": "default",
+    "badge": 1
+  },
+  "type": "test_newsletter",
+  "owner": "NewsletterOficial",
+  "slug": "teste-push-simulador"
+}

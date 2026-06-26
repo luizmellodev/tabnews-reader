@@ -24,6 +24,25 @@ enum DevWordleGameStatus: String, Codable, Equatable {
     case lost
 }
 
+enum DevWordlePlayMode: Equatable, Hashable {
+    case daily
+    case free
+
+    var title: String {
+        switch self {
+        case .daily: return "Diário"
+        case .free: return "Livre"
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .daily: return "calendar"
+        case .free: return "infinity"
+        }
+    }
+}
+
 enum DevWordleEngine {
     static let maxAttempts = 6
     static let wordLength = 5
@@ -58,6 +77,45 @@ enum DevWordleEngine {
     }
 }
 
+struct DevWordleFreeRoundResult: Codable, Equatable {
+    let word: String
+    let attempts: Int
+    let won: Bool
+}
+
+struct DevWordleFreeSession: Codable, Equatable {
+    static let targetWordCount = 5
+
+    var startTime: Date
+    var results: [DevWordleFreeRoundResult]
+
+    var wordsPlayed: Int { results.count }
+    var isComplete: Bool { results.count >= Self.targetWordCount }
+
+    var wins: Int { results.filter(\.won).count }
+
+    var averageAttempts: Double {
+        guard !results.isEmpty else { return 0 }
+        let total = results.reduce(0) { $0 + $1.attempts }
+        return Double(total) / Double(results.count)
+    }
+
+    func elapsedTime(at endDate: Date = .now) -> TimeInterval {
+        max(0, endDate.timeIntervalSince(startTime))
+    }
+
+    static func formattedDuration(_ interval: TimeInterval) -> String {
+        let total = Int(interval)
+        let minutes = total / 60
+        let seconds = total % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+
+    static func newSession() -> DevWordleFreeSession {
+        DevWordleFreeSession(startTime: .now, results: [])
+    }
+}
+
 enum DevWordleSchedule {
     static var nextPuzzleAt: Date {
         let calendar = Calendar.current
@@ -79,15 +137,26 @@ enum DevWordleSchedule {
 }
 
 struct DevWordDictionary {
+    /// Daily challenge pool — programming terms only.
     let answers: [String]
+    /// Guess-only pool (unioned into `validGuesses`).
+    let extras: [String]
+    /// Free mode pool — derived from `extras` minus `answers`.
+    let practiceAnswers: [String]
     let validGuesses: Set<String>
 
     static let shared: DevWordDictionary = {
-        if let loaded = loadFromBundle() {
-            return loaded
+        let loaded = loadFromBundle()
+        let dictionary = loaded ?? fallback
+        #if DEBUG
+        if loaded != nil {
+            DevWordDictionaryTests.runAll(on: dictionary)
         }
-        return fallback
+        #endif
+        return dictionary
     }()
+
+    var practiceWordCount: Int { practiceAnswers.count }
 
     func dailyWord(for date: Date = .now) -> String {
         let calendar = Calendar.current
@@ -96,6 +165,12 @@ struct DevWordDictionary {
         let days = calendar.dateComponents([.day], from: start, to: today).day ?? 0
         let index = abs(days) % answers.count
         return answers[index]
+    }
+
+    func randomPracticeWord(excluding words: Set<String> = []) -> String {
+        let excluded = words.map { $0.uppercased() }
+        let pool = practiceAnswers.filter { !excluded.contains($0) }
+        return (pool.isEmpty ? practiceAnswers : pool).randomElement() ?? practiceAnswers[0]
     }
 
     func isValidGuess(_ word: String) -> Bool {
@@ -119,15 +194,30 @@ struct DevWordDictionary {
 
         guard !answers.isEmpty else { return nil }
 
+        let answerSet = Set(answers)
+        let practice = extras
+            .filter { !answerSet.contains($0) }
+            .sorted()
+
+        guard !practice.isEmpty else { return nil }
+
+        #if DEBUG
+        DevWordDictionaryValidation.assertValid(answers: answers, extras: extras, practice: practice)
+        #endif
+
         return DevWordDictionary(
             answers: answers,
+            extras: extras,
+            practiceAnswers: practice,
             validGuesses: Set(answers + extras)
         )
     }
 
     private static let fallback = DevWordDictionary(
         answers: ["REACT", "SWIFT", "CACHE", "ASYNC", "HTTPS", "LINUX", "NGINX", "REDIS", "QUERY", "DEBUG"],
-        validGuesses: Set(["REACT", "SWIFT", "CACHE", "ASYNC", "HTTPS", "LINUX", "NGINX", "REDIS", "QUERY", "DEBUG", "CLASS", "ERROR", "TOKEN", "FETCH", "PROXY"])
+        extras: ["CLASS", "ERROR", "TOKEN", "FETCH", "PROXY", "ADMIN", "AGENT", "ALERT", "ALPHA", "BADGE"],
+        practiceAnswers: ["CLASS", "ERROR", "TOKEN", "FETCH", "PROXY", "ADMIN", "AGENT", "ALERT", "ALPHA", "BADGE"],
+        validGuesses: Set(["REACT", "SWIFT", "CACHE", "ASYNC", "HTTPS", "LINUX", "NGINX", "REDIS", "QUERY", "DEBUG", "CLASS", "ERROR", "TOKEN", "FETCH", "PROXY", "ADMIN", "AGENT", "ALERT", "ALPHA", "BADGE"])
     )
 
     private struct WordPayload: Decodable {

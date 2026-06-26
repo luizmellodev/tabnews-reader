@@ -9,23 +9,51 @@ final class DevWordleViewModel {
     var gameStatus: DevWordleGameStatus = .playing
     var shakeRow = false
     var revealedRows: Set<Int> = []
+    var invalidGuessCount = 0
+    var hintText: String?
 
     let targetWord: String
     let dateKey: String
+    let mode: DevWordlePlayMode
+    let sessionId: UUID
 
     private let dictionary = DevWordDictionary.shared
     private let storage = DevWordleStorage.shared
 
-    init(date: Date = .now) {
-        self.dateKey = Self.dateKey(for: date)
-        self.targetWord = dictionary.dailyWord(for: date)
+    init(mode: DevWordlePlayMode = .daily, date: Date = .now, excludeWords: Set<String> = [], forceFresh: Bool = false) {
+        self.mode = mode
+        self.sessionId = UUID()
+
+        switch mode {
+        case .daily:
+            self.dateKey = Self.dateKey(for: date)
+            self.targetWord = dictionary.dailyWord(for: date)
+        case .free:
+            self.dateKey = DevWordleStorage.freeModeKey
+            let saved = forceFresh ? nil : storage.loadState(for: DevWordleStorage.freeModeKey)
+            if let saved, saved.gameStatus == .playing {
+                self.targetWord = saved.targetWord
+            } else {
+                if saved != nil {
+                    storage.clearState(for: DevWordleStorage.freeModeKey)
+                }
+                var excluded = excludeWords
+                excluded.insert(dictionary.dailyWord(for: date))
+                self.targetWord = dictionary.randomPracticeWord(excluding: excluded)
+            }
+        }
+
         self.rows = Array(repeating: DevWordleGuessRow.empty(), count: DevWordleEngine.maxAttempts)
 
-        if let saved = storage.loadState(for: dateKey), saved.targetWord == targetWord {
+        if let saved = storage.loadState(for: dateKey),
+           saved.targetWord == targetWord,
+           mode == .daily || saved.gameStatus == .playing {
             rows = saved.rows
             currentRowIndex = saved.currentRowIndex
             currentGuess = saved.currentGuess
             gameStatus = saved.gameStatus
+            invalidGuessCount = saved.invalidGuessCount
+            hintText = saved.hintText
             if saved.gameStatus == .playing {
                 revealedRows = Set(0..<saved.currentRowIndex)
             } else {
@@ -34,13 +62,31 @@ final class DevWordleViewModel {
         }
     }
 
-    var isCompletedToday: Bool {
+    var isRoundComplete: Bool {
         gameStatus == .won || gameStatus == .lost
+    }
+
+    var isCompletedToday: Bool {
+        mode == .daily && isRoundComplete
+    }
+
+    var showHintOffer: Bool {
+        guard gameStatus == .playing, hintText == nil else { return false }
+        let attemptsLeft = DevWordleEngine.maxAttempts - currentRowIndex
+        return attemptsLeft <= 2 || invalidGuessCount >= 5
     }
 
     var winningAttemptNumber: Int? {
         guard gameStatus == .won else { return nil }
         return currentRowIndex + 1
+    }
+
+    var completedAttemptCount: Int? {
+        guard isRoundComplete else { return nil }
+        if gameStatus == .won {
+            return winningAttemptNumber
+        }
+        return DevWordleEngine.maxAttempts
     }
 
     var keyboardStates: [Character: DevWordleLetterResult] {
@@ -58,7 +104,8 @@ final class DevWordleViewModel {
     }
 
     var shareText: String {
-        let header = "DevWordle TabNews \(wonAttemptLabel())"
+        let label = mode == .free ? "DevWordle Livre" : "DevWordle TabNews"
+        let header = "\(label) \(wonAttemptLabel())"
         let completedCount = gameStatus == .playing ? currentRowIndex : currentRowIndex + 1
         let grid = (0..<completedCount).map { rowIndex -> String in
             rows[rowIndex].results.compactMap { result in
@@ -77,7 +124,7 @@ final class DevWordleViewModel {
         guard gameStatus == .playing else { return }
         guard currentGuess.count < DevWordleEngine.wordLength else { return }
         currentGuess.append(character.uppercased().first ?? character)
-        RestFeedbackManager.shared.tap()
+        RestFeedbackManager.shared.tapHaptic()
         persist()
     }
 
@@ -85,7 +132,7 @@ final class DevWordleViewModel {
         guard gameStatus == .playing else { return }
         guard !currentGuess.isEmpty else { return }
         currentGuess.removeLast()
-        RestFeedbackManager.shared.tap()
+        RestFeedbackManager.shared.tapHaptic()
         persist()
     }
 
@@ -95,7 +142,9 @@ final class DevWordleViewModel {
 
         let guess = currentGuess.uppercased()
         guard dictionary.isValidGuess(guess) else {
+            invalidGuessCount += 1
             withInvalidShake()
+            persist()
             return
         }
 
@@ -104,25 +153,41 @@ final class DevWordleViewModel {
         rows[currentRowIndex].results = results
         revealedRows.insert(currentRowIndex)
 
-        RestFeedbackManager.shared.confirm()
+        RestFeedbackManager.shared.confirmHaptic()
 
         if guess == targetWord {
             gameStatus = .won
-            storage.recordWin(on: dateKey)
-            if let attempt = winningAttemptNumber {
-                GameCenterManager.shared.submitDevWordleScore(attempts: attempt)
-                GamificationManager.shared.trackDevWordleWin(attempts: attempt)
+            if mode == .daily {
+                storage.recordWin(on: dateKey)
+                if let attempt = winningAttemptNumber {
+                    GameCenterManager.shared.submitDevWordleScore(attempts: attempt)
+                    GamificationManager.shared.trackDevWordleWin(attempts: attempt)
+                }
             }
         } else if currentRowIndex >= DevWordleEngine.maxAttempts - 1 {
             gameStatus = .lost
-            storage.recordLoss(on: dateKey)
-            GamificationManager.shared.trackDevWordlePlayed()
+            if mode == .daily {
+                storage.recordLoss(on: dateKey)
+                GamificationManager.shared.trackDevWordlePlayed()
+            }
         } else {
             currentRowIndex += 1
             currentGuess = ""
         }
 
         persist()
+    }
+
+    func acceptHint() {
+        guard showHintOffer else { return }
+        hintText = generateHint()
+        RestFeedbackManager.shared.confirmHaptic()
+        persist()
+    }
+
+    func clearSavedFreeState() {
+        guard mode == .free else { return }
+        storage.clearState(for: dateKey)
     }
 
     static func todaySummary() -> DevWordleDailySummary {
@@ -136,10 +201,46 @@ final class DevWordleViewModel {
                 rows: rows,
                 currentRowIndex: currentRowIndex,
                 currentGuess: currentGuess,
-                gameStatus: gameStatus
+                gameStatus: gameStatus,
+                invalidGuessCount: invalidGuessCount,
+                hintText: hintText
             ),
             for: dateKey
         )
+    }
+
+    private func generateHint() -> String {
+        let target = Array(targetWord.uppercased())
+        let knownCorrectPositions = Set(
+            (0..<currentRowIndex).flatMap { rowIndex in
+                (0..<DevWordleEngine.wordLength).compactMap { column in
+                    rows[rowIndex].results[column] == .correct ? column : nil
+                }
+            }
+        )
+
+        for (index, letter) in target.enumerated() where !knownCorrectPositions.contains(index) {
+            return "A \(ordinalPosition(index + 1)) letra é \(letter)"
+        }
+
+        for letter in Set(target) {
+            let state = keyboardStates[letter]
+            if state != .correct && state != .present {
+                return "A palavra contém a letra \(letter)"
+            }
+        }
+
+        return "A palavra começa com \(target[0])"
+    }
+
+    private func ordinalPosition(_ position: Int) -> String {
+        switch position {
+        case 1: return "1ª"
+        case 2: return "2ª"
+        case 3: return "3ª"
+        case 4: return "4ª"
+        default: return "5ª"
+        }
     }
 
     private func withInvalidShake() {
@@ -178,6 +279,8 @@ struct DevWordleSavedState: Codable {
     let currentRowIndex: Int
     let currentGuess: String
     let gameStatus: DevWordleGameStatus
+    var invalidGuessCount: Int = 0
+    var hintText: String? = nil
 }
 
 struct DevWordleDailySummary {
@@ -189,11 +292,13 @@ struct DevWordleDailySummary {
 @MainActor
 final class DevWordleStorage {
     static let shared = DevWordleStorage()
+    static let freeModeKey = "free"
 
     private enum Keys {
         static let currentStreak = "devWordleCurrentStreak"
         static let maxStreak = "devWordleMaxStreak"
         static let lastPlayedDate = "devWordleLastPlayedDate"
+        static let freeSession = "devWordle_freeSession"
     }
 
     private init() {}
@@ -206,6 +311,24 @@ final class DevWordleStorage {
     func saveState(_ state: DevWordleSavedState, for dateKey: String) {
         guard let data = try? JSONEncoder().encode(state) else { return }
         UserDefaults.standard.set(data, forKey: stateKey(dateKey))
+    }
+
+    func clearState(for dateKey: String) {
+        UserDefaults.standard.removeObject(forKey: stateKey(dateKey))
+    }
+
+    func loadFreeSession() -> DevWordleFreeSession? {
+        guard let data = UserDefaults.standard.data(forKey: Keys.freeSession) else { return nil }
+        return try? JSONDecoder().decode(DevWordleFreeSession.self, from: data)
+    }
+
+    func saveFreeSession(_ session: DevWordleFreeSession) {
+        guard let data = try? JSONEncoder().encode(session) else { return }
+        UserDefaults.standard.set(data, forKey: Keys.freeSession)
+    }
+
+    func clearFreeSession() {
+        UserDefaults.standard.removeObject(forKey: Keys.freeSession)
     }
 
     func summary(for dateKey: String) -> DevWordleDailySummary {

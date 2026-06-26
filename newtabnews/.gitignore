@@ -129,6 +129,16 @@ functions/.env.local
 .runtimeconfig.json
 
 # ========================================
+# SCRIPTS
+# ========================================
+Scripts/node_modules/
+# Local APNs device testing — contains Team ID / Key IDs
+Scripts/test-push-device.mjs
+Scripts/test-push-device.sh
+Scripts/package.json
+Scripts/package-lock.json
+
+# ========================================
 # TEMPORARY FILES
 # ========================================
 # Example files and documentation helpers

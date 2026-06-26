@@ -4,6 +4,8 @@
 <dict>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Queremos te notificar sobre nossa newsletter diária!</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

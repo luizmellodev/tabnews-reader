@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 import UserNotifications
 
 class NotificationManager: ObservableObject {
@@ -29,6 +30,14 @@ class NotificationManager: ObservableObject {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
             DispatchQueue.main.async {
                 self.isPermissionGranted = success
+                if success {
+                    AppDelegate.registerForPushNotifications()
+                    #if DEBUG
+                    UNUserNotificationCenter.current().getNotificationSettings { settings in
+                        print("🔔 Permissão após autorizar: \(settings.authorizationStatus.rawValue) (2=autorizado)")
+                    }
+                    #endif
+                }
             }
             if let error = error {
                 print("Erro ao solicitar permissão: \(error.localizedDescription)")

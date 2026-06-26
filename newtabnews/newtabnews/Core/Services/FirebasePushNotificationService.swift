@@ -61,5 +61,66 @@ class FirebasePushNotificationService {
             }
         }
     }
+
+    struct DebugInfo: Identifiable {
+        let id = UUID()
+        let fcmToken: String
+        let deviceId: String
+        let permissionStatus: String
+        let apnsTokenRegistered: Bool
+    }
+
+    func fetchDebugInfo(completion: @escaping (DebugInfo) -> Void) {
+        Messaging.messaging().token { token, error in
+            let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "unknown"
+            let fcmToken = token ?? "indisponível (\(error?.localizedDescription ?? "erro desconhecido"))"
+            let apnsRegistered = Messaging.messaging().apnsToken != nil
+
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                DispatchQueue.main.async {
+                    completion(DebugInfo(
+                        fcmToken: fcmToken,
+                        deviceId: deviceId,
+                        permissionStatus: Self.permissionLabel(settings.authorizationStatus),
+                        apnsTokenRegistered: apnsRegistered
+                    ))
+                }
+            }
+        }
+    }
+
+    func sendLocalTestNotification(completion: @escaping (String) -> Void) {
+        let content = UNMutableNotificationContent()
+        content.title = "🧪 Teste local"
+        content.body = "Se você viu isso, o iOS exibe notificações deste app."
+        content.sound = .default
+
+        let request = UNNotificationRequest(
+            identifier: "push-debug-local-test",
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        )
+
+        UNUserNotificationCenter.current().add(request) { error in
+            DispatchQueue.main.async {
+                if let error {
+                    completion("Erro: \(error.localizedDescription)")
+                } else {
+                    completion("Agendada — deve aparecer em ~1s")
+                }
+            }
+        }
+    }
+
+    private static func permissionLabel(_ status: UNAuthorizationStatus) -> String {
+        switch status {
+        case .authorized: "autorizado"
+        case .denied: "negado"
+        case .notDetermined: "não solicitado"
+        case .provisional: "provisório"
+        case .ephemeral: "ephemeral"
+        @unknown default: "desconhecido"
+        }
+    }
 }
 

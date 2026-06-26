@@ -17,19 +17,75 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
-        
+
         Messaging.messaging().delegate = self
-        
         UNUserNotificationCenter.current().delegate = self
-        
-        application.registerForRemoteNotifications()
-        
+        #if DEBUG
+        print("📬 Push handlers registrados (AppDelegate + UNUserNotificationCenter)")
+        #endif
+
+        registerForPushIfNeeded(application)
+
         return true
     }
-    
+
+    private func registerForPushIfNeeded(_ application: UIApplication) {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                #if DEBUG
+                print("🔔 Permissão de notificação: \(settings.authorizationStatus.rawValue)")
+                #endif
+                switch settings.authorizationStatus {
+                case .authorized, .provisional, .ephemeral:
+                    application.registerForRemoteNotifications()
+                default:
+                    break
+                }
+            }
+        }
+    }
+
+    static func registerForPushNotifications() {
+        DispatchQueue.main.async {
+            UIApplication.shared.registerForRemoteNotifications()
+        }
+    }
+
     func application(_ application: UIApplication,
                      didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        Messaging.messaging().apnsToken = deviceToken
+        #if DEBUG
+        Messaging.messaging().setAPNSToken(deviceToken, type: .sandbox)
+        print("📱 APNs token registrado (sandbox): \(deviceToken.map { String(format: "%02x", $0) }.joined())")
+        #else
+        Messaging.messaging().setAPNSToken(deviceToken, type: .prod)
+        print("📱 APNs token registrado (production)")
+        #endif
+
+        refreshFCMTokenAfterAPNS()
+    }
+
+    private func refreshFCMTokenAfterAPNS() {
+        Messaging.messaging().token { token, error in
+            guard let token, error == nil else {
+                if let error {
+                    print("❌ Erro ao atualizar FCM token: \(error.localizedDescription)")
+                }
+                return
+            }
+
+            DispatchQueue.main.async {
+                #if DEBUG
+                print("📱 FCM Token (atualizado): \(token)")
+                print("📱 APNs vinculado ao FCM: sim")
+                #endif
+                FirebasePushNotificationService.shared.saveDeviceToken(token)
+                Messaging.messaging().subscribe(toTopic: "all_users") { error in
+                    if let error {
+                        print("❌ Erro ao inscrever no tópico: \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
     }
     
     func application(_ application: UIApplication,
@@ -40,8 +96,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        #if DEBUG
+        print("📬 Push remoto recebido (background): \(userInfo)")
+        #endif
+        Messaging.messaging().appDidReceiveMessage(userInfo)
         WatchSyncManager.shared.forwardNotificationToWatch(userInfo: userInfo)
-        completionHandler(.noData)
+        completionHandler(.newData)
     }
 }
 
@@ -49,11 +109,22 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 extension AppDelegate: MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         guard let token = fcmToken else { return }
-        
+        guard Messaging.messaging().apnsToken != nil else {
+            #if DEBUG
+            print("⚠️ FCM token ignorado — APNs ainda não registrado")
+            #endif
+            return
+        }
+
+        #if DEBUG
+        print("📱 FCM Token: \(token)")
+        print("📱 APNs vinculado ao FCM: sim")
+        #endif
+
         FirebasePushNotificationService.shared.saveDeviceToken(token)
-        
+
         Messaging.messaging().subscribe(toTopic: "all_users") { error in
-            if let error = error {
+            if let error {
                 print("❌ Erro ao inscrever no tópico: \(error.localizedDescription)")
             }
         }
@@ -65,7 +136,12 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        WatchSyncManager.shared.forwardNotificationToWatch(userInfo: notification.request.content.userInfo)
+        let userInfo = notification.request.content.userInfo
+        #if DEBUG
+        print("📬 Push remoto recebido (foreground): \(userInfo)")
+        #endif
+        Messaging.messaging().appDidReceiveMessage(userInfo)
+        WatchSyncManager.shared.forwardNotificationToWatch(userInfo: userInfo)
         completionHandler([.banner, .sound, .badge])
     }
     

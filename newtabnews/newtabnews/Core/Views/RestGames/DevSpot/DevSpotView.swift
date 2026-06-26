@@ -104,7 +104,7 @@ struct DevSpotView: View {
 
                 if viewModel.phase == .revealing {
                     DevSpotSearchButton(term: round.devTerm) { term in
-                        guard let url = DevSpotSearch.programmingSearchURL(for: term) else { return }
+                        guard let url = RestGameProgrammingSearch.programmingSearchURL(for: term) else { return }
                         openURL(url)
                     }
                     .padding(.top, 16)
