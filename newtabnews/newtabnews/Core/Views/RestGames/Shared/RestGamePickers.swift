@@ -488,13 +488,15 @@ struct HSLColorPickerView: View {
                 verticalSlider(
                     value: $color.saturation,
                     range: 0...100,
-                    gradient: saturationGradient
+                    gradient: saturationGradient,
+                    axis: .saturation
                 )
 
                 verticalSlider(
                     value: $color.lightness,
                     range: 0...100,
-                    gradient: lightnessGradient
+                    gradient: lightnessGradient,
+                    axis: .lightness
                 )
 
                 Spacer()
@@ -504,6 +506,9 @@ struct HSLColorPickerView: View {
         }
         .onAppear {
             ToneGenerator.shared.configureSessionIfNeeded()
+        }
+        .onDisappear {
+            RestFeedbackManager.shared.endColorAdjust()
         }
     }
 
@@ -545,8 +550,12 @@ struct HSLColorPickerView: View {
                             binding: value,
                             range: 0...360,
                             locationY: gesture.location.y,
-                            height: geo.size.height
+                            height: geo.size.height,
+                            axis: .hue
                         )
+                    }
+                    .onEnded { _ in
+                        RestFeedbackManager.shared.endColorAdjust()
                     }
             )
         }
@@ -556,7 +565,8 @@ struct HSLColorPickerView: View {
     private func verticalSlider(
         value: Binding<Double>,
         range: ClosedRange<Double>,
-        gradient: LinearGradient
+        gradient: LinearGradient,
+        axis: ColorSliderAxis
     ) -> some View {
         GeometryReader { geo in
             let span = range.upperBound - range.lowerBound
@@ -583,8 +593,12 @@ struct HSLColorPickerView: View {
                             binding: value,
                             range: range,
                             locationY: gesture.location.y,
-                            height: geo.size.height
+                            height: geo.size.height,
+                            axis: axis
                         )
+                    }
+                    .onEnded { _ in
+                        RestFeedbackManager.shared.endColorAdjust()
                     }
             )
         }
@@ -599,7 +613,8 @@ struct HSLColorPickerView: View {
         binding: Binding<Double>,
         range: ClosedRange<Double>,
         locationY: CGFloat,
-        height: CGFloat
+        height: CGFloat,
+        axis: ColorSliderAxis
     ) {
         let clampedY = max(0, min(height, locationY))
         let inverted = 1 - (clampedY / height)
@@ -608,7 +623,8 @@ struct HSLColorPickerView: View {
         RestFeedbackManager.shared.colorAdjust(
             hue: color.hue,
             saturation: color.saturation,
-            lightness: color.lightness
+            lightness: color.lightness,
+            activeAxis: axis
         )
     }
 

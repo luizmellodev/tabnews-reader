@@ -11,7 +11,7 @@ final class RestFeedbackManager {
     private let notification = UINotificationFeedbackGenerator()
 
     private var lastSliderHapticTime: TimeInterval = 0
-    private var lastColorSoundTime: TimeInterval = 0
+    private var isColorAdjusting = false
 
     private init() {}
 
@@ -40,23 +40,50 @@ final class RestFeedbackManager {
         impactLight.impactOccurred(intensity: 0.35)
     }
 
-    /// Pitch follows hue while adjusting color sliders.
-    func colorAdjust(hue: Double, saturation: Double, lightness: Double) {
-        let now = ProcessInfo.processInfo.systemUptime
-        guard now - lastColorSoundTime > 0.07 else { return }
-        lastColorSoundTime = now
-
+    /// Continuous pitch while adjusting color sliders — no engine restarts per tick.
+    func colorAdjust(
+        hue: Double,
+        saturation: Double,
+        lightness: Double,
+        activeAxis: ColorSliderAxis = .hue
+    ) {
         let hueNorm = hue / 360
         let satNorm = saturation / 100
         let lightNorm = lightness / 100
-        let frequency = 280 + (hueNorm * 520) + (satNorm * 80)
-        let volume = Float(0.16 + (lightNorm * 0.2))
 
-        ToneGenerator.shared.playBriefTone(frequency: frequency, duration: 0.07, volume: volume)
+        // Hue sets the base note; saturation & lightness bend pitch and loudness.
+        let hueFrequency = 220 + (hueNorm * 500)
+
+        let satPitchRange = activeAxis == .saturation ? 340.0 : 200.0
+        let saturationPitch = (satNorm - 0.5) * satPitchRange
+
+        let lightPitchRange = activeAxis == .lightness ? 280.0 : 160.0
+        let lightnessPitch = (lightNorm - 0.5) * lightPitchRange
+
+        let frequency = min(1_200, max(90, hueFrequency + saturationPitch + lightnessPitch))
+
+        let volumeLightRange = activeAxis == .lightness ? 0.28 : 0.18
+        let volumeSatBoost = activeAxis == .saturation ? 0.10 : 0.05
+        let volume = Float(min(0.45, 0.13 + (lightNorm * volumeLightRange) + (satNorm * volumeSatBoost)))
+
+        ToneGenerator.shared.sustain(
+            frequency: frequency,
+            volume: volume,
+            purpose: .colorPicker
+        )
+        isColorAdjusting = true
+
+        let now = ProcessInfo.processInfo.systemUptime
         if now - lastSliderHapticTime > 0.12 {
             lastSliderHapticTime = now
             impactLight.impactOccurred(intensity: 0.3)
         }
+    }
+
+    func endColorAdjust() {
+        guard isColorAdjusting else { return }
+        isColorAdjusting = false
+        ToneGenerator.shared.release(purpose: .colorPicker)
     }
 
     func countdownTick(second: Int, total: Int) {
@@ -116,4 +143,10 @@ final class RestFeedbackManager {
         notification.notificationOccurred(.error)
         AudioServicesPlaySystemSound(1053)
     }
+}
+
+enum ColorSliderAxis {
+    case hue
+    case saturation
+    case lightness
 }

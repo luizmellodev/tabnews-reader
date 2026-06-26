@@ -1,12 +1,19 @@
 import AVFoundation
 
+enum ToneSustainPurpose: Equatable {
+    case soundMatch
+    case colorPicker
+}
+
 final class ToneGenerator {
     static let shared = ToneGenerator()
 
     private final class OscillatorState {
         var phase: Double = 0
-        var frequency: Double = 440
-        var volume: Float = 0.25
+        var currentFrequency: Double = 440
+        var targetFrequency: Double = 440
+        var currentVolume: Float = 0
+        var targetVolume: Float = 0
     }
 
     private let engine = AVAudioEngine()
@@ -15,11 +22,14 @@ final class ToneGenerator {
     private var isConfigured = false
     private var isRunning = false
     private var isSustainMode = false
+    private var sustainPurpose: ToneSustainPurpose?
     private var briefToneWorkItem: DispatchWorkItem?
 
     var isSustaining: Bool { isSustainMode }
 
     private let sampleRate: Double = 44_100
+    private let frequencySmoothing = 0.004
+    private let volumeSmoothing = 0.015
 
     private init() {}
 
@@ -27,7 +37,7 @@ final class ToneGenerator {
         guard !isConfigured else { return }
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try session.setCategory(.ambient, mode: .default, options: [.mixWithOthers])
             try session.setActive(true)
             isConfigured = true
         } catch {
@@ -35,33 +45,60 @@ final class ToneGenerator {
         }
     }
 
-    /// Continuous tone for Sound Match (memorize + recreate). Only updates frequency in place.
-    func sustain(frequency: Double, volume: Float = 0.25) {
+    /// Continuous tone — updates pitch/volume in place without restarting the engine.
+    func sustain(
+        frequency: Double,
+        volume: Float = 0.25,
+        purpose: ToneSustainPurpose = .soundMatch
+    ) {
         configureSessionIfNeeded()
         briefToneWorkItem?.cancel()
         isSustainMode = true
-        state.frequency = max(20, frequency)
-        state.volume = volume
+        sustainPurpose = purpose
+        state.targetFrequency = max(20, frequency)
+        state.targetVolume = volume
         startEngineIfNeeded()
     }
 
-    /// Short tone for color slider ticks and countdown — does not interrupt sustain mode.
+    /// Fades out and stops a sustained tone for the given purpose.
+    func release(purpose: ToneSustainPurpose, fadeDuration: TimeInterval = 0.08) {
+        guard sustainPurpose == purpose else { return }
+        briefToneWorkItem?.cancel()
+        isSustainMode = false
+        sustainPurpose = nil
+        state.targetVolume = 0
+
+        let work = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            if self.state.currentVolume < 0.003 {
+                self.stopEngineOnly()
+            }
+        }
+        briefToneWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + fadeDuration, execute: work)
+    }
+
+    /// Short tone for countdown — does not interrupt sustain mode.
     func playBriefTone(frequency: Double, duration: TimeInterval = 0.055, volume: Float = 0.18) {
         configureSessionIfNeeded()
         briefToneWorkItem?.cancel()
 
         if isSustainMode {
-            state.frequency = max(20, frequency)
+            state.targetFrequency = max(20, frequency)
             return
         }
 
-        state.frequency = max(20, frequency)
-        state.volume = volume
+        state.targetFrequency = max(20, frequency)
+        state.targetVolume = volume
         startEngineIfNeeded()
 
         let work = DispatchWorkItem { [weak self] in
             guard let self, !self.isSustainMode else { return }
-            self.stopEngineOnly()
+            self.state.targetVolume = 0
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+                guard let self, !self.isSustainMode, self.state.currentVolume < 0.003 else { return }
+                self.stopEngineOnly()
+            }
         }
         briefToneWorkItem = work
         DispatchQueue.main.asyncAfter(deadline: .now() + duration, execute: work)
@@ -70,6 +107,9 @@ final class ToneGenerator {
     func stop() {
         briefToneWorkItem?.cancel()
         isSustainMode = false
+        sustainPurpose = nil
+        state.targetVolume = 0
+        state.currentVolume = 0
         stopEngineOnly()
     }
 
@@ -78,6 +118,8 @@ final class ToneGenerator {
         engine.stop()
         isRunning = false
         state.phase = 0
+        state.currentVolume = 0
+        state.targetVolume = 0
     }
 
     private func startEngineIfNeeded() {
@@ -100,17 +142,24 @@ final class ToneGenerator {
     private func setupSourceNode() {
         let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)!
         let oscillator = state
+        let freqSmooth = frequencySmoothing
+        let volSmooth = volumeSmoothing
+        let rate = sampleRate
 
         let node = AVAudioSourceNode(format: format) { _, _, frameCount, audioBufferList -> OSStatus in
             let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
-            let phaseIncrement = 2 * Double.pi * oscillator.frequency / self.sampleRate
 
             for frame in 0..<Int(frameCount) {
-                let sample = Float32(sin(oscillator.phase)) * oscillator.volume
+                oscillator.currentFrequency += (oscillator.targetFrequency - oscillator.currentFrequency) * freqSmooth
+                oscillator.currentVolume += (oscillator.targetVolume - oscillator.currentVolume) * Float(volSmooth)
+
+                let sample = Float32(sin(oscillator.phase)) * oscillator.currentVolume
+                let phaseIncrement = 2 * Double.pi * oscillator.currentFrequency / rate
                 oscillator.phase += phaseIncrement
                 if oscillator.phase >= 2 * Double.pi {
                     oscillator.phase -= 2 * Double.pi
                 }
+
                 for buffer in ablPointer {
                     guard let buf = buffer.mData?.assumingMemoryBound(to: Float.self) else { continue }
                     buf[frame] = sample
