@@ -87,6 +87,7 @@ enum RestGameLeaderboard: String, CaseIterable, Identifiable {
     case devWordle = "tabnews.devwordle.best"
     case devSpot = "tabnews.devspot.best"
     case bigO = "tabnews.bigo.best"
+    case algoSpot = "tabnews.algospot.best"
     case colorMatch = "tabnews.colormatch.best"
     case soundMatch = "tabnews.soundmatch.best"
 
@@ -97,6 +98,7 @@ enum RestGameLeaderboard: String, CaseIterable, Identifiable {
         case .devWordle: return "DevWordle"
         case .devSpot: return "DevSpot"
         case .bigO: return "Big O"
+        case .algoSpot: return "AlgoSpot"
         case .colorMatch: return "Color Match"
         case .soundMatch: return "Sound Match"
         }
@@ -107,6 +109,7 @@ enum RestGameLeaderboard: String, CaseIterable, Identifiable {
         case .devWordle: return "character.textbox"
         case .devSpot: return "brain.head.profile"
         case .bigO: return "function"
+        case .algoSpot: return "puzzlepiece.extension"
         case .colorMatch: return "paintpalette.fill"
         case .soundMatch: return "waveform"
         }
@@ -115,7 +118,7 @@ enum RestGameLeaderboard: String, CaseIterable, Identifiable {
     var preferredTimeScope: GKLeaderboard.TimeScope {
         switch self {
         case .devWordle: return .week
-        case .devSpot, .bigO, .colorMatch, .soundMatch: return .allTime
+        case .devSpot, .bigO, .algoSpot, .colorMatch, .soundMatch: return .allTime
         }
     }
 }
@@ -198,6 +201,10 @@ final class GameCenterManager: ObservableObject {
 
     func submitBigOScore(correctCount: Int) {
         submitScore(correctCount * 100, to: .bigO)
+    }
+
+    func submitAlgoSpotScore(correctCount: Int) {
+        submitScore(correctCount * 100, to: .algoSpot)
     }
 
     func submitArcadeScore(totalScore: Double, gameType: RestGameType) {

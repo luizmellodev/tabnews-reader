@@ -1,0 +1,804 @@
+{
+  "challenges": [
+    {
+      "id": "free-as-dijkstra",
+      "title": "Dijkstra",
+      "snippet": "function shortestPaths(adj, n, source):\n  dist = array(n, infinity)\n  dist[source] = 0\n  for count in 0..n:\n    u = minVertex(dist, visited)\n    for v in 0..n:\n      if adj[u][v] and dist[u] + adj[u][v] < dist[v]:\n        dist[v] = dist[u] + adj[u][v]",
+      "options": [
+        "Dijkstra",
+        "Bellman-Ford",
+        "Floyd-Warshall",
+        "BFS"
+      ],
+      "answer": "Dijkstra",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n²)",
+      "whatItIs": "Algoritmo de grafo que encontra caminhos mínimos a partir de uma fonte com pesos não negativos.",
+      "explanation": "Relaxa distâncias a partir do vértice com menor distância conhecida.",
+      "hint": "minVertex + relaxação de arestas.",
+      "reference": "https://www.geeksforgeeks.org/dsa/dijkstras-shortest-path-algorithm-greedy-algo-7/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-floyd-warshall",
+      "title": "Floyd-Warshall",
+      "snippet": "function floydWarshall(dist):\n  n = dist.length\n  for k in 0..n:\n    for i in 0..n:\n      for j in 0..n:\n        dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])",
+      "options": [
+        "Floyd-Warshall",
+        "Dijkstra",
+        "Bellman-Ford",
+        "Multiplicação de matrizes"
+      ],
+      "answer": "Floyd-Warshall",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n³)",
+      "whatItIs": "Algoritmo de grafo que calcula caminhos mínimos entre todos os pares de vértices.",
+      "explanation": "Todos os pares: tenta melhorar dist[i][j] passando por intermediário k.",
+      "hint": "Três loops i, j, k.",
+      "reference": "https://www.geeksforgeeks.org/dsa/floyd-warshall-algorithm-dp-16/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-bellman-ford",
+      "title": "Bellman-Ford",
+      "snippet": "function bellmanFord(adj, n, source):\n  dist = array(n, infinity)\n  dist[source] = 0\n  for i in 1..n - 1:\n    for u in 0..n:\n      for v in 0..n:\n        if adj[u][v]:\n          relax(u, v, dist)",
+      "options": [
+        "Bellman-Ford",
+        "Dijkstra",
+        "Floyd-Warshall",
+        "BFS"
+      ],
+      "answer": "Bellman-Ford",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n²)",
+      "whatItIs": "Algoritmo de grafo que calcula caminhos mínimos a partir de uma fonte, inclusive com arestas de peso negativo.",
+      "explanation": "Relaxa todas as arestas n-1 vezes — caminhos mínimos com pesos negativos.",
+      "hint": "n-1 rodadas de relaxação.",
+      "reference": "https://www.geeksforgeeks.org/dsa/bellman-ford-algorithm-dp-23/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-kruskal",
+      "title": "Kruskal",
+      "snippet": "function buildMST(edges, n):\n  sort(edges by weight)\n  parent = initParent(n)\n  mst = []\n  for edge in edges:\n    if root(parent, edge.u) != root(parent, edge.v):\n      link(parent, edge.u, edge.v)\n      mst.push(edge)",
+      "options": [
+        "Kruskal",
+        "Prim",
+        "Dijkstra",
+        "Union-Find"
+      ],
+      "answer": "Kruskal",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n log n)",
+      "whatItIs": "Algoritmo de grafo que constrói uma árvore geradora mínima ordenando arestas por peso.",
+      "explanation": "Ordena arestas por peso e adiciona à MST se não formar ciclo.",
+      "hint": "Union-Find para detectar ciclos.",
+      "reference": "https://www.geeksforgeeks.org/dsa/kruskals-minimum-spanning-tree-algorithm-greedy-algo-2/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-union-find",
+      "title": "Union-Find",
+      "snippet": "function root(parent, x):\n  if parent[x] != x:\n    parent[x] = root(parent, parent[x])\n  return parent[x]",
+      "options": [
+        "Union-Find",
+        "Kruskal",
+        "DFS",
+        "BFS"
+      ],
+      "answer": "Union-Find",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(log n)",
+      "whatItIs": "Estrutura de conjuntos disjuntos para saber se dois elementos estão no mesmo grupo e unir grupos.",
+      "explanation": "Estrutura disjunta com path compression — find com compressão de caminho.",
+      "hint": "parent[x] aponta para representante.",
+      "reference": "https://www.geeksforgeeks.org/dsa/union-find/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-two-sum",
+      "title": "Two sum",
+      "snippet": "function twoSum(arr, target):\n  seen = map()\n  for i in 0..arr.length:\n    need = target - arr[i]\n    if need in seen:\n      return [seen[need], i]\n    seen[arr[i]] = i",
+      "options": [
+        "Two sum",
+        "Sliding window",
+        "Moore voting",
+        "Busca linear"
+      ],
+      "answer": "Two sum",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Encontra dois números que somam um alvo usando hash map em uma passagem.",
+      "explanation": "Hash map guarda valores vistos; busca complemento target - arr[i].",
+      "hint": "Lookup O(1) no map.",
+      "reference": "https://www.geeksforgeeks.org/dsa/check-if-pair-with-given-sum-exists-in-array/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-cycle-detection",
+      "title": "Detecção de ciclo",
+      "snippet": "function hasCycle(head):\n  slow = head\n  fast = head\n  while fast != null and fast.next != null:\n    slow = slow.next\n    fast = fast.next.next\n    if slow == fast:\n      return true\n  return false",
+      "options": [
+        "Detecção de ciclo",
+        "Two pointers",
+        "DFS",
+        "BFS"
+      ],
+      "answer": "Detecção de ciclo",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Detecta se uma lista ligada tem ciclo usando dois ponteiros (tartaruga e lebre).",
+      "explanation": "Algoritmo de Floyd (tortoise and hare) para ciclo em lista ligada.",
+      "hint": "fast avança 2x, slow 1x.",
+      "reference": "https://www.geeksforgeeks.org/dsa/detect-loop-in-a-linked-list/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-dutch-flag",
+      "title": "Dutch national flag",
+      "snippet": "function sortColors(arr):\n  low = 0\n  mid = 0\n  high = arr.length - 1\n  while mid <= high:\n    if arr[mid] == 0:\n      swap(arr[low], arr[mid]); low++; mid++\n    else if arr[mid] == 2:\n      swap(arr[mid], arr[high]); high--\n    else:\n      mid++",
+      "options": [
+        "Dutch national flag",
+        "Quick sort",
+        "Counting sort",
+        "Selection sort"
+      ],
+      "answer": "Dutch national flag",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n)",
+      "whatItIs": "Algoritmo de particionamento que ordena array de três valores (ex.: 0, 1, 2) em uma passagem.",
+      "explanation": "Três ponteiros particionam array de 0s, 1s e 2s em uma passagem.",
+      "hint": "low, mid, high — bandeira holandesa.",
+      "reference": "https://www.geeksforgeeks.org/dsa/sort-an-array-of-0s-1s-and-2s/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-n-queens",
+      "title": "N-Queens",
+      "snippet": "function countSolutions(n, row, cols):\n  if row == n:\n    return 1\n  count = 0\n  for col in 0..n:\n    if isSafe(row, col, cols):\n      cols[row] = col\n      count = count + countSolutions(n, row + 1, cols)\n  return count",
+      "options": [
+        "N-Queens",
+        "Permutações",
+        "Power set",
+        "Torre de Hanói"
+      ],
+      "answer": "N-Queens",
+      "difficulty": "hard",
+      "category": "backtracking",
+      "caseNote": "O(n!)",
+      "whatItIs": "Conta (ou gera) soluções do problema das n rainhas em um tabuleiro usando backtracking.",
+      "explanation": "Backtracking coloca rainhas linha a linha verificando segurança.",
+      "hint": "Tenta cada coluna por linha.",
+      "reference": "https://www.geeksforgeeks.org/dsa/n-queen-problem-backtracking-3/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-naive-strstr",
+      "title": "Busca de substring",
+      "snippet": "function findSubstring(text, pattern):\n  for i in 0..text.length - pattern.length:\n    match = true\n    for j in 0..pattern.length:\n      if text[i + j] != pattern[j]:\n        match = false\n        break\n    if match:\n      return i\n  return -1",
+      "options": [
+        "Busca de substring",
+        "KMP",
+        "Busca linear",
+        "Rabin-Karp"
+      ],
+      "answer": "Busca de substring",
+      "difficulty": "medium",
+      "category": "busca",
+      "caseNote": "O(n²)",
+      "whatItIs": "Procura um padrão dentro de um texto testando cada posição possível (força bruta).",
+      "explanation": "Força bruta: testa alinhamento em cada posição do texto.",
+      "hint": "Dois loops aninhados.",
+      "reference": "https://www.geeksforgeeks.org/dsa/naive-algorithm-for-pattern-searching/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-power-set-bitmask",
+      "title": "Power set (bitmask)",
+      "snippet": "function powerSet(arr):\n  n = arr.length\n  for mask in 0..(1 << n):\n    subset = []\n    for i in 0..n:\n      if mask & (1 << i):\n        subset.push(arr[i])\n    print(subset)",
+      "options": [
+        "Power set (bitmask)",
+        "Power set",
+        "Permutações",
+        "Counting sort"
+      ],
+      "answer": "Power set (bitmask)",
+      "difficulty": "hard",
+      "category": "recursao",
+      "caseNote": "O(2^n)",
+      "whatItIs": "Gera subconjuntos iterando máscaras de bits de 0 até 2^n − 1.",
+      "explanation": "Itera máscaras de bits de 0 a 2^n-1 para gerar subconjuntos.",
+      "hint": "mask & (1 << i) testa inclusão.",
+      "reference": "https://www.geeksforgeeks.org/dsa/power-set/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-linear-probing",
+      "title": "Hash linear probing",
+      "snippet": "function insert(table, key, value):\n  idx = hash(key) % table.capacity\n  while table.slots[idx] is occupied:\n    idx = (idx + 1) % table.capacity\n  table.slots[idx] = (key, value)",
+      "options": [
+        "Hash linear probing",
+        "Two sum",
+        "Union-Find",
+        "Busca linear"
+      ],
+      "answer": "Hash linear probing",
+      "difficulty": "medium",
+      "category": "hash",
+      "caseNote": "O(n)",
+      "whatItIs": "Técnica de hash que resolve colisões procurando o próximo slot livre linearmente.",
+      "explanation": "Open addressing: em colisão, avança linearmente até slot vazio.",
+      "hint": "idx = (idx + 1) % capacity.",
+      "reference": "https://www.geeksforgeeks.org/dsa/hashing-set-3-open-addressing/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-heap-pop",
+      "title": "Heap pop",
+      "snippet": "function pop(heap):\n  min = heap.data[0]\n  heap.data[0] = heap.data[heap.size - 1]\n  heap.size = heap.size - 1\n  siftDown(heap, 0)\n  return min",
+      "options": [
+        "Heap pop",
+        "Heap push",
+        "Heap sort",
+        "Selection sort"
+      ],
+      "answer": "Heap pop",
+      "difficulty": "medium",
+      "category": "heap",
+      "caseNote": "O(log n)",
+      "whatItIs": "Remove o elemento mínimo (ou máximo) de uma heap e restaura a propriedade da árvore.",
+      "explanation": "Remove raiz, move último para root e desce com siftDown.",
+      "hint": "siftDown restaura heap.",
+      "reference": "https://www.geeksforgeeks.org/dsa/heap-insert-and-delete-operations/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-three-sum",
+      "title": "Three sum",
+      "snippet": "function threeSum(arr):\n  for i in 0..arr.length:\n    for j in i + 1..arr.length:\n      for k in j + 1..arr.length:\n        if arr[i] + arr[j] + arr[k] == 0:\n          return true\n  return false",
+      "options": [
+        "Three sum",
+        "Two sum",
+        "Multiplicação de matrizes",
+        "Floyd-Warshall"
+      ],
+      "answer": "Three sum",
+      "difficulty": "hard",
+      "category": "forca-bruta",
+      "caseNote": "O(n³)",
+      "whatItIs": "Verifica se existem três elementos que somam zero — versão força bruta com três loops.",
+      "explanation": "Força bruta: três loops testam todas as triplas.",
+      "hint": "Índices i < j < k.",
+      "reference": "https://www.geeksforgeeks.org/dsa/find-triplets-with-zero-sum/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-rotate-array",
+      "title": "Rotacionar array",
+      "snippet": "function rotate(arr, k):\n  k = k % arr.length\n  reverse(arr, 0, arr.length - 1)\n  reverse(arr, 0, k - 1)\n  reverse(arr, k, arr.length - 1)",
+      "options": [
+        "Rotacionar array",
+        "Two pointers",
+        "Reverse string",
+        "Merge de ordenados"
+      ],
+      "answer": "Rotacionar array",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Desloca os elementos de um array circularmente usando o truque das três reversões.",
+      "explanation": "Truque das três reversões para rotacionar array em O(n) e O(1) extra.",
+      "hint": "reverse global + duas parciais.",
+      "reference": "https://www.geeksforgeeks.org/dsa/array-rotation/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-tree-height",
+      "title": "Altura da árvore",
+      "snippet": "function height(node):\n  if node == null:\n    return 0\n  return 1 + max(height(node.left), height(node.right))",
+      "options": [
+        "Altura da árvore",
+        "DFS",
+        "BFS",
+        "Busca em BST"
+      ],
+      "answer": "Altura da árvore",
+      "difficulty": "medium",
+      "category": "arvore",
+      "caseNote": "O(n)",
+      "whatItIs": "Calcula a profundidade máxima de uma árvore binária — quantos níveis existem do root até a folha mais distante.",
+      "explanation": "Recursão retorna 1 + máximo das alturas dos filhos.",
+      "hint": "Caso base: nó nulo → 0.",
+      "reference": "https://www.geeksforgeeks.org/dsa/write-a-c-program-to-find-the-maximum-depth-or-height-of-a-tree/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-bst-degenerate",
+      "title": "BST degenerada",
+      "snippet": "function searchSkewed(node, target):\n  while node != null:\n    if node.value == target:\n      return true\n    node = node.right\n  return false\n// árvore vira lista ligada",
+      "options": [
+        "BST degenerada",
+        "Busca em BST",
+        "Busca linear",
+        "DFS"
+      ],
+      "answer": "BST degenerada",
+      "difficulty": "medium",
+      "category": "busca",
+      "caseNote": "O(n)",
+      "whatItIs": "Caso patológico de árvore binária de busca que perdeu o balanceamento e virou uma lista ligada.",
+      "explanation": "BST desbalanceada onde todos os nós só têm filho à direita — vira lista.",
+      "hint": "Só desce para a direita.",
+      "reference": "https://www.geeksforgeeks.org/dsa/binary-search-tree-data-structure/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-print-triangle",
+      "title": "Triângulo de números",
+      "snippet": "function printTriangle(n):\n  for i in 1..n:\n    for j in 1..i:\n      print(j)",
+      "options": [
+        "Triângulo de números",
+        "Bubble sort",
+        "Multiplicação de matrizes",
+        "Three sum"
+      ],
+      "answer": "Triângulo de números",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n²)",
+      "whatItIs": "Imprime um triângulo de números com loops aninhados — padrão didático O(n²).",
+      "explanation": "Loop externo controla linhas; interno imprime 1..i.",
+      "hint": "Padrão de impressão triangular.",
+      "reference": "https://www.geeksforgeeks.org/dsa/analysis-of-algorithms-set-1-asymptotic-analysis/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-exponential-doubling",
+      "title": "Dobrar até n",
+      "snippet": "function doublingSteps(n):\n  steps = 0\n  i = 1\n  while i < n:\n    i = i * 2\n    steps = steps + 1\n  return steps",
+      "options": [
+        "Dobrar até n",
+        "Busca binária",
+        "MDC de Euclides",
+        "Fibonacci recursivo"
+      ],
+      "answer": "Dobrar até n",
+      "difficulty": "easy",
+      "category": "padrao",
+      "caseNote": "O(log n)",
+      "whatItIs": "Padrão logarítmico que dobra um valor até ultrapassar n, contando quantos passos.",
+      "explanation": "Dobra i até passar de n — conta quantos passos.",
+      "hint": "i = i * 2 em loop.",
+      "reference": "https://www.geeksforgeeks.org/dsa/analysis-of-algorithms-set-1-asymptotic-analysis/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-halving-loop",
+      "title": "Dividir por 2",
+      "snippet": "function steps(n):\n  count = 0\n  while n > 1:\n    n = n / 2\n    count = count + 1\n  return count",
+      "options": [
+        "Dividir por 2",
+        "Dobrar até n",
+        "Busca binária",
+        "MDC de Euclides"
+      ],
+      "answer": "Dividir por 2",
+      "difficulty": "easy",
+      "category": "padrao",
+      "caseNote": "O(log n)",
+      "whatItIs": "Padrão logarítmico que divide um valor pela metade repetidamente até chegar a 1.",
+      "explanation": "Divide n por 2 repetidamente até chegar a 1.",
+      "hint": "Padrão logarítmico simples.",
+      "reference": "https://www.geeksforgeeks.org/dsa/analysis-of-algorithms-set-1-asymptotic-analysis/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-binary-search-rec",
+      "title": "Busca binária recursiva",
+      "snippet": "function search(arr, target, left, right):\n  if left > right:\n    return -1\n  mid = (left + right) / 2\n  if arr[mid] == target:\n    return mid\n  if arr[mid] < target:\n    return search(arr, target, mid + 1, right)\n  return search(arr, target, left, mid - 1)",
+      "options": [
+        "Busca binária recursiva",
+        "Busca binária",
+        "Busca ternária",
+        "Busca em BST"
+      ],
+      "answer": "Busca binária recursiva",
+      "difficulty": "medium",
+      "category": "busca",
+      "caseNote": "O(log n)",
+      "whatItIs": "Versão recursiva da busca binária em array ordenado.",
+      "explanation": "Versão recursiva da busca binária com left/right.",
+      "hint": "Duas chamadas recursivas conforme mid.",
+      "reference": "https://www.geeksforgeeks.org/dsa/binary-search/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-contains-duplicates",
+      "title": "Verificar duplicata",
+      "snippet": "function hasDuplicate(arr):\n  seen = set()\n  for x in arr:\n    if x in seen:\n      return true\n    seen.add(x)\n  return false",
+      "options": [
+        "Verificar duplicata",
+        "Two sum",
+        "Moore voting",
+        "Busca linear"
+      ],
+      "answer": "Verificar duplicata",
+      "difficulty": "medium",
+      "category": "hash",
+      "caseNote": "O(n)",
+      "whatItIs": "Detecta se há elementos repetidos em um array usando um conjunto (set).",
+      "explanation": "Set detecta se elemento já foi visto.",
+      "hint": "Lookup e insert no set.",
+      "reference": "https://www.geeksforgeeks.org/dsa/check-if-array-elements-are-distinct/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-copy-array",
+      "title": "Copiar array",
+      "snippet": "function duplicate(arr):\n  result = newBuffer(arr.length)\n  for i in 0..arr.length:\n    result[i] = arr[i]\n  return result",
+      "options": [
+        "Copiar array",
+        "Busca linear",
+        "Soma recursiva",
+        "Merge de ordenados"
+      ],
+      "answer": "Copiar array",
+      "difficulty": "easy",
+      "category": "basico",
+      "caseNote": "O(n)",
+      "whatItIs": "Operação linear que duplica todos os elementos de um array para um novo buffer.",
+      "explanation": "Loop simples copia cada elemento para novo buffer.",
+      "hint": "Um loop linear.",
+      "reference": "https://www.geeksforgeeks.org/dsa/arrays/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-pair-count",
+      "title": "Contar pares",
+      "snippet": "function countPairs(arr):\n  count = 0\n  for i in 0..arr.length:\n    for j in i + 1..arr.length:\n      count = count + 1\n  return count",
+      "options": [
+        "Contar pares",
+        "Three sum",
+        "Bubble sort",
+        "Triângulo de números"
+      ],
+      "answer": "Contar pares",
+      "difficulty": "medium",
+      "category": "forca-bruta",
+      "caseNote": "O(n²)",
+      "whatItIs": "Conta quantos pares de índices (i, j) existem — padrão de força bruta com dois loops.",
+      "explanation": "Dois loops aninhados contam todos os pares (i,j) com i < j.",
+      "hint": "Combinação de índices.",
+      "reference": "https://www.geeksforgeeks.org/dsa/analysis-of-algorithms-set-1-asymptotic-analysis/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-matrix-traverse",
+      "title": "Percorrer matriz",
+      "snippet": "function traverse(matrix):\n  rows = matrix.length\n  cols = matrix[0].length\n  for i in 0..rows:\n    for j in 0..cols:\n      print(matrix[i][j])",
+      "options": [
+        "Percorrer matriz",
+        "Multiplicação de matrizes",
+        "Floyd-Warshall",
+        "Triângulo de números"
+      ],
+      "answer": "Percorrer matriz",
+      "difficulty": "medium",
+      "category": "matriz",
+      "caseNote": "O(n²)",
+      "whatItIs": "Visita todas as células de uma matriz 2D com loops aninhados.",
+      "explanation": "Dois loops percorrem todas as células da matriz.",
+      "hint": "i sobre linhas, j sobre colunas.",
+      "reference": "https://www.geeksforgeeks.org/dsa/search-a-2d-matrix/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-median-two-sorted",
+      "title": "Mediana dois arrays",
+      "snippet": "function medianSorted(a, b):\n  i = 0\n  j = 0\n  for step in 0..(a.length + b.length) / 2:\n    if a[i] <= b[j]:\n      median = a[i]\n      i = i + 1\n    else:\n      median = b[j]\n      j = j + 1\n  return median",
+      "options": [
+        "Mediana dois arrays",
+        "Merge de ordenados",
+        "Busca binária",
+        "Two pointers"
+      ],
+      "answer": "Mediana dois arrays",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n)",
+      "whatItIs": "Encontra a mediana de dois arrays já ordenados fundindo-os até a posição central.",
+      "explanation": "Merge ingênuo até a posição da mediana.",
+      "hint": "Dois ponteiros como merge.",
+      "reference": "https://www.geeksforgeeks.org/dsa/median-of-two-sorted-arrays-of-different-sizes/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-karatsuba-naive",
+      "title": "Multiplicação ingênua",
+      "snippet": "function multiply(a, b):\n  result = 0\n  for i in 0..a.length:\n    for j in 0..b.length:\n      result = result + digit(a, i) * digit(b, j)\n  return result",
+      "options": [
+        "Multiplicação ingênua",
+        "Multiplicação de matrizes",
+        "Karatsuba",
+        "Three sum"
+      ],
+      "answer": "Multiplicação ingênua",
+      "difficulty": "hard",
+      "category": "matematica",
+      "caseNote": "O(n²)",
+      "whatItIs": "Multiplica dois números dígito a dígito como na multiplicação escolar.",
+      "explanation": "Multiplicação escolar: produto dígito a dígito com loops duplos.",
+      "hint": "Dois loops sobre dígitos.",
+      "reference": "https://www.geeksforgeeks.org/dsa/analysis-of-algorithms-set-1-asymptotic-analysis/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-sum-array",
+      "title": "Soma do array",
+      "snippet": "function sum(arr):\n  total = 0\n  for i in 0..arr.length:\n    total = total + arr[i]\n  return total",
+      "options": [
+        "Soma do array",
+        "Busca linear",
+        "Copiar array",
+        "Soma recursiva"
+      ],
+      "answer": "Soma do array",
+      "difficulty": "easy",
+      "category": "basico",
+      "caseNote": "O(n)",
+      "whatItIs": "Acumula todos os elementos do array em uma única variável.",
+      "explanation": "Acumula cada elemento em total com um loop.",
+      "hint": "Padrão reduce linear.",
+      "reference": "https://www.geeksforgeeks.org/dsa/arrays/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-find-max",
+      "title": "Encontrar máximo",
+      "snippet": "function maxValue(arr):\n  best = arr[0]\n  for i in 1..arr.length:\n    if arr[i] > best:\n      best = arr[i]\n  return best",
+      "options": [
+        "Encontrar máximo",
+        "Busca linear",
+        "Moore voting",
+        "Soma do array"
+      ],
+      "answer": "Encontrar máximo",
+      "difficulty": "easy",
+      "category": "basico",
+      "caseNote": "O(n)",
+      "whatItIs": "Percorre o array uma vez para achar o maior elemento.",
+      "explanation": "Uma passagem mantendo o maior valor visto.",
+      "hint": "Compara cada arr[i] com best.",
+      "reference": "https://www.geeksforgeeks.org/dsa/maximum-element-in-an-array/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-count-evens",
+      "title": "Contar pares",
+      "snippet": "function countEvens(arr):\n  count = 0\n  for x in arr:\n    if x % 2 == 0:\n      count = count + 1\n  return count",
+      "options": [
+        "Contar pares",
+        "Soma do array",
+        "Busca linear",
+        "Moore voting"
+      ],
+      "answer": "Contar pares",
+      "difficulty": "easy",
+      "category": "basico",
+      "caseNote": "O(n)",
+      "whatItIs": "Conta quantos pares de índices (i, j) existem — padrão de força bruta com dois loops.",
+      "explanation": "Itera e incrementa contador quando elemento é par.",
+      "hint": "Condição x % 2 == 0.",
+      "reference": "https://www.geeksforgeeks.org/dsa/arrays/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-reverse-recursive",
+      "title": "Inverter recursivo",
+      "snippet": "function reverseList(node, prev):\n  if node == null:\n    return prev\n  next = node.next\n  node.next = prev\n  return reverseList(next, node)",
+      "options": [
+        "Inverter recursivo",
+        "Detecção de ciclo",
+        "DFS",
+        "Soma recursiva"
+      ],
+      "answer": "Inverter recursivo",
+      "difficulty": "medium",
+      "category": "lista",
+      "caseNote": "O(n)",
+      "whatItIs": "Inverte uma lista ligada trocando os ponteiros next de forma recursiva.",
+      "explanation": "Inverte lista ligada recursivamente trocando ponteiros next.",
+      "hint": "node.next = prev a cada chamada.",
+      "reference": "https://www.geeksforgeeks.org/dsa/reverse-a-linked-list/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-prefix-sum",
+      "title": "Prefix sum",
+      "snippet": "function buildSums(arr):\n  sums = newBuffer(arr.length + 1, 0)\n  for i in 0..arr.length:\n    sums[i + 1] = sums[i] + arr[i]\n  return sums",
+      "options": [
+        "Prefix sum",
+        "Sliding window",
+        "Soma do array",
+        "Two sum"
+      ],
+      "answer": "Prefix sum",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Pré-calcula somas acumuladas do array para responder consultas de intervalo em O(1).",
+      "explanation": "Constrói somas acumuladas para consultas O(1).",
+      "hint": "sums[i+1] = sums[i] + arr[i].",
+      "reference": "https://www.geeksforgeeks.org/dsa/prefix-sum-array-implementation/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-bfs-shortest",
+      "title": "BFS caminho mínimo",
+      "snippet": "function shortestPath(grid, start, goal):\n  queue = [start]\n  dist = map(start -> 0)\n  while queue not empty:\n    cell = queue.popFront()\n    if cell == goal:\n      return dist[cell]\n    for neighbor in neighbors(cell):\n      if neighbor not in dist:\n        dist[neighbor] = dist[cell] + 1\n        queue.push(neighbor)",
+      "options": [
+        "BFS caminho mínimo",
+        "Dijkstra",
+        "DFS",
+        "Bellman-Ford"
+      ],
+      "answer": "BFS caminho mínimo",
+      "difficulty": "medium",
+      "category": "grafos",
+      "caseNote": "O(n)",
+      "whatItIs": "Encontra o menor número de passos entre dois pontos em um grafo sem pesos nas arestas.",
+      "explanation": "BFS em grid não ponderado encontra menor número de passos.",
+      "hint": "dist incrementa por camada.",
+      "reference": "https://www.geeksforgeeks.org/dsa/shortest-path-unweighted-graph/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-prim-mst",
+      "title": "Prim MST",
+      "snippet": "function growMST(adj, n):\n  key = array(n, infinity)\n  key[0] = 0\n  for count in 0..n:\n    u = minKey(key, inMST)\n    inMST[u] = true\n    for v in 0..n:\n      if adj[u][v] and not inMST[v]:\n        key[v] = min(key[v], adj[u][v])",
+      "options": [
+        "Prim MST",
+        "Kruskal",
+        "Dijkstra",
+        "Bellman-Ford"
+      ],
+      "answer": "Prim MST",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n²)",
+      "whatItIs": "Algoritmo de grafo que constrói árvore geradora mínima crescendo a partir de um vértice.",
+      "explanation": "Cresce MST escolhendo aresta mínima a partir do conjunto já incluído.",
+      "hint": "minKey + atualiza key[v].",
+      "reference": "https://www.geeksforgeeks.org/dsa/prims-minimum-spanning-tree-mst-greedy-algo-5/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-quickselect",
+      "title": "Quickselect",
+      "snippet": "function kth(arr, k, low, high):\n  if low == high:\n    return arr[low]\n  pivot = partition(arr, low, high)\n  if k == pivot:\n    return arr[k]\n  if k < pivot:\n    return kth(arr, k, low, pivot - 1)\n  return kth(arr, k, pivot + 1, high)",
+      "options": [
+        "Quickselect",
+        "Quick sort",
+        "Busca binária",
+        "Heap sort"
+      ],
+      "answer": "Quickselect",
+      "difficulty": "hard",
+      "category": "ordenacao",
+      "caseNote": "O(n)",
+      "whatItIs": "Encontra o k-ésimo menor elemento usando particionamento estilo quicksort.",
+      "explanation": "Como quicksort, mas só recursa no lado que contém o k-ésimo.",
+      "hint": "partition + uma recursão.",
+      "reference": "https://www.geeksforgeeks.org/dsa/quickselect-algorithm/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-sieve",
+      "title": "Crivo de Eratóstenes",
+      "snippet": "function sieve(n):\n  isPrime = array(n + 1, true)\n  isPrime[0] = false\n  isPrime[1] = false\n  for p in 2..sqrt(n):\n    if isPrime[p]:\n      for multiple in p*p..n step p:\n        isPrime[multiple] = false",
+      "options": [
+        "Crivo de Eratóstenes",
+        "MDC de Euclides",
+        "Counting sort",
+        "Soma do array"
+      ],
+      "answer": "Crivo de Eratóstenes",
+      "difficulty": "medium",
+      "category": "matematica",
+      "caseNote": "O(n log log n)",
+      "whatItIs": "Algoritmo para encontrar todos os números primos até n eliminando múltiplos de cada primo.",
+      "explanation": "Marca múltiplos de cada primo a partir de p².",
+      "hint": "Loop interno com step p.",
+      "reference": "https://www.geeksforgeeks.org/dsa/sieve-of-eratosthenes/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-kadane",
+      "title": "Kadane",
+      "snippet": "function maxSubarray(arr):\n  best = arr[0]\n  current = arr[0]\n  for i in 1..arr.length:\n    current = max(arr[i], current + arr[i])\n    best = max(best, current)\n  return best",
+      "options": [
+        "Kadane",
+        "Sliding window",
+        "Moore voting",
+        "Prefix sum"
+      ],
+      "answer": "Kadane",
+      "difficulty": "medium",
+      "category": "dp",
+      "caseNote": "O(n)",
+      "whatItIs": "Encontra a subarray contígua de soma máxima em um array.",
+      "explanation": "Algoritmo de Kadane para subarray de soma máxima.",
+      "hint": "current = max(arr[i], current + arr[i]).",
+      "reference": "https://www.geeksforgeeks.org/dsa/largest-sum-contiguous-subarray/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-lis",
+      "title": "LIS",
+      "snippet": "function longestIncreasing(arr):\n  dp = newBuffer(arr.length, 1)\n  for i in 1..arr.length:\n    for j in 0..i - 1:\n      if arr[j] < arr[i]:\n        dp[i] = max(dp[i], dp[j] + 1)\n  return max(dp)",
+      "options": [
+        "LIS",
+        "LCS",
+        "Kadane",
+        "Three sum"
+      ],
+      "answer": "LIS",
+      "difficulty": "hard",
+      "category": "dp",
+      "caseNote": "O(n²)",
+      "whatItIs": "Encontra o tamanho da maior subsequência estritamente crescente de um array.",
+      "explanation": "DP clássico: maior subsequência crescente.",
+      "hint": "dp[i] = max(dp[j]+1) se arr[j] < arr[i].",
+      "reference": "https://www.geeksforgeeks.org/dsa/longest-increasing-subsequence-dp-3/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-lcs",
+      "title": "LCS",
+      "snippet": "function commonSubseq(a, b):\n  m = a.length\n  n = b.length\n  dp = matrix(m + 1, n + 1, 0)\n  for i in 1..m:\n    for j in 1..n:\n      if a[i-1] == b[j-1]:\n        dp[i][j] = dp[i-1][j-1] + 1\n      else:\n        dp[i][j] = max(dp[i-1][j], dp[i][j-1])\n  return dp[m][n]",
+      "options": [
+        "LCS",
+        "LIS",
+        "Edit distance",
+        "Floyd-Warshall"
+      ],
+      "answer": "LCS",
+      "difficulty": "hard",
+      "category": "dp",
+      "caseNote": "O(mn)",
+      "whatItIs": "Encontra o comprimento da maior subsequência comum entre duas strings.",
+      "explanation": "Maior subsequência comum: DP em duas strings.",
+      "hint": "dp[i][j] com match ou max dos vizinhos.",
+      "reference": "https://www.geeksforgeeks.org/dsa/longest-common-subsequence-dp-4/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "free-as-edit-distance",
+      "title": "Edit distance",
+      "snippet": "function editDistance(a, b):\n  m = a.length\n  n = b.length\n  dp = matrix(m + 1, n + 1, 0)\n  for i in 0..m:\n    dp[i][0] = i\n  for j in 0..n:\n    dp[0][j] = j\n  for i in 1..m:\n    for j in 1..n:\n      cost = a[i-1] == b[j-1] ? 0 : 1\n      dp[i][j] = min(dp[i-1][j] + 1, dp[i][j-1] + 1, dp[i-1][j-1] + cost)\n  return dp[m][n]",
+      "options": [
+        "Edit distance",
+        "LCS",
+        "LIS",
+        "Busca de substring"
+      ],
+      "answer": "Edit distance",
+      "difficulty": "hard",
+      "category": "dp",
+      "caseNote": "O(mn)",
+      "whatItIs": "Calcula o custo mínimo de transformar uma string em outra com inserção, deleção e substituição.",
+      "explanation": "Levenshtein: inserção, deleção ou substituição para transformar a em b.",
+      "hint": "Três operações no min().",
+      "reference": "https://www.geeksforgeeks.org/dsa/edit-distance-dp-5/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    }
+  ]
+}

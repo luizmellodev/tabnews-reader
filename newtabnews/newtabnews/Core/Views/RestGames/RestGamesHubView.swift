@@ -5,6 +5,7 @@ private enum HubDestination: Hashable {
     case devLeet
     case devSpot
     case bigO
+    case algoSpot
     case arcade(RestGameType)
 }
 
@@ -14,6 +15,7 @@ struct RestGamesHubView: View {
     @State private var destination: HubDestination?
     @State private var dailySummary = DevWordleViewModel.todaySummary()
     @State private var bigOSummary = BigOViewModel.todaySummary()
+    @State private var algoSpotSummary = AlgoSpotViewModel.todaySummary()
     @State private var weeklySummary = DevLeetHubSummary.current()
     @State private var showLeaderboards = false
 
@@ -82,6 +84,17 @@ struct RestGamesHubView: View {
                             }
 
                             arcadeCard(
+                                title: "AlgoSpot",
+                                subtitle: "Qual algoritmo é este código?",
+                                icon: "puzzlepiece.extension",
+                                accent: AlgoSpotTheme.accent,
+                                destination: .algoSpot,
+                                trailing: { algoSpotDailyBadge }
+                            ) {
+                                AlgoSpotPreview()
+                            }
+
+                            arcadeCard(
                                 title: "Color Match",
                                 subtitle: "Memorize a cor e recrie",
                                 icon: "paintpalette.fill",
@@ -127,6 +140,8 @@ struct RestGamesHubView: View {
                     DevSpotView()
                 case .bigO:
                     BigOView()
+                case .algoSpot:
+                    AlgoSpotView()
                 case .arcade(let gameType):
                     switch gameType {
                     case .color:
@@ -141,6 +156,7 @@ struct RestGamesHubView: View {
             RestFeedbackManager.shared.prepare()
             dailySummary = DevWordleViewModel.todaySummary()
             bigOSummary = BigOViewModel.todaySummary()
+            algoSpotSummary = AlgoSpotViewModel.todaySummary()
             weeklySummary = DevLeetHubSummary.current()
         }
         .sheet(isPresented: $showLeaderboards) {
@@ -373,6 +389,23 @@ struct RestGamesHubView: View {
             } else {
                 Text("Hoje")
                     .foregroundStyle(BigOTheme.accentLight)
+            }
+        }
+        .font(.caption2.weight(.bold))
+        .labelStyle(.titleAndIcon)
+    }
+
+    private var algoSpotDailyBadge: some View {
+        Group {
+            if algoSpotSummary.won {
+                Label("Acertou", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            } else if algoSpotSummary.played {
+                Label("Errou", systemImage: "xmark.circle.fill")
+                    .foregroundStyle(.orange)
+            } else {
+                Text("Hoje")
+                    .foregroundStyle(AlgoSpotTheme.accentLight)
             }
         }
         .font(.caption2.weight(.bold))

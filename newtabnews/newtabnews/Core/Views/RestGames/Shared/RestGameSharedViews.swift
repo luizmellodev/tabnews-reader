@@ -323,6 +323,7 @@ enum RestGameOnboardingID: String {
     case devLeet
     case devSpot
     case bigO
+    case algoSpot
 }
 
 enum RestGameOnboarding {
@@ -476,6 +477,20 @@ extension RestGameOnboardingOverlay {
             steps: [
                 "Leia o snippet de pseudocódigo no card.",
                 "Escolha a complexidade correta entre 4 opções.",
+                "Diário: 1 desafio por dia. Livre: 10 rounds."
+            ],
+            onPlay: onPlay
+        )
+    }
+
+    static func algoSpot(onPlay: @escaping () -> Void) -> RestGameOnboardingOverlay {
+        RestGameOnboardingOverlay(
+            title: "AlgoSpot",
+            icon: "puzzlepiece.extension",
+            accent: AlgoSpotTheme.accent,
+            steps: [
+                "Leia o pseudocódigo — sem o nome da função.",
+                "Escolha qual algoritmo é entre 4 opções.",
                 "Diário: 1 desafio por dia. Livre: 10 rounds."
             ],
             onPlay: onPlay

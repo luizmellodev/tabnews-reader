@@ -1,0 +1,604 @@
+{
+  "challenges": [
+    {
+      "id": "daily-as-linear-search",
+      "title": "Busca linear",
+      "snippet": "function find(arr, target):\n  for i in 0..arr.length:\n    if arr[i] == target:\n      return i\n  return -1",
+      "options": [
+        "Busca linear",
+        "Busca binária",
+        "Busca ternária",
+        "DFS"
+      ],
+      "answer": "Busca linear",
+      "difficulty": "easy",
+      "category": "busca",
+      "caseNote": "O(n)",
+      "whatItIs": "Algoritmo de busca que percorre o array elemento a elemento até encontrar o alvo.",
+      "explanation": "Percorre cada elemento até encontrar o alvo ou esgotar o array.",
+      "hint": "Um único loop sobre n elementos.",
+      "reference": "https://www.geeksforgeeks.org/dsa/linear-search/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-binary-search",
+      "title": "Busca binária",
+      "snippet": "function binarySearch(arr, target):\n  left = 0\n  right = arr.length - 1\n  while left <= right:\n    mid = (left + right) / 2\n    if arr[mid] == target:\n      return mid\n    if arr[mid] < target:\n      left = mid + 1\n    else:\n      right = mid - 1\n  return -1",
+      "options": [
+        "Busca binária",
+        "Busca linear",
+        "Busca ternária",
+        "Busca em BST"
+      ],
+      "answer": "Busca binária",
+      "difficulty": "easy",
+      "category": "busca",
+      "caseNote": "O(log n)",
+      "whatItIs": "Algoritmo de busca em array ordenado que divide o intervalo pela metade a cada passo.",
+      "explanation": "Divide o intervalo pela metade a cada iteração em array ordenado.",
+      "hint": "left e right convergem para o meio.",
+      "reference": "https://www.geeksforgeeks.org/dsa/binary-search/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-ternary-search",
+      "title": "Busca ternária",
+      "snippet": "function ternarySearch(arr, target, left, right):\n  if left > right:\n    return -1\n  third = (right - left) / 3\n  mid1 = left + third\n  mid2 = right - third\n  if target < arr[mid1]:\n    return ternarySearch(arr, target, left, mid1 - 1)\n  if target > arr[mid2]:\n    return ternarySearch(arr, target, mid2 + 1, right)\n  return ternarySearch(arr, target, mid1 + 1, mid2 - 1)",
+      "options": [
+        "Busca ternária",
+        "Busca binária",
+        "Busca linear",
+        "Interpolation search"
+      ],
+      "answer": "Busca ternária",
+      "difficulty": "medium",
+      "category": "busca",
+      "caseNote": "O(log n)",
+      "whatItIs": "Busca em array unimodal ou ordenado dividindo o intervalo em três partes a cada passo.",
+      "explanation": "Divide o intervalo em três partes a cada passo.",
+      "hint": "Dois pontos médios (mid1 e mid2).",
+      "reference": "https://www.geeksforgeeks.org/dsa/ternary-search/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-bubble-sort",
+      "title": "Bubble sort",
+      "snippet": "function bubbleSort(arr):\n  n = arr.length\n  for i in 0..n:\n    for j in 0..n - i - 1:\n      if arr[j] > arr[j + 1]:\n        swap(arr[j], arr[j + 1])",
+      "options": [
+        "Bubble sort",
+        "Selection sort",
+        "Insertion sort",
+        "Merge sort"
+      ],
+      "answer": "Bubble sort",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n²)",
+      "whatItIs": "Algoritmo de ordenação que compara pares adjacentes e troca se estiverem fora de ordem.",
+      "explanation": "Compara pares adjacentes e troca se estiverem fora de ordem.",
+      "hint": "O maior 'borbulha' até o fim a cada passagem.",
+      "reference": "https://www.geeksforgeeks.org/dsa/bubble-sort/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-selection-sort",
+      "title": "Selection sort",
+      "snippet": "function selectionSort(arr):\n  n = arr.length\n  for i in 0..n:\n    minIdx = i\n    for j in i + 1..n:\n      if arr[j] < arr[minIdx]:\n        minIdx = j\n    swap(arr[i], arr[minIdx])",
+      "options": [
+        "Selection sort",
+        "Bubble sort",
+        "Insertion sort",
+        "Heap sort"
+      ],
+      "answer": "Selection sort",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n²)",
+      "whatItIs": "Algoritmo de ordenação que a cada passo coloca o menor elemento restante na posição correta.",
+      "explanation": "Em cada posição i, encontra o menor do restante e troca.",
+      "hint": "Loop interno busca o mínimo.",
+      "reference": "https://www.geeksforgeeks.org/dsa/selection-sort/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-insertion-sort",
+      "title": "Insertion sort",
+      "snippet": "function insertionSort(arr):\n  for i in 1..arr.length:\n    key = arr[i]\n    j = i - 1\n    while j >= 0 and arr[j] > key:\n      arr[j + 1] = arr[j]\n      j = j - 1\n    arr[j + 1] = key",
+      "options": [
+        "Insertion sort",
+        "Bubble sort",
+        "Selection sort",
+        "Counting sort"
+      ],
+      "answer": "Insertion sort",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n²)",
+      "whatItIs": "Algoritmo de ordenação que insere cada elemento na posição correta do trecho já ordenado.",
+      "explanation": "Insere cada elemento na posição correta do subarray ordenado à esquerda.",
+      "hint": "Desloca elementos maiores que key.",
+      "reference": "https://www.geeksforgeeks.org/dsa/insertion-sort/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-merge-sort",
+      "title": "Merge sort",
+      "snippet": "function sort(arr, left, right):\n  if left >= right:\n    return\n  mid = (left + right) / 2\n  sort(arr, left, mid)\n  sort(arr, mid + 1, right)\n  combine(arr, left, mid, right)",
+      "options": [
+        "Merge sort",
+        "Quick sort",
+        "Heap sort",
+        "Insertion sort"
+      ],
+      "answer": "Merge sort",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n log n)",
+      "whatItIs": "Algoritmo de ordenação divide-e-conquista que divide o array e faz merge das metades.",
+      "explanation": "Divide o array ao meio recursivamente e depois faz merge das metades ordenadas.",
+      "hint": "Divide e conquista com merge.",
+      "reference": "https://www.geeksforgeeks.org/dsa/merge-sort/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-heap-sort",
+      "title": "Heap sort",
+      "snippet": "function sort(arr):\n  buildMaxHeap(arr)\n  for i in arr.length - 1 down to 1:\n    swap(arr[0], arr[i])\n    restoreHeap(arr, 0, i)",
+      "options": [
+        "Heap sort",
+        "Merge sort",
+        "Quick sort",
+        "Selection sort"
+      ],
+      "answer": "Heap sort",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n log n)",
+      "whatItIs": "Algoritmo de ordenação que usa uma heap para extrair repetidamente o maior elemento.",
+      "explanation": "Constrói max-heap e extrai o máximo repetidamente para o final.",
+      "hint": "heapify após cada swap com o root.",
+      "reference": "https://www.geeksforgeeks.org/dsa/heap-sort/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-quick-sort",
+      "title": "Quick sort",
+      "snippet": "function sort(arr, low, high):\n  if low < high:\n    pivot = partition(arr, low, high)\n    sort(arr, low, pivot - 1)\n    sort(arr, pivot + 1, high)\n// pivot sempre o menor elemento",
+      "options": [
+        "Quick sort",
+        "Merge sort",
+        "Heap sort",
+        "Bubble sort"
+      ],
+      "answer": "Quick sort",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n²)",
+      "whatItIs": "Algoritmo de ordenação que particiona o array em torno de um pivot e ordena recursivamente.",
+      "explanation": "Particiona em torno de um pivot e ordena recursivamente as duas partes.",
+      "hint": "partition + duas chamadas recursivas.",
+      "reference": "https://www.geeksforgeeks.org/dsa/quick-sort/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-dfs",
+      "title": "DFS",
+      "snippet": "function traverse(node):\n  if node == null:\n    return\n  visit(node)\n  traverse(node.left)\n  traverse(node.right)",
+      "options": [
+        "DFS",
+        "BFS",
+        "Dijkstra",
+        "Merge sort"
+      ],
+      "answer": "DFS",
+      "difficulty": "medium",
+      "category": "grafos",
+      "caseNote": "O(n)",
+      "whatItIs": "Busca em profundidade: explora um grafo ou árvore indo o mais fundo possível antes de voltar.",
+      "explanation": "Visita um nó e explora recursivamente os filhos antes de voltar.",
+      "hint": "Pré-ordem: visita antes dos filhos.",
+      "reference": "https://www.geeksforgeeks.org/dsa/tree-traversals-inorder-preorder-and-postorder/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-bfs",
+      "title": "BFS",
+      "snippet": "function levelOrder(root):\n  queue = [root]\n  while queue not empty:\n    node = queue.popFront()\n    for child in node.children:\n      queue.push(child)",
+      "options": [
+        "BFS",
+        "DFS",
+        "Dijkstra",
+        "Bellman-Ford"
+      ],
+      "answer": "BFS",
+      "difficulty": "medium",
+      "category": "grafos",
+      "caseNote": "O(n)",
+      "whatItIs": "Busca em largura: explora um grafo ou árvore nível a nível, usando uma fila.",
+      "explanation": "Explora nível a nível usando uma fila.",
+      "hint": "popFront + enfileirar filhos.",
+      "reference": "https://www.geeksforgeeks.org/dsa/level-order-tree-traversal/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-fib-recursive",
+      "title": "Fibonacci recursivo",
+      "snippet": "function calc(n):\n  if n <= 1:\n    return n\n  return calc(n - 1) + calc(n - 2)",
+      "options": [
+        "Fibonacci recursivo",
+        "Torre de Hanói",
+        "Power set",
+        "Permutações"
+      ],
+      "answer": "Fibonacci recursivo",
+      "difficulty": "hard",
+      "category": "recursao",
+      "caseNote": "O(2^n)",
+      "whatItIs": "Calcula o n-ésimo número de Fibonacci com duas chamadas recursivas por nível.",
+      "explanation": "Cada chamada gera duas subchamadas — árvore exponencial.",
+      "hint": "Dois casos base e duas recursões.",
+      "reference": "https://www.geeksforgeeks.org/dsa/program-for-nth-fibonacci-number/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-subsets",
+      "title": "Power set",
+      "snippet": "function subsets(arr, index, current):\n  if index == arr.length:\n    print(current)\n    return\n  subsets(arr, index + 1, current)\n  subsets(arr, index + 1, current + [arr[index]])",
+      "options": [
+        "Power set",
+        "Permutações",
+        "Fibonacci recursivo",
+        "N-Queens"
+      ],
+      "answer": "Power set",
+      "difficulty": "hard",
+      "category": "recursao",
+      "caseNote": "O(2^n)",
+      "whatItIs": "Gera todos os subconjuntos de um conjunto — incluir ou não cada elemento.",
+      "explanation": "Para cada elemento, decide incluir ou não — gera todos os subconjuntos.",
+      "hint": "Duas chamadas recursivas por nível.",
+      "reference": "https://www.geeksforgeeks.org/dsa/power-set/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-permutations",
+      "title": "Permutações",
+      "snippet": "function permute(arr, used, path):\n  if path.length == arr.length:\n    print(path)\n    return\n  for i in 0..arr.length:\n    if not used[i]:\n      used[i] = true\n      permute(arr, used, path + [arr[i]])\n      used[i] = false",
+      "options": [
+        "Permutações",
+        "Power set",
+        "N-Queens",
+        "Fibonacci recursivo"
+      ],
+      "answer": "Permutações",
+      "difficulty": "hard",
+      "category": "recursao",
+      "caseNote": "O(n!)",
+      "whatItIs": "Gera todas as ordens possíveis dos elementos de um array usando backtracking.",
+      "explanation": "Tenta cada elemento não usado em cada posição da permutação.",
+      "hint": "Backtracking com array used.",
+      "reference": "https://www.geeksforgeeks.org/dsa/write-a-program-to-print-all-permutations-of-a-given-string/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-hanoi",
+      "title": "Torre de Hanói",
+      "snippet": "function hanoi(n, from, to, aux):\n  if n == 1:\n    move(from, to)\n    return\n  hanoi(n - 1, from, aux, to)\n  move(from, to)\n  hanoi(n - 1, aux, to, from)",
+      "options": [
+        "Torre de Hanói",
+        "Fibonacci recursivo",
+        "Merge sort",
+        "Power set"
+      ],
+      "answer": "Torre de Hanói",
+      "difficulty": "hard",
+      "category": "recursao",
+      "caseNote": "O(2^n)",
+      "whatItIs": "Move n discos entre três pinos seguindo regras de tamanho, com solução recursiva clássica.",
+      "explanation": "Move n discos movendo recursivamente n-1 discos para a torre auxiliar.",
+      "hint": "Três pinos e duas recursões com n-1.",
+      "reference": "https://www.geeksforgeeks.org/dsa/c-program-for-tower-of-hanoi/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-matrix-multiply",
+      "title": "Multiplicação de matrizes",
+      "snippet": "function multiply(A, B):\n  n = A.length\n  C = matrix(n, n)\n  for i in 0..n:\n    for j in 0..n:\n      for k in 0..n:\n        C[i][j] = C[i][j] + A[i][k] * B[k][j]\n  return C",
+      "options": [
+        "Multiplicação de matrizes",
+        "Floyd-Warshall",
+        "Three sum",
+        "Merge sort"
+      ],
+      "answer": "Multiplicação de matrizes",
+      "difficulty": "hard",
+      "category": "matriz",
+      "caseNote": "O(n³)",
+      "whatItIs": "Calcula o produto de duas matrizes quadradas com três loops aninhados.",
+      "explanation": "Três loops i, j, k para combinar linha de A com coluna de B.",
+      "hint": "Produto escalar em cada célula C[i][j].",
+      "reference": "https://www.geeksforgeeks.org/dsa/matrix-multiplication/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-two-pointers-reverse",
+      "title": "Two pointers",
+      "snippet": "function reverse(arr):\n  left = 0\n  right = arr.length - 1\n  while left < right:\n    swap(arr[left], arr[right])\n    left = left + 1\n    right = right - 1",
+      "options": [
+        "Two pointers",
+        "Sliding window",
+        "Busca binária",
+        "Busca linear"
+      ],
+      "answer": "Two pointers",
+      "difficulty": "easy",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Técnica com dois índices que convergem ou avançam em ritmos diferentes no mesmo array.",
+      "explanation": "Dois índices convergem do início e do fim trocando elementos.",
+      "hint": "left avança, right recua.",
+      "reference": "https://www.geeksforgeeks.org/dsa/write-a-program-to-reverse-an-array-or-string/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-two-pointers-palindrome",
+      "title": "Two pointers (palíndromo)",
+      "snippet": "function isPalindrome(s):\n  left = 0\n  right = s.length - 1\n  while left < right:\n    if s[left] != s[right]:\n      return false\n    left = left + 1\n    right = right - 1\n  return true",
+      "options": [
+        "Two pointers",
+        "Sliding window",
+        "Busca linear",
+        "Busca binária"
+      ],
+      "answer": "Two pointers",
+      "difficulty": "easy",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Técnica com dois índices que convergem ou avançam em ritmos diferentes no mesmo array.",
+      "explanation": "Compara caracteres das extremidades movendo para o centro.",
+      "hint": "Mesmo padrão de reverse, mas comparando.",
+      "reference": "https://www.geeksforgeeks.org/dsa/check-if-a-string-is-palindrome-or-not/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-bst-search",
+      "title": "Busca em BST",
+      "snippet": "function bstSearch(node, target):\n  if node == null:\n    return false\n  if node.value == target:\n    return true\n  if target < node.value:\n    return bstSearch(node.left, target)\n  return bstSearch(node.right, target)",
+      "options": [
+        "Busca em BST",
+        "Busca binária",
+        "DFS",
+        "Busca linear"
+      ],
+      "answer": "Busca em BST",
+      "difficulty": "medium",
+      "category": "busca",
+      "caseNote": "O(log n)",
+      "whatItIs": "Busca um valor em árvore binária de busca descendo para esquerda ou direita conforme a comparação.",
+      "explanation": "Em árvore binária de busca, desce para esquerda ou direita conforme o valor.",
+      "hint": "Recursão com comparação no nó.",
+      "reference": "https://www.geeksforgeeks.org/dsa/binary-search-tree-data-structure/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-gcd",
+      "title": "MDC de Euclides",
+      "snippet": "function gcd(a, b):\n  while b != 0:\n    temp = b\n    b = a % b\n    a = temp\n  return a",
+      "options": [
+        "MDC de Euclides",
+        "Fibonacci recursivo",
+        "Two pointers",
+        "Busca binária"
+      ],
+      "answer": "MDC de Euclides",
+      "difficulty": "medium",
+      "category": "matematica",
+      "caseNote": "O(log n)",
+      "whatItIs": "Calcula o máximo divisor comum de dois inteiros usando resto sucessivo.",
+      "explanation": "Substitui (a,b) por (b, a mod b) até b ser zero.",
+      "hint": "Algoritmo clássico de Euclides iterativo.",
+      "reference": "https://www.geeksforgeeks.org/dsa/euclidean-algorithms-basic-and-extended/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-counting-sort",
+      "title": "Counting sort",
+      "snippet": "function countingSort(arr, k):\n  count = array(k + 1, 0)\n  for x in arr:\n    count[x] = count[x] + 1\n  idx = 0\n  for v in 0..k:\n    for c in 0..count[v]:\n      arr[idx] = v\n      idx = idx + 1",
+      "options": [
+        "Counting sort",
+        "Radix sort",
+        "Insertion sort",
+        "Merge sort"
+      ],
+      "answer": "Counting sort",
+      "difficulty": "hard",
+      "category": "ordenacao",
+      "caseNote": "O(n)",
+      "whatItIs": "Algoritmo de ordenação que conta frequências de valores em um range limitado.",
+      "explanation": "Conta frequências e reconstrói o array ordenado pelo range de valores.",
+      "hint": "Array count[v] de frequências.",
+      "reference": "https://www.geeksforgeeks.org/dsa/counting-sort/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-recursive-sum",
+      "title": "Soma recursiva",
+      "snippet": "function sumArray(arr, index):\n  if index == arr.length:\n    return 0\n  return arr[index] + sumArray(arr, index + 1)",
+      "options": [
+        "Soma recursiva",
+        "DFS",
+        "Fibonacci recursivo",
+        "Busca linear"
+      ],
+      "answer": "Soma recursiva",
+      "difficulty": "easy",
+      "category": "recursao",
+      "caseNote": "O(n)",
+      "whatItIs": "Soma os elementos de um array usando recursão em vez de loop.",
+      "explanation": "Caso base no fim do array; soma o elemento atual com o restante.",
+      "hint": "Uma chamada recursiva por índice.",
+      "reference": "https://www.geeksforgeeks.org/dsa/analysis-of-algorithms-set-1-asymptotic-analysis/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-timsort",
+      "title": "Timsort",
+      "snippet": "function sortArray(arr):\n  return arr.sort()",
+      "options": [
+        "Timsort",
+        "Merge sort",
+        "Heap sort",
+        "Quick sort"
+      ],
+      "answer": "Timsort",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n log n)",
+      "whatItIs": "Algoritmo de ordenação híbrido (merge + insertion) usado em sorts built-in modernos.",
+      "explanation": "Ordenação built-in eficiente (Timsort em Python/Java) — híbrido merge + insertion.",
+      "hint": "Chamada única a sort() no array.",
+      "reference": "https://www.geeksforgeeks.org/dsa/analysis-of-algorithms-set-3-asymptotic-notations/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-radix-sort",
+      "title": "Radix sort",
+      "snippet": "function radixSort(arr, d):\n  for digit in 0..d:\n    countingSortByDigit(arr, digit)",
+      "options": [
+        "Radix sort",
+        "Counting sort",
+        "Heap sort",
+        "Merge sort"
+      ],
+      "answer": "Radix sort",
+      "difficulty": "hard",
+      "category": "ordenacao",
+      "caseNote": "O(n)",
+      "whatItIs": "Algoritmo de ordenação que ordena dígito a dígito (ou caractere a caractere) de forma estável.",
+      "explanation": "Ordena dígito a dígito usando counting sort estável em cada posição.",
+      "hint": "Loop externo sobre dígitos.",
+      "reference": "https://www.geeksforgeeks.org/dsa/radix-sort/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-moore-voting",
+      "title": "Moore voting",
+      "snippet": "function majority(arr):\n  candidate = null\n  count = 0\n  for x in arr:\n    if count == 0:\n      candidate = x\n      count = 1\n    else if x == candidate:\n      count = count + 1\n    else:\n      count = count - 1\n  return candidate",
+      "options": [
+        "Moore voting",
+        "Two sum",
+        "Sliding window",
+        "Busca linear"
+      ],
+      "answer": "Moore voting",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Encontra candidato a elemento majoritário (que aparece mais de n/2 vezes) em uma passagem.",
+      "explanation": "Algoritmo de Boyer-Moore para encontrar candidato a elemento majoritário.",
+      "hint": "Cancela votos de pares diferentes.",
+      "reference": "https://www.geeksforgeeks.org/dsa/majority-element/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-sliding-window",
+      "title": "Sliding window",
+      "snippet": "function maxInWindow(arr, k):\n  total = 0\n  for i in 0..k:\n    total = total + arr[i]\n  best = total\n  for i in k..arr.length:\n    total = total + arr[i] - arr[i - k]\n    best = max(best, total)\n  return best",
+      "options": [
+        "Sliding window",
+        "Two pointers",
+        "Prefix sum",
+        "Busca linear"
+      ],
+      "answer": "Sliding window",
+      "difficulty": "medium",
+      "category": "padrao",
+      "caseNote": "O(n)",
+      "whatItIs": "Técnica que mantém uma janela fixa deslizando sobre o array para calcular agregados.",
+      "explanation": "Mantém soma de janela fixa deslizando: adiciona novo, remove o que saiu.",
+      "hint": "Segundo loop atualiza total.",
+      "reference": "https://www.geeksforgeeks.org/dsa/window-sliding-technique/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-merge-sorted",
+      "title": "Merge de ordenados",
+      "snippet": "function combine(a, b):\n  i = 0\n  j = 0\n  result = []\n  while i < a.length and j < b.length:\n    if a[i] <= b[j]:\n      result.push(a[i])\n      i = i + 1\n    else:\n      result.push(b[j])\n      j = j + 1\n  // append rest",
+      "options": [
+        "Merge de ordenados",
+        "Merge sort",
+        "Two pointers",
+        "Busca binária"
+      ],
+      "answer": "Merge de ordenados",
+      "difficulty": "medium",
+      "category": "ordenacao",
+      "caseNote": "O(n)",
+      "whatItIs": "Funde dois arrays ordenados em um único array ordenado com dois ponteiros.",
+      "explanation": "Dois ponteiros percorrem arrays já ordenados fundindo em ordem.",
+      "hint": "Compara a[i] e b[j] a cada passo.",
+      "reference": "https://www.geeksforgeeks.org/dsa/merge-two-sorted-arrays/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-heap-push",
+      "title": "Heap push",
+      "snippet": "function push(heap, value):\n  heap.data[heap.size] = value\n  heap.size = heap.size + 1\n  siftUp(heap, heap.size - 1)",
+      "options": [
+        "Heap push",
+        "Heap pop",
+        "Heap sort",
+        "Insertion sort"
+      ],
+      "answer": "Heap push",
+      "difficulty": "medium",
+      "category": "heap",
+      "caseNote": "O(log n)",
+      "whatItIs": "Insere um elemento em uma heap e sobe até restaurar a propriedade da árvore.",
+      "explanation": "Insere no final da heap e sobe o elemento com siftUp.",
+      "hint": "siftUp restaura propriedade de min-heap.",
+      "reference": "https://www.geeksforgeeks.org/dsa/heap-insert-and-delete-operations/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-topological-sort",
+      "title": "Ordenação topológica",
+      "snippet": "function topoDFS(node, visited, order):\n  visited.add(node)\n  for next in node.neighbors:\n    if next not in visited:\n      topoDFS(next, visited, order)\n  order.push(node)",
+      "options": [
+        "Ordenação topológica",
+        "DFS",
+        "BFS",
+        "Kruskal"
+      ],
+      "answer": "Ordenação topológica",
+      "difficulty": "hard",
+      "category": "grafos",
+      "caseNote": "O(n)",
+      "whatItIs": "Ordena vértices de um grafo direcionado acíclico respeitando dependências entre eles.",
+      "explanation": "DFS pós-ordem: empilha nó após visitar todos os vizinhos.",
+      "hint": "order.push ao final da recursão.",
+      "reference": "https://www.geeksforgeeks.org/dsa/topological-sorting/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    },
+    {
+      "id": "daily-as-activity-selection",
+      "title": "Seleção de atividades",
+      "snippet": "function activitySelection(activities):\n  sort(activities by end time)\n  count = 1\n  lastEnd = activities[0].end\n  for i in 1..activities.length:\n    if activities[i].start >= lastEnd:\n      count = count + 1\n      lastEnd = activities[i].end\n  return count",
+      "options": [
+        "Seleção de atividades",
+        "Greedy genérico",
+        "Merge sort",
+        "Sliding window"
+      ],
+      "answer": "Seleção de atividades",
+      "difficulty": "medium",
+      "category": "greedy",
+      "caseNote": "O(n log n)",
+      "whatItIs": "Algoritmo guloso que escolhe o máximo de atividades não sobrepostas por horário de término.",
+      "explanation": "Greedy: ordena por fim e escolhe atividades compatíveis não sobrepostas.",
+      "hint": "Sempre pega a que termina mais cedo.",
+      "reference": "https://www.geeksforgeeks.org/dsa/activity-selection-problem-greedy-algo-1/",
+      "learnMoreURL": "https://www.geeksforgeeks.org/dsa/algorithms/"
+    }
+  ]
+}

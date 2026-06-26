@@ -12,7 +12,7 @@ struct RestGamesHubBanner: View {
                         .tracking(2)
                         .foregroundStyle(.white)
 
-                    Text("Wordle · Leet · Spot · Big O · Color · Sound")
+                    Text("Wordle · Leet · Spot · Big O · AlgoSpot · Color · Sound")
                         .font(.caption2.weight(.medium))
                         .foregroundStyle(.white.opacity(0.5))
                 }
