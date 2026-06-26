@@ -2,9 +2,13 @@
 /**
  * Audits DevWordle word lists.
  * Run from repo root: node newtabnews/Scripts/audit-dev-words.mjs
- * Optional: --write strips practiceAnswers from dev_words.json (derived at runtime).
+ *
+ * Lists:
+ *   answers         — daily targets (programming only)
+ *   practiceAnswers — free mode targets (programming only, disjoint from answers)
+ *   extraGuesses    — valid guesses (dev + non-dev; blocklist not applied)
  */
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
@@ -24,46 +28,47 @@ const MIN_EXTRAS = 150;
 const MIN_PRACTICE = 150;
 
 const blocklist = new Set(JSON.parse(readFileSync(BLOCKLIST_PATH, "utf8")));
-const writeMode = process.argv.includes("--write");
 
 function isValidWord(word) {
   return word.length === WORD_LENGTH && /^[A-Z]+$/.test(word);
 }
 
-function derivedPractice(answers, extras) {
-  const answerSet = new Set(answers);
-  return extras.filter((w) => !answerSet.has(w)).sort();
+function validateList(name, list, { applyBlocklist }) {
+  const errors = [];
+  const seen = new Set();
+  for (const word of list) {
+    if (!isValidWord(word)) {
+      errors.push(`${name}: invalid word "${word}" (must be 5 uppercase letters)`);
+    }
+    if (applyBlocklist && blocklist.has(word)) {
+      errors.push(`${name}: blocklisted "${word}"`);
+    }
+    if (seen.has(word)) {
+      errors.push(`${name}: duplicate "${word}"`);
+    }
+    seen.add(word);
+  }
+  return errors;
 }
 
 function validate(data) {
   const errors = [];
   const answers = data.answers ?? [];
   const extras = data.extraGuesses ?? [];
-  const practice = derivedPractice(answers, extras);
+  const practice = data.practiceAnswers ?? [];
 
-  for (const [name, list] of [
-    ["answers", answers],
-    ["extraGuesses", extras],
-  ]) {
-    const seen = new Set();
-    for (const word of list) {
-      if (!isValidWord(word)) {
-        errors.push(`${name}: invalid word "${word}" (must be 5 uppercase letters)`);
-      }
-      if (blocklist.has(word)) {
-        errors.push(`${name}: blocklisted "${word}"`);
-      }
-      if (seen.has(word)) {
-        errors.push(`${name}: duplicate "${word}"`);
-      }
-      seen.add(word);
-    }
-  }
+  errors.push(...validateList("answers", answers, { applyBlocklist: true }));
+  errors.push(...validateList("practiceAnswers", practice, { applyBlocklist: true }));
+  errors.push(...validateList("extraGuesses", extras, { applyBlocklist: false }));
 
   const answerSet = new Set(answers);
-  const overlap = answers.filter((w) => practice.includes(w));
+  const overlap = practice.filter((w) => answerSet.has(w));
   if (overlap.length) {
     errors.push(`overlap answers/practice: ${overlap.join(", ")}`);
+  }
+
+  if (!data.practiceAnswers) {
+    errors.push("practiceAnswers is required in dev_words.json");
   }
 
   if (answers.length < MIN_ANSWERS) {
@@ -79,14 +84,8 @@ function validate(data) {
   return { errors, answers, extras, practice };
 }
 
-const raw = JSON.parse(readFileSync(WORDS_PATH, "utf8"));
-const { errors, answers, extras, practice } = validate(raw);
-
-if (writeMode) {
-  const output = { answers, extraGuesses: extras };
-  writeFileSync(WORDS_PATH, JSON.stringify(output, null, 2) + "\n");
-  console.log("Wrote dev_words.json without practiceAnswers");
-}
+const data = JSON.parse(readFileSync(WORDS_PATH, "utf8"));
+const { errors, answers, extras, practice } = validate(data);
 
 if (errors.length) {
   console.error("DevWordle word audit FAILED:\n");
@@ -95,7 +94,7 @@ if (errors.length) {
 }
 
 console.log("DevWordle word audit OK");
-console.log(`  answers:         ${answers.length}`);
-console.log(`  extraGuesses:    ${extras.length}`);
-console.log(`  practiceAnswers: ${practice.length} (derived)`);
-console.log(`  blocklist:       ${blocklist.size} words`);
+console.log(`  answers:         ${answers.length} (daily, programming)`);
+console.log(`  practiceAnswers: ${practice.length} (free, programming)`);
+console.log(`  extraGuesses:    ${extras.length} (valid guesses, any theme)`);
+console.log(`  blocklist:       ${blocklist.size} words (answers + free only)`);

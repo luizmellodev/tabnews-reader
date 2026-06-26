@@ -40,20 +40,23 @@ enum DevWordDictionaryValidation {
         }
 
         checkList("answers", answers)
-        checkList("extraGuesses", extras)
         checkList("practiceAnswers", practice)
+
+        var extrasSeen = Set<String>()
+        for word in extras {
+            if word.count != wordLength || !word.allSatisfy(\.isLetter) {
+                errors.append("extraGuesses: invalid word \"\(word)\"")
+            }
+            if extrasSeen.contains(word) {
+                errors.append("extraGuesses: duplicate \"\(word)\"")
+            }
+            extrasSeen.insert(word)
+        }
 
         let answerSet = Set(answers)
         let overlap = practice.filter { answerSet.contains($0) }
         if !overlap.isEmpty {
             errors.append("overlap answers/practice: \(overlap.joined(separator: ", "))")
-        }
-
-        let expectedPractice = extras.filter { !answerSet.contains($0) }.sorted()
-        if practice.sorted() != expectedPractice {
-            errors.append(
-                "practiceAnswers must equal extraGuesses minus answers (expected \(expectedPractice.count), got \(practice.count))"
-            )
         }
 
         if answers.count < minAnswers {

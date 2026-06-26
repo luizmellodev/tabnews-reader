@@ -1,0 +1,724 @@
+{
+  "challenges": [
+    {
+      "id": "free-pop-stack",
+      "title": "Pop na pilha",
+      "snippet": "function pop(stack):\n  if stack.size == 0:\n    return null\n  stack.size = stack.size - 1\n  return stack.data[stack.size]",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(log n)",
+        "O(n²)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "easy",
+      "caseNote": "pior caso",
+      "explanation": "Remover do topo é O(1).",
+      "hint": "Precisa percorrer a pilha?",
+      "reference": "https://www.geeksforgeeks.org/dsa/stack-data-structure/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-linked-list-head",
+      "title": "Inserir no início",
+      "snippet": "function prepend(list, value):\n  node = new Node(value)\n  node.next = list.head\n  list.head = node",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(log n)",
+        "O(n²)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "easy",
+      "caseNote": "pior caso",
+      "explanation": "Inserção na cabeça de lista ligada é O(1).",
+      "hint": "Acesso direto ao head.",
+      "reference": "https://www.geeksforgeeks.org/dsa/linked-list-data-structure/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-array-append",
+      "title": "Append amortizado",
+      "snippet": "function append(arr, value):\n  if arr.size == arr.capacity:\n    resize(arr, arr.capacity * 2)\n  arr.data[arr.size] = value\n  arr.size = arr.size + 1",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(log n)",
+        "O(n²)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "easy",
+      "caseNote": "caso amortizado",
+      "explanation": "Append em array dinâmico é O(1) amortizado.",
+      "hint": "Resize ocasional, mas amortizado.",
+      "reference": "https://www.geeksforgeeks.org/dsa/array/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-min-two",
+      "title": "Mínimo de dois",
+      "snippet": "function min2(a, b):\n  if a < b:\n    return a\n  return b",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(log n)",
+        "O(n²)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "easy",
+      "caseNote": "pior caso",
+      "explanation": "Comparação única entre dois valores.",
+      "hint": "Número fixo de operações.",
+      "reference": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-string-length",
+      "title": "Tamanho da string",
+      "snippet": "function length(s):\n  return s.size",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(log n)",
+        "O(n²)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "easy",
+      "caseNote": "pior caso (size armazenado)",
+      "explanation": "Se o tamanho é mantido, retornar length é O(1).",
+      "hint": "Precisa contar caractere por caractere?",
+      "reference": "https://www.geeksforgeeks.org/dsa/string-data-structure/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-copy-array",
+      "title": "Copiar array",
+      "snippet": "function copy(arr):\n  result = array(arr.length)\n  for i in 0..arr.length:\n    result[i] = arr[i]\n  return result",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "easy",
+      "caseNote": "pior caso",
+      "explanation": "Copia n elementos — linear.",
+      "hint": "Um loop de n.",
+      "reference": "https://www.geeksforgeeks.org/dsa/arrays/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-contains-duplicates",
+      "title": "Verificar duplicata",
+      "snippet": "function hasDuplicate(arr):\n  seen = set()\n  for x in arr:\n    if x in seen:\n      return true\n    seen.add(x)\n  return false",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(1)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Cada elemento: lookup/inserção O(1) no set — total O(n).",
+      "hint": "n operações em hash set.",
+      "reference": "https://www.geeksforgeeks.org/dsa/check-if-array-elements-are-distinct/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-two-sum-hash",
+      "title": "Two sum com hash",
+      "snippet": "function twoSum(arr, target):\n  seen = map()\n  for i in 0..arr.length:\n    need = target - arr[i]\n    if need in seen:\n      return [seen[need], i]\n    seen[arr[i]] = i",
+      "options": [
+        "O(n²)",
+        "O(n)",
+        "O(n log n)",
+        "O(1)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Um passe com lookup O(1) no map.",
+      "hint": "Uma passagem + hash map.",
+      "reference": "https://www.geeksforgeeks.org/dsa/check-if-pair-with-given-sum-exists-in-array/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-is-palindrome",
+      "title": "Verificar palíndromo",
+      "snippet": "function isPalindrome(s):\n  left = 0\n  right = s.length - 1\n  while left < right:\n    if s[left] != s[right]:\n      return false\n    left = left + 1\n    right = right - 1\n  return true",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "easy",
+      "caseNote": "pior caso",
+      "explanation": "Two pointers avançam até o centro — O(n).",
+      "hint": "Quantos caracteres comparados?",
+      "reference": "https://www.geeksforgeeks.org/dsa/check-if-a-string-is-palindrome-or-not/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-sliding-window-max",
+      "title": "Janela deslizante",
+      "snippet": "function maxInWindow(arr, k):\n  windowSum = 0\n  for i in 0..k:\n    windowSum = windowSum + arr[i]\n  best = windowSum\n  for i in k..arr.length:\n    windowSum = windowSum + arr[i] - arr[i - k]\n    best = max(best, windowSum)\n  return best",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(2^n)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Cada elemento entra e sai da janela uma vez.",
+      "hint": "Dois loops mas linear total.",
+      "reference": "https://www.geeksforgeeks.org/dsa/window-sliding-technique/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-binary-tree-height",
+      "title": "Altura da árvore",
+      "snippet": "function height(node):\n  if node == null:\n    return 0\n  return 1 + max(height(node.left), height(node.right))",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(2^n)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Visita cada nó uma vez para calcular altura.",
+      "hint": "Recursão em todos os nós.",
+      "reference": "https://www.geeksforgeeks.org/dsa/write-a-c-program-to-find-the-maximum-depth-or-height-of-a-tree/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-balanced-bst-search",
+      "title": "Busca em BST",
+      "snippet": "function bstSearch(node, target):\n  if node == null:\n    return false\n  if node.value == target:\n    return true\n  if target < node.value:\n    return bstSearch(node.left, target)\n  return bstSearch(node.right, target)",
+      "options": [
+        "O(n)",
+        "O(log n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(log n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso (BST balanceada)",
+      "explanation": "Em BST balanceada, altura é O(log n).",
+      "hint": "Profundidade da árvore balanceada.",
+      "reference": "https://www.geeksforgeeks.org/dsa/binary-search-tree-data-structure/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-bst-worst",
+      "title": "Busca em BST degenerada",
+      "snippet": "function searchSkewed(node, target):\n  while node != null:\n    if node.value == target:\n      return true\n    node = node.right\n  return false\n// árvore vira lista ligada",
+      "options": [
+        "O(log n)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "BST degenerada (só filhos à direita) tem altura n.",
+      "hint": "Lista ligada disfarçada de árvore.",
+      "reference": "https://www.geeksforgeeks.org/dsa/binary-search-tree-data-structure/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-merge-two-sorted",
+      "title": "Merge de ordenados",
+      "snippet": "function merge(a, b):\n  i = 0\n  j = 0\n  result = []\n  while i < a.length and j < b.length:\n    if a[i] <= b[j]:\n      result.push(a[i])\n      i = i + 1\n    else:\n      result.push(b[j])\n      j = j + 1\n  // append rest",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(2^n)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Se a e b juntos têm n elementos, cada um é processado uma vez.",
+      "hint": "Dois ponteiros, total n passos.",
+      "reference": "https://www.geeksforgeeks.org/dsa/merge-two-sorted-arrays/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-counting-sort",
+      "title": "Counting sort",
+      "snippet": "function countingSort(arr, k):\n  count = array(k + 1, 0)\n  for x in arr:\n    count[x] = count[x] + 1\n  idx = 0\n  for v in 0..k:\n    for c in 0..count[v]:\n      arr[idx] = v\n      idx = idx + 1",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(2^n)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "hard",
+      "caseNote": "pior caso (k fixo pequeno)",
+      "explanation": "Com range k fixo, os loops internos somam n — linear no tamanho do array.",
+      "hint": "k constante em relação a n.",
+      "reference": "https://www.geeksforgeeks.org/dsa/counting-sort/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-radix-sort",
+      "title": "Radix sort",
+      "snippet": "function radixSort(arr, d):\n  for digit in 0..d:\n    countingSortByDigit(arr, digit)",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(2^n)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "hard",
+      "caseNote": "pior caso (d fixo)",
+      "explanation": "Com número fixo de dígitos d, são d passagens lineares.",
+      "hint": "d constante — ex: inteiros 32-bit.",
+      "reference": "https://www.geeksforgeeks.org/dsa/radix-sort/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-brute-force-three-sum",
+      "title": "Three sum força bruta",
+      "snippet": "function threeSum(arr):\n  for i in 0..arr.length:\n    for j in i + 1..arr.length:\n      for k in j + 1..arr.length:\n        if arr[i] + arr[j] + arr[k] == 0:\n          return true\n  return false",
+      "options": [
+        "O(n²)",
+        "O(n³)",
+        "O(n log n)",
+        "O(2^n)"
+      ],
+      "answer": "O(n³)",
+      "difficulty": "hard",
+      "caseNote": "pior caso",
+      "explanation": "Três loops aninhados — O(n³).",
+      "hint": "Três índices independentes.",
+      "reference": "https://www.geeksforgeeks.org/dsa/find-triplets-with-zero-sum/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-karatsuba",
+      "title": "Multiplicação ingênua",
+      "snippet": "function multiply(a, b):\n  result = 0\n  for i in 0..a.length:\n    for j in 0..b.length:\n      result = result + digit(a, i) * digit(b, j)\n  return result",
+      "options": [
+        "O(n)",
+        "O(n²)",
+        "O(n log n)",
+        "O(n³)"
+      ],
+      "answer": "O(n²)",
+      "difficulty": "hard",
+      "caseNote": "pior caso",
+      "explanation": "Dois loops sobre os dígitos — quadrático.",
+      "hint": "Produto dígito a dígito.",
+      "reference": "https://www.geeksforgeeks.org/dsa/analysis-of-algorithms-set-1-asymptotic-analysis/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-dijkstra",
+      "title": "Dijkstra (lista)",
+      "snippet": "function dijkstra(adj, n, source):\n  dist = array(n, infinity)\n  dist[source] = 0\n  for count in 0..n:\n    u = minVertex(dist, visited)\n    for v in 0..n:\n      if adj[u][v] and dist[u] + adj[u][v] < dist[v]:\n        dist[v] = dist[u] + adj[u][v]",
+      "options": [
+        "O(n)",
+        "O(n²)",
+        "O(n log n)",
+        "O(2^n)"
+      ],
+      "answer": "O(n²)",
+      "difficulty": "hard",
+      "caseNote": "pior caso",
+      "explanation": "n extrações do mínimo O(n) + n atualizações — O(n²).",
+      "hint": "Matriz de adjacência n×n.",
+      "reference": "https://www.geeksforgeeks.org/dsa/dijkstras-shortest-path-algorithm-greedy-algo-7/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-floyd-warshall",
+      "title": "Floyd-Warshall",
+      "snippet": "function floydWarshall(dist):\n  n = dist.length\n  for k in 0..n:\n    for i in 0..n:\n      for j in 0..n:\n        dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])",
+      "options": [
+        "O(n²)",
+        "O(n³)",
+        "O(n log n)",
+        "O(2^n)"
+      ],
+      "answer": "O(n³)",
+      "difficulty": "hard",
+      "caseNote": "pior caso",
+      "explanation": "Três loops sobre n vértices.",
+      "hint": "Todos os pares via intermediário k.",
+      "reference": "https://www.geeksforgeeks.org/dsa/floyd-warshall-algorithm-dp-16/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-backtrack-nqueens",
+      "title": "N-Queens backtrack",
+      "snippet": "function solveNQueens(n, row, cols):\n  if row == n:\n    return 1\n  count = 0\n  for col in 0..n:\n    if isSafe(row, col, cols):\n      cols[row] = col\n      count = count + solveNQueens(n, row + 1, cols)\n  return count",
+      "options": [
+        "O(n)",
+        "O(n!)",
+        "O(2^n)",
+        "O(n²)"
+      ],
+      "answer": "O(n!)",
+      "difficulty": "hard",
+      "caseNote": "pior caso",
+      "explanation": "Backtracking tenta colunas em cada linha — fatorial no pior caso.",
+      "hint": "Todas as permutações de colunas.",
+      "reference": "https://www.geeksforgeeks.org/dsa/n-queen-problem-backtracking-3/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-power-set-bitmask",
+      "title": "Power set bitmask",
+      "snippet": "function powerSet(arr):\n  n = arr.length\n  for mask in 0..(1 << n):\n    subset = []\n    for i in 0..n:\n      if mask & (1 << i):\n        subset.push(arr[i])\n    print(subset)",
+      "options": [
+        "O(n)",
+        "O(2^n)",
+        "O(n!)",
+        "O(n²)"
+      ],
+      "answer": "O(2^n)",
+      "difficulty": "hard",
+      "caseNote": "pior caso",
+      "explanation": "Existem 2^n subconjuntos; o fator n nas opções internas ainda domina 2^n no crescimento.",
+      "hint": "Quantos subconjuntos existem?",
+      "reference": "https://www.geeksforgeeks.org/dsa/power-set/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-linear-probing",
+      "title": "Hash linear probing",
+      "snippet": "function insert(map, key, value):\n  idx = hash(key) % map.capacity\n  while map.slots[idx] is occupied:\n    idx = (idx + 1) % map.capacity\n  map.slots[idx] = (key, value)",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Colisões em cadeia podem percorrer todos os slots.",
+      "hint": "Pior caso: tabela cheia.",
+      "reference": "https://www.geeksforgeeks.org/dsa/hashing-set-3-open-addressing/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-strstr-naive",
+      "title": "Busca substring",
+      "snippet": "function findSubstring(text, pattern):\n  for i in 0..text.length - pattern.length:\n    match = true\n    for j in 0..pattern.length:\n      if text[i + j] != pattern[j]:\n        match = false\n        break\n    if match:\n      return i\n  return -1",
+      "options": [
+        "O(n)",
+        "O(n²)",
+        "O(n log n)",
+        "O(2^n)"
+      ],
+      "answer": "O(n²)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "No pior caso (texto repetido), comparações chegam a O(n²).",
+      "hint": "Loops aninhados sobre texto e padrão.",
+      "reference": "https://www.geeksforgeeks.org/dsa/naive-algorithm-for-pattern-searching/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-heap-insert",
+      "title": "Inserir em min-heap",
+      "snippet": "function heapPush(heap, value):\n  heap.data[heap.size] = value\n  heap.size = heap.size + 1\n  siftUp(heap, heap.size - 1)",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(log n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "siftUp sobe na altura da heap — O(log n).",
+      "hint": "Altura de árvore binária completa.",
+      "reference": "https://www.geeksforgeeks.org/dsa/heap-insert-and-delete-operations/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-heap-extract",
+      "title": "Extrair mínimo heap",
+      "snippet": "function heapPop(heap):\n  min = heap.data[0]\n  heap.data[0] = heap.data[heap.size - 1]\n  heap.size = heap.size - 1\n  siftDown(heap, 0)\n  return min",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(log n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "siftDown desce na altura — O(log n).",
+      "hint": "Restaura propriedade de heap.",
+      "reference": "https://www.geeksforgeeks.org/dsa/heap-insert-and-delete-operations/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-gcd-euclidean",
+      "title": "MDC de Euclides",
+      "snippet": "function gcd(a, b):\n  while b != 0:\n    temp = b\n    b = a % b\n    a = temp\n  return a",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(log n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Número de passos é O(log min(a,b)).",
+      "hint": "b diminui a cada iteração.",
+      "reference": "https://www.geeksforgeeks.org/dsa/euclidean-algorithms-basic-and-extended/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-exponential-doubling",
+      "title": "Dobrar até n",
+      "snippet": "function doublingSteps(n):\n  steps = 0\n  i = 1\n  while i < n:\n    i = i * 2\n    steps = steps + 1\n  return steps",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(log n)",
+      "difficulty": "easy",
+      "caseNote": "pior caso",
+      "explanation": "i dobra até passar de n — O(log n) iterações.",
+      "hint": "Quantas vezes dá para dobrar?",
+      "reference": "https://www.geeksforgeeks.org/dsa/analysis-of-algorithms-set-1-asymptotic-analysis/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-print-triangle",
+      "title": "Triângulo de números",
+      "snippet": "function printTriangle(n):\n  for i in 1..n:\n    for j in 1..i:\n      print(j)",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(2^n)"
+      ],
+      "answer": "O(n²)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Linha i tem i itens — total n(n+1)/2 = O(n²).",
+      "hint": "Soma 1+2+...+n.",
+      "reference": "https://www.geeksforgeeks.org/dsa/analysis-of-algorithms-set-1-asymptotic-analysis/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-recursive-sum",
+      "title": "Soma recursiva",
+      "snippet": "function sumArray(arr, index):\n  if index == arr.length:\n    return 0\n  return arr[index] + sumArray(arr, index + 1)",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(2^n)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "easy",
+      "caseNote": "pior caso",
+      "explanation": "Uma chamada recursiva por elemento — O(n).",
+      "hint": "Profundidade n.",
+      "reference": "https://www.geeksforgeeks.org/dsa/analysis-of-algorithms-set-1-asymptotic-analysis/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-moore-voting",
+      "title": "Majority element",
+      "snippet": "function majority(arr):\n  candidate = null\n  count = 0\n  for x in arr:\n    if count == 0:\n      candidate = x\n      count = 1\n    else if x == candidate:\n      count = count + 1\n    else:\n      count = count - 1\n  return candidate",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Boyer-Moore faz duas passagens lineares.",
+      "hint": "Uma passagem + verificação.",
+      "reference": "https://www.geeksforgeeks.org/dsa/majority-element/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-cycle-detection",
+      "title": "Ciclo em lista",
+      "snippet": "function hasCycle(head):\n  slow = head\n  fast = head\n  while fast != null and fast.next != null:\n    slow = slow.next\n    fast = fast.next.next\n    if slow == fast:\n      return true\n  return false",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Floyd: ponteiros avançam até encontrar ciclo ou fim.",
+      "hint": "Tortoise and hare.",
+      "reference": "https://www.geeksforgeeks.org/dsa/detect-loop-in-a-linked-list/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-sort-colors",
+      "title": "Dutch national flag",
+      "snippet": "function sortColors(arr):\n  low = 0\n  mid = 0\n  high = arr.length - 1\n  while mid <= high:\n    if arr[mid] == 0:\n      swap(arr[low], arr[mid]); low++; mid++\n    else if arr[mid] == 2:\n      swap(arr[mid], arr[high]); high--\n    else:\n      mid++",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(1)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Um ponteiro percorre o array uma vez.",
+      "hint": "Três ponteiros, uma passagem.",
+      "reference": "https://www.geeksforgeeks.org/dsa/sort-an-array-of-0s-1s-and-2s/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-topological-sort",
+      "title": "DFS pós-ordem",
+      "snippet": "function topoDFS(node, visited, order):\n  visited.add(node)\n  for next in node.neighbors:\n    if next not in visited:\n      topoDFS(next, visited, order)\n  order.push(node)",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(2^n)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "hard",
+      "caseNote": "pior caso (n nós)",
+      "explanation": "Cada nó e aresta visitados uma vez em DFS — O(n) para n nós.",
+      "hint": "Visita + empilha ao final.",
+      "reference": "https://www.geeksforgeeks.org/dsa/topological-sorting/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-union-find",
+      "title": "Union-Find",
+      "snippet": "function find(parent, x):\n  if parent[x] != x:\n    parent[x] = find(parent, parent[x])\n  return parent[x]\n\nfunction union(parent, rank, a, b):\n  ra = find(parent, a)\n  rb = find(parent, b)\n  if ra == rb:\n    return\n  // union by rank",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(log n)",
+      "difficulty": "hard",
+      "caseNote": "pior caso",
+      "explanation": "Com union by rank, find é O(log n) no pior caso.",
+      "hint": "Árvore de profundidade logarítmica.",
+      "reference": "https://www.geeksforgeeks.org/dsa/union-find/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-mst-kruskal",
+      "title": "Kruskal MST",
+      "snippet": "function kruskal(edges, n):\n  sort(edges by weight)\n  parent = initParent(n)\n  mst = []\n  for edge in edges:\n    if find(parent, edge.u) != find(parent, edge.v):\n      union(parent, edge.u, edge.v)\n      mst.push(edge)",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(2^n)"
+      ],
+      "answer": "O(n log n)",
+      "difficulty": "hard",
+      "caseNote": "pior caso",
+      "explanation": "Ordenar n arestas domina: O(n log n).",
+      "hint": "Sort + union-find.",
+      "reference": "https://www.geeksforgeeks.org/dsa/kruskals-minimum-spanning-tree-algorithm-greedy-algo-2/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-bellman-ford",
+      "title": "Bellman-Ford",
+      "snippet": "function bellmanFord(adj, n, source):\n  dist = array(n, infinity)\n  dist[source] = 0\n  for i in 1..n - 1:\n    for u in 0..n:\n      for v in 0..n:\n        if adj[u][v]:\n          relax(u, v, dist)",
+      "options": [
+        "O(n)",
+        "O(n²)",
+        "O(n log n)",
+        "O(n³)"
+      ],
+      "answer": "O(n²)",
+      "difficulty": "hard",
+      "caseNote": "pior caso",
+      "explanation": "n-1 rodadas com loop duplo sobre n vértices — O(n²).",
+      "hint": "Relaxação repetida n vezes.",
+      "reference": "https://www.geeksforgeeks.org/dsa/bellman-ford-algorithm-dp-23/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-activity-selection",
+      "title": "Seleção de atividades",
+      "snippet": "function activitySelection(activities):\n  sort(activities by end time)\n  count = 1\n  lastEnd = activities[0].end\n  for i in 1..activities.length:\n    if activities[i].start >= lastEnd:\n      count = count + 1\n      lastEnd = activities[i].end\n  return count",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(2^n)"
+      ],
+      "answer": "O(n log n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Ordenação O(n log n) + varredura O(n).",
+      "hint": "Sort domina.",
+      "reference": "https://www.geeksforgeeks.org/dsa/activity-selection-problem-greedy-algo-1/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-median-two-sorted",
+      "title": "Mediana dois arrays",
+      "snippet": "function medianSorted(a, b):\n  i = 0\n  j = 0\n  for step in 0..(a.length + b.length) / 2:\n    if a[i] <= b[j]:\n      median = a[i]\n      i = i + 1\n    else:\n      median = b[j]\n      j = j + 1\n  return median",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso (merge simples)",
+      "explanation": "Merge até a metade — O(n) no algoritmo ingênuo.",
+      "hint": "Percorre metade dos elementos.",
+      "reference": "https://www.geeksforgeeks.org/dsa/median-of-two-sorted-arrays-of-different-sizes/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-rotate-array",
+      "title": "Rotacionar array",
+      "snippet": "function rotate(arr, k):\n  k = k % arr.length\n  reverse(arr, 0, arr.length - 1)\n  reverse(arr, 0, k - 1)\n  reverse(arr, k, arr.length - 1)",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "pior caso",
+      "explanation": "Três reversões, cada uma O(n).",
+      "hint": "Cada elemento é movido constante vezes.",
+      "reference": "https://www.geeksforgeeks.org/dsa/array-rotation/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    }
+  ]
+}

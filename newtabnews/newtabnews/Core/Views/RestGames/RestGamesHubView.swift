@@ -4,6 +4,7 @@ private enum HubDestination: Hashable {
     case devWordle
     case devLeet
     case devSpot
+    case bigO
     case arcade(RestGameType)
 }
 
@@ -12,6 +13,7 @@ struct RestGamesHubView: View {
     var onClose: (() -> Void)? = nil
     @State private var destination: HubDestination?
     @State private var dailySummary = DevWordleViewModel.todaySummary()
+    @State private var bigOSummary = BigOViewModel.todaySummary()
     @State private var weeklySummary = DevLeetHubSummary.current()
     @State private var showLeaderboards = false
 
@@ -69,6 +71,17 @@ struct RestGamesHubView: View {
                             }
 
                             arcadeCard(
+                                title: "Big O",
+                                subtitle: "Qual a complexidade do algoritmo?",
+                                icon: "function",
+                                accent: BigOTheme.accent,
+                                destination: .bigO,
+                                trailing: { bigODailyBadge }
+                            ) {
+                                BigOPreview()
+                            }
+
+                            arcadeCard(
                                 title: "Color Match",
                                 subtitle: "Memorize a cor e recrie",
                                 icon: "paintpalette.fill",
@@ -112,6 +125,8 @@ struct RestGamesHubView: View {
                     DevLeetView()
                 case .devSpot:
                     DevSpotView()
+                case .bigO:
+                    BigOView()
                 case .arcade(let gameType):
                     switch gameType {
                     case .color:
@@ -125,6 +140,7 @@ struct RestGamesHubView: View {
         .onAppear {
             RestFeedbackManager.shared.prepare()
             dailySummary = DevWordleViewModel.todaySummary()
+            bigOSummary = BigOViewModel.todaySummary()
             weeklySummary = DevLeetHubSummary.current()
         }
         .sheet(isPresented: $showLeaderboards) {
@@ -346,12 +362,54 @@ struct RestGamesHubView: View {
             .background(color.opacity(color == .gray ? 0.25 : 0.75), in: RoundedRectangle(cornerRadius: 6))
     }
 
+    private var bigODailyBadge: some View {
+        Group {
+            if bigOSummary.won {
+                Label("Acertou", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            } else if bigOSummary.played {
+                Label("Errou", systemImage: "xmark.circle.fill")
+                    .foregroundStyle(.orange)
+            } else {
+                Text("Hoje")
+                    .foregroundStyle(BigOTheme.accentLight)
+            }
+        }
+        .font(.caption2.weight(.bold))
+        .labelStyle(.titleAndIcon)
+    }
+
     private func arcadeCard<Preview: View>(
         title: String,
         subtitle: String,
         icon: String,
         accent: Color,
         destination hubDestination: HubDestination,
+        @ViewBuilder preview: () -> Preview
+    ) -> some View {
+        arcadeCard(
+            title: title,
+            subtitle: subtitle,
+            icon: icon,
+            accent: accent,
+            destination: hubDestination,
+            trailing: {
+                Image(systemName: "arrow.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.white.opacity(0.4))
+                    .padding(.top, 4)
+            },
+            preview: preview
+        )
+    }
+
+    private func arcadeCard<Preview: View, Trailing: View>(
+        title: String,
+        subtitle: String,
+        icon: String,
+        accent: Color,
+        destination hubDestination: HubDestination,
+        @ViewBuilder trailing: () -> Trailing,
         @ViewBuilder preview: () -> Preview
     ) -> some View {
         Button {
@@ -377,10 +435,7 @@ struct RestGamesHubView: View {
 
                     Spacer()
 
-                    Image(systemName: "arrow.right")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.white.opacity(0.4))
-                        .padding(.top, 4)
+                    trailing()
                 }
 
                 preview()

@@ -186,6 +186,14 @@
 		B0D5183425C046A28A393097 /* RestGamePickers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1576AB50B8D5426AB20781DC /* RestGamePickers.swift */; };
 		B2D9826FE8EB4E6AB635C19F /* RestGamePlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB20E6443F44E1AA0A1BE4 /* RestGamePlayView.swift */; };
 		BA4055F3DBCE4BE48E4403C1 /* DevSpotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD40B937DA164E089409B358 /* DevSpotView.swift */; };
+		E5B100A12F9000010068804D /* BigOEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5B100012F9000010068804D /* BigOEngine.swift */; };
+		E5B100A22F9000010068804D /* BigOViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5B100022F9000010068804D /* BigOViewModel.swift */; };
+		E5B100A32F9000010068804D /* BigOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5B100032F9000010068804D /* BigOView.swift */; };
+		E5B100A42F9000010068804D /* BigOCodeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5B100042F9000010068804D /* BigOCodeCardView.swift */; };
+		E5B100A52F9000010068804D /* BigOOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5B100052F9000010068804D /* BigOOptionsView.swift */; };
+		E5B100A62F9000010068804D /* BigOLearnSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5B100062F9000010068804D /* BigOLearnSheet.swift */; };
+		E5B100B12F9000010068804D /* big_o_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = E5B100072F9000010068804D /* big_o_daily.json */; };
+		E5B100B22F9000010068804D /* big_o_free.json in Resources */ = {isa = PBXBuildFile; fileRef = E5B100082F9000010068804D /* big_o_free.json */; };
 		C691DAF262AB406AA207296E /* DevWordleBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5728D8AF8F2408296178E2D /* DevWordleBoardView.swift */; };
 		C6EF614F898847D08AB8DB86 /* RestGamesHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA69EED4C427447E9102CB8B /* RestGamesHubView.swift */; };
 		C75A5F815869469288FE91B7 /* DevSpotEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C0EBF0FC18475F962933FF /* DevSpotEngine.swift */; };
@@ -402,6 +410,14 @@
 		B2B2ED2A42984CDF98E2D6FE /* RestGameEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameEngine.swift; sourceTree = "<group>"; };
 		BC86A73A42F548C99F4ECBE8 /* DevWordleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleEngine.swift; sourceTree = "<group>"; };
 		BD40B937DA164E089409B358 /* DevSpotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevSpotView.swift; sourceTree = "<group>"; };
+		E5B100012F9000010068804D /* BigOEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigOEngine.swift; sourceTree = "<group>"; };
+		E5B100022F9000010068804D /* BigOViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigOViewModel.swift; sourceTree = "<group>"; };
+		E5B100032F9000010068804D /* BigOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigOView.swift; sourceTree = "<group>"; };
+		E5B100042F9000010068804D /* BigOCodeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigOCodeCardView.swift; sourceTree = "<group>"; };
+		E5B100052F9000010068804D /* BigOOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigOOptionsView.swift; sourceTree = "<group>"; };
+		E5B100062F9000010068804D /* BigOLearnSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigOLearnSheet.swift; sourceTree = "<group>"; };
+		E5B100072F9000010068804D /* big_o_daily.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = big_o_daily.json; sourceTree = "<group>"; };
+		E5B100082F9000010068804D /* big_o_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = big_o_free.json; sourceTree = "<group>"; };
 		CA69EED4C427447E9102CB8B /* RestGamesHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGamesHubView.swift; sourceTree = "<group>"; };
 		CEAB388B57CD4A79AA767CB7 /* RestGameTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameTheme.swift; sourceTree = "<group>"; };
 		D4E5F6022F8000010068804C /* DevLeetEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevLeetEngine.swift; sourceTree = "<group>"; };
@@ -480,6 +496,7 @@
 				643122B8B84043FD96DC45C4 /* DevWordle */,
 				D4E5F6072F8000010068804C /* DevLeet */,
 				8DC07756BB2146818D07F487 /* DevSpot */,
+				E5B100092F9000010068804D /* BigO */,
 				3C7D1AE464B2414B8F232BCB /* Shared */,
 			);
 			path = RestGames;
@@ -929,6 +946,21 @@
 			path = DevSpot;
 			sourceTree = "<group>";
 		};
+		E5B100092F9000010068804D /* BigO */ = {
+			isa = PBXGroup;
+			children = (
+				E5B100032F9000010068804D /* BigOView.swift */,
+				E5B100022F9000010068804D /* BigOViewModel.swift */,
+				E5B100012F9000010068804D /* BigOEngine.swift */,
+				E5B100042F9000010068804D /* BigOCodeCardView.swift */,
+				E5B100052F9000010068804D /* BigOOptionsView.swift */,
+				E5B100062F9000010068804D /* BigOLearnSheet.swift */,
+				E5B100072F9000010068804D /* big_o_daily.json */,
+				E5B100082F9000010068804D /* big_o_free.json */,
+			);
+			path = BigO;
+			sourceTree = "<group>";
+		};
 		D4E5F6072F8000010068804C /* DevLeet */ = {
 			isa = PBXGroup;
 			children = (
@@ -1082,6 +1114,8 @@
 				A1B2C3D92F9000010068804D /* dev_word_blocklist.json in Resources */,
 				D4E5F6052F8000010068804C /* dev_leet_problems.json in Resources */,
 				449AA869DB8647A7AA74E861 /* dev_spot_words.json in Resources */,
+				E5B100B12F9000010068804D /* big_o_daily.json in Resources */,
+				E5B100B22F9000010068804D /* big_o_free.json in Resources */,
 				79259E8C2EFB82FB004BC057 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1274,6 +1308,12 @@
 				BA4055F3DBCE4BE48E4403C1 /* DevSpotView.swift in Sources */,
 				F1AD9D04C2204BE58A554E67 /* DevSpotViewModel.swift in Sources */,
 				C75A5F815869469288FE91B7 /* DevSpotEngine.swift in Sources */,
+				E5B100A12F9000010068804D /* BigOEngine.swift in Sources */,
+				E5B100A22F9000010068804D /* BigOViewModel.swift in Sources */,
+				E5B100A32F9000010068804D /* BigOView.swift in Sources */,
+				E5B100A42F9000010068804D /* BigOCodeCardView.swift in Sources */,
+				E5B100A52F9000010068804D /* BigOOptionsView.swift in Sources */,
+				E5B100A62F9000010068804D /* BigOLearnSheet.swift in Sources */,
 				D4E5F6012F8000010068804C /* DevLeetEngine.swift in Sources */,
 				D4E5F6032F8000010068804C /* DevLeetView.swift in Sources */,
 				EF99794497654680863D2FBD /* RestGameTheme.swift in Sources */,

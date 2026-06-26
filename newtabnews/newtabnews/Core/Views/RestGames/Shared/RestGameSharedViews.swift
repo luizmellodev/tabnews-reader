@@ -322,6 +322,7 @@ enum RestGameOnboardingID: String {
     case devWordle
     case devLeet
     case devSpot
+    case bigO
 }
 
 enum RestGameOnboarding {
@@ -462,6 +463,20 @@ extension RestGameOnboardingOverlay {
                 "Dois termos aparecem — só um é de dev.",
                 "Toque no termo certo o mais rápido que puder.",
                 "São 10 rounds. Quanto mais acertos seguidos, melhor."
+            ],
+            onPlay: onPlay
+        )
+    }
+
+    static func bigO(onPlay: @escaping () -> Void) -> RestGameOnboardingOverlay {
+        RestGameOnboardingOverlay(
+            title: "Big O",
+            icon: "function",
+            accent: BigOTheme.accent,
+            steps: [
+                "Leia o snippet de pseudocódigo no card.",
+                "Escolha a complexidade correta entre 4 opções.",
+                "Diário: 1 desafio por dia. Livre: 10 rounds."
             ],
             onPlay: onPlay
         )

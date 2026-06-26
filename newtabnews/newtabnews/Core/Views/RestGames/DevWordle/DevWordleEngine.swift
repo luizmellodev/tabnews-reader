@@ -139,9 +139,9 @@ enum DevWordleSchedule {
 struct DevWordDictionary {
     /// Daily challenge pool — programming terms only.
     let answers: [String]
-    /// Guess-only pool (unioned into `validGuesses`).
+    /// Valid guesses (dev + non-dev); never used as a target word.
     let extras: [String]
-    /// Free mode pool — derived from `extras` minus `answers`.
+    /// Free mode pool — separate programming terms, disjoint from `answers`.
     let practiceAnswers: [String]
     let validGuesses: Set<String>
 
@@ -192,14 +192,12 @@ struct DevWordDictionary {
             .map { $0.uppercased() }
             .filter { $0.count == DevWordleEngine.wordLength && $0.allSatisfy(\.isLetter) }
 
-        guard !answers.isEmpty else { return nil }
-
         let answerSet = Set(answers)
-        let practice = extras
-            .filter { !answerSet.contains($0) }
-            .sorted()
+        let practice = (payload.practiceAnswers ?? [])
+            .map { $0.uppercased() }
+            .filter { $0.count == DevWordleEngine.wordLength && $0.allSatisfy(\.isLetter) && !answerSet.contains($0) }
 
-        guard !practice.isEmpty else { return nil }
+        guard !answers.isEmpty, !practice.isEmpty else { return nil }
 
         #if DEBUG
         DevWordDictionaryValidation.assertValid(answers: answers, extras: extras, practice: practice)
@@ -209,19 +207,20 @@ struct DevWordDictionary {
             answers: answers,
             extras: extras,
             practiceAnswers: practice,
-            validGuesses: Set(answers + extras)
+            validGuesses: Set(answers + extras + practice)
         )
     }
 
     private static let fallback = DevWordDictionary(
         answers: ["REACT", "SWIFT", "CACHE", "ASYNC", "HTTPS", "LINUX", "NGINX", "REDIS", "QUERY", "DEBUG"],
-        extras: ["CLASS", "ERROR", "TOKEN", "FETCH", "PROXY", "ADMIN", "AGENT", "ALERT", "ALPHA", "BADGE"],
+        extras: ["ABOUT", "HOUSE", "WORLD", "PLACE", "WRITE", "CLASS", "ERROR", "TOKEN", "FETCH", "PROXY"],
         practiceAnswers: ["CLASS", "ERROR", "TOKEN", "FETCH", "PROXY", "ADMIN", "AGENT", "ALERT", "ALPHA", "BADGE"],
-        validGuesses: Set(["REACT", "SWIFT", "CACHE", "ASYNC", "HTTPS", "LINUX", "NGINX", "REDIS", "QUERY", "DEBUG", "CLASS", "ERROR", "TOKEN", "FETCH", "PROXY", "ADMIN", "AGENT", "ALERT", "ALPHA", "BADGE"])
+        validGuesses: Set(["REACT", "SWIFT", "CACHE", "ASYNC", "HTTPS", "LINUX", "NGINX", "REDIS", "QUERY", "DEBUG", "ABOUT", "HOUSE", "WORLD", "PLACE", "WRITE", "CLASS", "ERROR", "TOKEN", "FETCH", "PROXY", "ADMIN", "AGENT", "ALERT", "ALPHA", "BADGE"])
     )
 
     private struct WordPayload: Decodable {
         let answers: [String]
         let extraGuesses: [String]
+        let practiceAnswers: [String]?
     }
 }
