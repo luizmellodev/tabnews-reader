@@ -13,45 +13,63 @@ struct DevWordleView: View {
     @State private var showFreeModeLockedHint = false
 
     var body: some View {
-        ZStack {
-            RestGameBackground(animated: false)
+        GeometryReader { geometry in
+            let bottomSafe = geometry.safeAreaInsets.bottom
+            let keyboardHeight = DevWordleKeyboardView.preferredHeight(
+                compact: usesCompactKeyboard,
+                extraCompact: usesExtraCompactKeyboard
+            )
+            let hintHeight: CGFloat = showsHintChrome ? 44 : 0
+            let boardScaleValue = boardScale(
+                in: geometry,
+                keyboardHeight: keyboardHeight,
+                hintHeight: hintHeight
+            )
 
-            VStack(spacing: 0) {
-                header
+            ZStack {
+                RestGameBackground(animated: false)
 
-                Spacer(minLength: 16)
+                VStack(spacing: 0) {
+                    header
 
-                boardArea
-                    .padding(.horizontal, 16)
+                    Spacer(minLength: usesTightVerticalSpacing ? 6 : 12)
 
-                Spacer(minLength: 16)
+                    boardArea
+                        .padding(.horizontal, 16)
+                        .scaleEffect(boardScaleValue)
+                        .frame(height: Self.boardNaturalHeight * boardScaleValue)
 
-                hintBanner
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
+                    Spacer(minLength: usesTightVerticalSpacing ? 6 : 12)
 
-                bottomArea
-                    .padding(.horizontal, playMode == .daily && dailyViewModel.isRoundComplete ? 16 : 8)
-                    .padding(.bottom, 12)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    if showsHintChrome {
+                        hintBanner
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 8)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
 
-            if showOnboarding {
-                RestGameOnboardingOverlay.devWordle {
-                    RestGameOnboarding.markSeen(.devWordle)
-                    showOnboarding = false
+                    bottomArea
+                        .padding(.horizontal, playMode == .daily && dailyViewModel.isRoundComplete ? 16 : 8)
+                        .padding(.bottom, max(bottomSafe, 8))
                 }
-            }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .animation(.spring(response: 0.38, dampingFraction: 0.86), value: showsHintChrome)
+                .animation(.spring(response: 0.38, dampingFraction: 0.86), value: modeSubtitle)
 
-            if showConfetti {
-                GeometryReader { geometry in
+                if showOnboarding {
+                    RestGameOnboardingOverlay.devWordle {
+                        RestGameOnboarding.markSeen(.devWordle)
+                        showOnboarding = false
+                    }
+                }
+
+                if showConfetti {
                     ParticleSystemView(
                         configuration: .confetti,
                         origin: CGPoint(x: geometry.size.width / 2, y: 72)
                     )
                     .allowsHitTesting(false)
                 }
-                .ignoresSafeArea()
             }
         }
         .onAppear {
@@ -127,6 +145,45 @@ struct DevWordleView: View {
         playMode == .daily && dailyViewModel.isRoundComplete
     }
 
+    private var showsHintChrome: Bool {
+        guard !showDailyCompleteEmptyState else { return false }
+        return activeViewModel.hintText != nil || activeViewModel.showHintOffer
+    }
+
+    private var usesCompactKeyboard: Bool {
+        showsHintChrome || !modeSubtitle.isEmpty
+    }
+
+    private var usesExtraCompactKeyboard: Bool {
+        showsHintChrome && !modeSubtitle.isEmpty
+    }
+
+    private var usesTightVerticalSpacing: Bool {
+        usesCompactKeyboard
+    }
+
+    private static let boardNaturalHeight: CGFloat = 6 * 67 + 5 * 10
+
+    private var layoutHeaderHeight: CGFloat {
+        var height: CGFloat = 128
+        if !modeSubtitle.isEmpty {
+            height += 26
+        }
+        if playMode == .free, freeSession != nil {
+            height += 28
+        }
+        return height
+    }
+
+    private func boardScale(in geometry: GeometryProxy, keyboardHeight: CGFloat, hintHeight: CGFloat) -> CGFloat {
+        let bottomSafe = geometry.safeAreaInsets.bottom
+        let bottomChromeHeight = keyboardHeight + hintHeight + max(bottomSafe, 8) + (showsHintChrome ? 8 : 0)
+        let verticalGaps: CGFloat = usesTightVerticalSpacing ? 12 : 24
+        let available = geometry.size.height - layoutHeaderHeight - bottomChromeHeight - verticalGaps
+        guard available > 0 else { return 0.55 }
+        return min(1, available / Self.boardNaturalHeight)
+    }
+
     @ViewBuilder
     private var boardArea: some View {
         ZStack {
@@ -174,6 +231,8 @@ struct DevWordleView: View {
                 DevWordleKeyboardView(
                     keyboardStates: activeViewModel.keyboardStates,
                     isEnabled: !activeViewModel.isRoundComplete,
+                    compact: usesCompactKeyboard,
+                    extraCompact: usesExtraCompactKeyboard,
                     onLetter: { activeViewModel.appendLetter($0) },
                     onDelete: { activeViewModel.deleteLetter() },
                     onSubmit: { activeViewModel.submitGuess() }
@@ -281,9 +340,11 @@ struct DevWordleView: View {
                 Text(hintText)
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(.white.opacity(0.85))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
+            .padding(.vertical, 8)
             .padding(.horizontal, 14)
             .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             .id(activeViewModel.sessionId)
@@ -298,7 +359,7 @@ struct DevWordleView: View {
                 }
                 .foregroundStyle(Color(red: 0.78, green: 0.68, blue: 0.30))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                .padding(.vertical, 8)
                 .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
             .buttonStyle(.plain)

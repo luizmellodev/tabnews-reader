@@ -171,10 +171,39 @@ enum RestGamesNewPuzzlePrompt {
     #endif
 }
 
+private struct RestGamesAttentionBorder: View {
+    let colors: [Color]
+    let rotation: Double
+    let cornerRadius: CGFloat
+
+    private var gradientColors: [Color] {
+        colors + [colors[0].opacity(0.25)]
+    }
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+            .strokeBorder(
+                AngularGradient(
+                    colors: gradientColors,
+                    center: .center,
+                    angle: .degrees(rotation)
+                ),
+                lineWidth: 1.5
+            )
+    }
+}
+
 struct RestGamesNewPuzzleBanner: View {
     let state: RestGamesNewPuzzlePrompt.State
     let onTap: () -> Void
     let onDismiss: () -> Void
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var gradientRotation: Double = 0
+    @State private var autoDismissTask: Task<Void, Never>?
+
+    private let autoDismissDuration: TimeInterval = 5
+    private let cornerRadius: CGFloat = 12
 
     var body: some View {
         HStack(spacing: 10) {
@@ -204,7 +233,7 @@ struct RestGamesNewPuzzleBanner: View {
             }
             .buttonStyle(.plain)
 
-            Button(action: onDismiss) {
+            Button(action: dismissBanner) {
                 Image(systemName: "xmark")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.tertiary)
@@ -217,11 +246,62 @@ struct RestGamesNewPuzzleBanner: View {
         .padding(.leading, 12)
         .padding(.trailing, 8)
         .padding(.vertical, 10)
-        .background(Color("CardColor"), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .background(Color("CardColor"), in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            if reduceMotion {
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .strokeBorder(attentionBorderColors.first?.opacity(0.55) ?? Color.green.opacity(0.55), lineWidth: 1.5)
+            } else {
+                RestGamesAttentionBorder(
+                    colors: attentionBorderColors,
+                    rotation: gradientRotation,
+                    cornerRadius: cornerRadius
+                )
+            }
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .stroke(Color.primary.opacity(0.06), lineWidth: 1)
         }
+        .onAppear {
+            startBorderAnimationIfNeeded()
+            scheduleAutoDismiss()
+        }
+        .onDisappear {
+            autoDismissTask?.cancel()
+        }
+    }
+
+    private var attentionBorderColors: [Color] {
+        var colors: [Color] = []
+        if state.hasWordle { colors.append(.green) }
+        if state.hasLeet { colors.append(.orange) }
+        if colors.isEmpty { colors = [.green, .cyan] }
+        return colors
+    }
+
+    private func startBorderAnimationIfNeeded() {
+        guard !reduceMotion else { return }
+
+        withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
+            gradientRotation = 360
+        }
+    }
+
+    private func scheduleAutoDismiss() {
+        autoDismissTask?.cancel()
+        autoDismissTask = Task {
+            try? await Task.sleep(nanoseconds: UInt64(autoDismissDuration * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                dismissBanner()
+            }
+        }
+    }
+
+    private func dismissBanner() {
+        autoDismissTask?.cancel()
+        onDismiss()
     }
 
     private func gameIcon(_ symbol: String, color: Color) -> some View {

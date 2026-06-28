@@ -169,9 +169,9 @@ struct DailyDigestView: View {
     
     private func headerView(_ digest: DailyDigest) -> some View {
         VStack(spacing: 8) {
-            Image(systemName: "sun.max.fill")
+            Image(systemName: "sunset.fill")
                 .font(.system(size: 44))
-                .foregroundStyle(.blue)
+                .foregroundStyle(.orange)
 
             Text("Briefing Diário")
                 .font(.title2)
@@ -295,14 +295,14 @@ struct DailyDigestBanner: View {
     let onTap: () -> Void
 
     private let messages = [
-        "Acordou? Os melhores posts de hoje já estão aqui!",
-        "Seu café da manhã de conteúdo chegou! ☕",
+        "Fim de expediente? O resumo do dia no TabNews está pronto!",
+        "Antes de fechar o dia, veja o que rolou no TabNews!",
         "Não perdeu nada do TabNews hoje — a gente filtrou pra você!",
         "As discussões mais quentes do dia te esperam!",
         "Pouco tempo? Veja o que rolou hoje no TabNews!",
         "Briefing pronto: o essencial de hoje em um lugar só!",
-        "Começou o dia? Veja o que a comunidade produziu!",
-        "Seu resumo diário está prontinho!"
+        "Hora de encerrar? Confira os destaques de hoje!",
+        "Seu resumo diário chegou — veja o que a comunidade produziu!"
     ]
 
     @State private var currentMessage: String = ""
@@ -310,9 +310,9 @@ struct DailyDigestBanner: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
-                Image(systemName: "sun.max.fill")
+                Image(systemName: "sunset.fill")
                     .font(.title2)
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(.orange)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Briefing Diário")
@@ -335,10 +335,10 @@ struct DailyDigestBanner: View {
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color.blue.opacity(0.1))
+                    .fill(Color.orange.opacity(0.1))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                            .stroke(Color.orange.opacity(0.3), lineWidth: 1)
                     )
             )
         }

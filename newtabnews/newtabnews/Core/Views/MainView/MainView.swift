@@ -27,6 +27,11 @@ struct MainView: View {
     @Binding var postToOpen: PostRequest?
     @Binding var isLoadingPost: Bool
 
+    private var isWeekend: Bool {
+        let weekday = Calendar.current.component(.weekday, from: Date())
+        return weekday == 7 || weekday == 1
+    }
+
     private var shouldShowDigestBanner: Bool {
         #if DEBUG
         if debugShowDigestBanner {
@@ -34,9 +39,7 @@ struct MainView: View {
         }
         #endif
 
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: Date())
-        return weekday == 7 || weekday == 1
+        return isWeekend
     }
 
     private var shouldShowDailyDigestBanner: Bool {
@@ -45,6 +48,8 @@ struct MainView: View {
             return true
         }
         #endif
+
+        guard !isWeekend else { return false }
 
         return dailyDigestManager.shouldShowBanner()
     }

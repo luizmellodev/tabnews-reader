@@ -59,6 +59,8 @@ struct OnboardingView: View {
                     ForEach(0..<pages.count, id: \.self) { index in
                         OnboardingPageView(
                             page: pages[index],
+                            pageIndex: index,
+                            currentPage: currentPage,
                             isLast: index == pages.count - 1,
                             screenSize: geometry.size,
                             completion: {
@@ -101,13 +103,17 @@ private struct OnboardingPage {
 
 private struct OnboardingPageView: View {
     let page: OnboardingPage
+    let pageIndex: Int
+    let currentPage: Int
     let isLast: Bool
     let screenSize: CGSize
     let completion: () -> Void
     
     @State private var showContent = false
     @State private var showSecondaryImage = false
-    @State private var rotationAngle = 0.0
+    @State private var entranceTask: Task<Void, Never>?
+    
+    private var isActive: Bool { currentPage == pageIndex }
     
     var body: some View {
         VStack(spacing: 32) {
@@ -174,22 +180,50 @@ private struct OnboardingPageView: View {
         }
         .padding()
         .onAppear {
+            syncWithActiveState()
+        }
+        .onChange(of: isActive) { _, _ in
+            syncWithActiveState()
+        }
+        .onDisappear {
+            entranceTask?.cancel()
+        }
+    }
+
+    private func syncWithActiveState() {
+        if isActive {
+            playEntranceAnimation()
+        } else {
+            resetContent()
+        }
+    }
+
+    private func resetContent() {
+        entranceTask?.cancel()
+        showContent = false
+        showSecondaryImage = false
+    }
+
+    private func playEntranceAnimation() {
+        entranceTask?.cancel()
+        showContent = false
+        showSecondaryImage = false
+
+        entranceTask = Task { @MainActor in
+            // Aguarda um frame para o SwiftUI registrar o estado "oculto" antes de animar
+            try? await Task.sleep(nanoseconds: 50_000_000)
+            guard !Task.isCancelled, isActive else { return }
+
             withAnimation(.spring(duration: 0.7)) {
                 showContent = true
             }
-            
-            withAnimation(.spring(duration: 0.7).delay(0.3)) {
+
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            guard !Task.isCancelled, isActive else { return }
+
+            withAnimation(.spring(duration: 0.7)) {
                 showSecondaryImage = true
             }
-            
-            // Continuous rotation animation for icons
-            withAnimation(.linear(duration: 20).repeatForever(autoreverses: false)) {
-                rotationAngle = 360
-            }
-        }
-        .onDisappear {
-            showContent = false
-            showSecondaryImage = false
         }
     }
 }

@@ -3,11 +3,15 @@ import SwiftUI
 struct DevWordleKeyboardView: View {
     let keyboardStates: [Character: DevWordleLetterResult]
     var isEnabled = true
+    var compact = false
+    var extraCompact = false
     let onLetter: (Character) -> Void
     let onDelete: () -> Void
     let onSubmit: () -> Void
 
-    private let keyHeight: CGFloat = 48
+    private static let defaultKeyHeight: CGFloat = 48
+    private static let compactKeyHeight: CGFloat = 42
+    private static let extraCompactKeyHeight: CGFloat = 36
     private let letterKeyWidth: CGFloat = 34
     private let keySpacing: CGFloat = 6
     private let deleteKeyWidth: CGFloat = 54
@@ -19,6 +23,12 @@ struct DevWordleKeyboardView: View {
         Array("ZXCVBNM")
     ]
 
+    private var keyHeight: CGFloat {
+        if extraCompact { return Self.extraCompactKeyHeight }
+        if compact { return Self.compactKeyHeight }
+        return Self.defaultKeyHeight
+    }
+
     private var topRowWidth: CGFloat {
         rowWidth(for: rows[0].count)
     }
@@ -27,13 +37,46 @@ struct DevWordleKeyboardView: View {
         (topRowWidth - rowWidth(for: rows[1].count)) / 2
     }
 
-    /// Z fica na coluna do S — um passo à direita do A.
     private var thirdRowLeading: CGFloat {
         secondRowLeading + letterKeyWidth + keySpacing
     }
 
+    private var layoutHeight: CGFloat {
+        keyHeight * 4 + keySpacing * 3
+    }
+
+    static func preferredHeight(compact: Bool, extraCompact: Bool = false) -> CGFloat {
+        let keyHeight: CGFloat
+        if extraCompact {
+            keyHeight = extraCompactKeyHeight
+        } else if compact {
+            keyHeight = compactKeyHeight
+        } else {
+            keyHeight = defaultKeyHeight
+        }
+        return keyHeight * 4 + 6 * 3
+    }
+
     var body: some View {
-        VStack(spacing: 8) {
+        GeometryReader { geometry in
+            let scale = min(1, geometry.size.width / topRowWidth)
+
+            HStack {
+                Spacer(minLength: 0)
+                keyboardBody
+                    .frame(width: topRowWidth, height: layoutHeight)
+                    .scaleEffect(scale, anchor: .center)
+                Spacer(minLength: 0)
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .bottom)
+        }
+        .frame(height: layoutHeight)
+        .opacity(isEnabled ? 1 : 0.35)
+        .allowsHitTesting(isEnabled)
+    }
+
+    private var keyboardBody: some View {
+        VStack(spacing: keySpacing) {
             ForEach(Array(rows.enumerated()), id: \.offset) { index, row in
                 if index == 0 {
                     HStack(spacing: keySpacing) {
@@ -76,8 +119,6 @@ struct DevWordleKeyboardView: View {
                 }
             }
         }
-        .opacity(isEnabled ? 1 : 0.35)
-        .allowsHitTesting(isEnabled)
     }
 
     private func rowWidth(for keyCount: Int) -> CGFloat {
