@@ -1,10 +1,24 @@
 # TabNews Reader
 
-An unofficial iOS client for [TabNews](https://www.tabnews.com.br), a Brazilian tech community where developers publish posts, debate in comments, and earn reputation through *tabcoins*. Think Hacker News or Reddit, but focused on engineering culture in Portuguese.
+An unofficial iOS client for [TabNews](https://www.tabnews.com.br), a Brazilian tech community where developers publish posts, debate in comments, and earn reputation through _tabcoins_. Think Hacker News or Reddit, but focused on engineering culture in Portuguese.
 
 This app started as a better way to read TabNews on the phone. It grew into a full client: library tools, digests, widgets, Apple Watch, push notifications, and a set of mini-games I built for breaks between articles.
 
 **[Download on the App Store](https://apps.apple.com/app/id6755933359)** · fan-made, not affiliated with TabNews
+
+## Screenshots
+
+| Home feed                                                              | Post reader                                                               |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| ![Home feed with daily briefing cards](docs/screenshots/news-home.png) | ![Native Markdown reader with highlights](docs/screenshots/news-post.png) |
+
+| Newsletter                                              | Dev Games hub                                    |
+| ------------------------------------------------------- | ------------------------------------------------ |
+| ![Newsletter tab](docs/screenshots/news-newsletter.png) | ![Jogos Dev hub](docs/screenshots/news-game.png) |
+
+| Big O                                                    | DevLeet                                                                |
+| -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| ![Big O daily challenge](docs/screenshots/news-bigo.png) | ![Weekly LeetCode-style challenge](docs/screenshots/news-leetcode.png) |
 
 ---
 
@@ -12,7 +26,7 @@ This app started as a better way to read TabNews on the phone. It grew into a fu
 
 If you're outside Brazil, TabNews probably won't ring a bell. That's the point of this README.
 
-TabNews is a public platform for long-form technical writing and discussion. Posts rank by community votes (*tabcoins*). There's a weekly newsletter, community digests, and a comment culture that's closer to a dev forum than a news feed. The official site works well in Safari; this project asks what a native iOS experience could add on top of that.
+TabNews is a public platform for long-form technical writing and discussion. Posts rank by community votes (_tabcoins_). There's a weekly newsletter, community digests, and a comment culture that's closer to a dev forum than a news feed. The official site works well in Safari; this project asks what a native iOS experience could add on top of that.
 
 ---
 
@@ -60,15 +74,15 @@ Daily challenges, free practice after completing the daily run, Game Center lead
 
 ## Stack
 
-| Layer | Choices |
-|-------|---------|
-| UI | SwiftUI, iOS 26+ |
-| Local data | SwiftData |
-| Networking | async/await, custom API client against TabNews |
-| Auth | native login + web session fallback, Keychain for tokens |
-| Push | Firebase (FCM + APNs) |
-| Games audio | AVAudioEngine oscillator (`ToneGenerator`) |
-| Games social | GameKit (leaderboards & achievements) |
+| Layer           | Choices                                                                  |
+| --------------- | ------------------------------------------------------------------------ |
+| UI              | SwiftUI, iOS 26+                                                         |
+| Local data      | SwiftData                                                                |
+| Networking      | async/await, custom API client against TabNews                           |
+| Auth            | native login + web session fallback, Keychain for tokens                 |
+| Push            | Firebase (FCM + APNs)                                                    |
+| Games audio     | AVAudioEngine oscillator (`ToneGenerator`)                               |
+| Games social    | GameKit (leaderboards & achievements)                                    |
 | Widgets / Watch | WidgetKit, watchOS, shared App Group `group.tabnews.com.app.tabnews-ios` |
 
 No storyboards. The app target, widget extension, and watch app live in one Xcode project under `newtabnews/`.
@@ -120,12 +134,12 @@ Leaderboards and achievements use IDs prefixed with `tabnews.*` in App Store Con
 
 ## Deep links
 
-| URL | Opens |
-|-----|-------|
-| `tabnews://home` | Home feed |
-| `tabnews://newsletter` | Newsletter tab |
-| `tabnews://digest` | Digest sheet |
-| `tabnews://post/{owner}/{slug}` | Specific post |
+| URL                             | Opens          |
+| ------------------------------- | -------------- |
+| `tabnews://home`                | Home feed      |
+| `tabnews://newsletter`          | Newsletter tab |
+| `tabnews://digest`              | Digest sheet   |
+| `tabnews://post/{owner}/{slug}` | Specific post  |
 
 Used by widgets, notifications, and external shortcuts.
 
