@@ -246,17 +246,21 @@ class AuthService: ObservableObject {
     }
     
     private func clearWebViewCookies() {
-        let dataStore = WKWebsiteDataStore.default()
-        let dataTypes = Set([WKWebsiteDataTypeCookies])
-        
-        dataStore.fetchDataRecords(ofTypes: dataTypes) { records in
-            // Filtrar apenas cookies do TabNews
-            let tabnewsRecords = records.filter { $0.displayName.contains("tabnews.com.br") }
-            
-            dataStore.removeData(ofTypes: dataTypes, for: tabnewsRecords) {
-                #if DEBUG
-                print("🍪 [AuthService] Cookies da WebView limpos")
-                #endif
+        // WKWebsiteDataStore é @MainActor; logout() pode vir de uma Task em background
+        // (ex.: validateSession recebendo 401), então sempre pular para a main
+        Task { @MainActor in
+            let dataStore = WKWebsiteDataStore.default()
+            let dataTypes = Set([WKWebsiteDataTypeCookies])
+
+            dataStore.fetchDataRecords(ofTypes: dataTypes) { records in
+                // Filtrar apenas cookies do TabNews
+                let tabnewsRecords = records.filter { $0.displayName.contains("tabnews.com.br") }
+
+                dataStore.removeData(ofTypes: dataTypes, for: tabnewsRecords) {
+                    #if DEBUG
+                    print("🍪 [AuthService] Cookies da WebView limpos")
+                    #endif
+                }
             }
         }
     }
