@@ -47,6 +47,5 @@ extension Notification.Name {
     static let showRestGamesHub = Notification.Name("showRestGamesHub")
     static let simulateFirstPostLongPress = Notification.Name("simulateFirstPostLongPress")
     static let dismissContextMenu = Notification.Name("dismissContextMenu")
-    static let navigateToHome = Notification.Name("navigateToHome")
     static let openLoginWebView = Notification.Name("openLoginWebView")
 }

@@ -1,303 +1,116 @@
 import SwiftUI
 
+/// Dicas de uso exibidas após o onboarding (e em Perfil > Ver Dicas Novamente).
+/// Usa o mesmo OnboardingPageView do onboarding para manter o visual preto e branco.
 struct OnboardingTipsView: View {
     @Binding var showOnboarding: Bool
     @State private var currentTip = 0
-    @Environment(\.colorScheme) var colorScheme
-    var onNavigateToLibrary: (() -> Void)?
-    
-    private var overlayColor: Color {
-        colorScheme == .dark ? Color.black.opacity(0.9) : Color.black.opacity(0.7)
-    }
-    
-    private let tips: [CoachMark] = [
-        CoachMark(
-            title: "Pressione e Segure",
-            message: "Segure um post para ver atalhos rápidos: curtir, salvar em pasta ou ouvir",
-            xOffset: 0,
-            yOffset: 150,
-            arrow: .down
+
+    private let tips: [OnboardingPage] = [
+        OnboardingPage(
+            title: "Segure um post",
+            subtitle: "Na lista de posts, segure um item para ver os atalhos:",
+            imageName: "hand.tap.fill",
+            secondaryImageName: "ellipsis.circle",
+            illustration: .postMenu
         ),
-        CoachMark(
-            title: "Biblioteca",
-            message: "Aqui você encontra seus posts curtidos, destaques, anotações e pastas organizadas",
-            xOffset: -35,
-            yOffset: 230,
-            arrow: .up
+        OnboardingPage(
+            title: "Destaque e anote",
+            subtitle: "Dentro de um post, toque em Destacar e selecione o trecho. Use Anotar para guardar suas ideias sobre a leitura.",
+            imageName: "highlighter",
+            secondaryImageName: "note.text"
         ),
-        CoachMark(
-            title: "Criar Pastas",
-            message: "Toque no botão 'Criar pasta' para criar pastas e organizar seus posts!",
-            xOffset: 0,
-            yOffset: 145,
-            arrow: .down
+        OnboardingPage(
+            title: "Sua Biblioteca",
+            subtitle: "Curtidos, Ler Depois, destaques, anotações e pastas ficam na aba Biblioteca. Para criar uma pasta, toque no ícone de pasta com + no topo.",
+            imageName: "books.vertical.fill",
+            secondaryImageName: "folder.badge.plus"
         ),
-        CoachMark(
-            title: "Atenção!",
-            message: "Este app não é oficial do TabNews e não possui vínculo com Filipe Deschamps. É um projeto independente e open source criado pela comunidade para ser um complemento ao site oficial.",
-            xOffset: 0,
-            yOffset: 0,
-            arrow: .none
+        OnboardingPage(
+            title: "Conheça quem escreve",
+            subtitle: "Toque no @ do autor de um post ou comentário para ver o perfil, os TabCoins e as publicações da pessoa.",
+            imageName: "person.crop.circle.fill",
+            secondaryImageName: "at"
+        ),
+        OnboardingPage(
+            title: "Jogos Dev",
+            subtitle: "Na aba Perfil, abra Jogos Dev: desafios diários como Regex Golf, DevWordle e Big O, com rankings no Game Center.",
+            imageName: "gamecontroller.fill",
+            secondaryImageName: "trophy.fill"
+        ),
+        OnboardingPage(
+            title: "App não oficial",
+            subtitle: "Este app não é oficial do TabNews e não tem vínculo com Filipe Deschamps. É um projeto independente e open source, feito para complementar o site oficial.",
+            imageName: "heart.fill",
+            secondaryImageName: "chevron.left.forwardslash.chevron.right"
         )
     ]
-    
+
     var body: some View {
-        ZStack {
-            if currentTip == 1 {
-                VStack(spacing: 0) {
-                    overlayColor
-                    Color.clear
-                        .frame(height: 100)
-                }
-                .ignoresSafeArea()
-                .onTapGesture {
-                    nextTip()
-                }
-            } else {
-                overlayColor
+        GeometryReader { geometry in
+            ZStack {
+                Color("Background")
                     .ignoresSafeArea()
-                    .onTapGesture {
-                        if currentTip != 0 {
-                            nextTip()
+                Image("ruido")
+                    .resizable()
+                    .scaledToFill()
+                    .blendMode(.overlay)
+                    .ignoresSafeArea()
+
+                TabView(selection: $currentTip) {
+                    ForEach(0..<tips.count, id: \.self) { index in
+                        OnboardingPageView(
+                            page: tips[index],
+                            pageIndex: index,
+                            currentPage: currentTip,
+                            isLast: index == tips.count - 1,
+                            screenSize: geometry.size,
+                            finishTitle: "Começar a usar",
+                            completion: completeTips
+                        )
+                        .tag(index)
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+
+                VStack {
+                    HStack {
+                        Spacer()
+                        if currentTip < tips.count - 1 {
+                            Button("Pular", action: completeTips)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 24)
+                                .padding(.top, 8)
+                                .transition(.opacity)
                         }
                     }
-            }
-            
-            // Context menu simulado para primeira dica
-            if currentTip == 0 {
-                VStack(spacing: 0) {
                     Spacer()
-                        .frame(height: 280)
-                    
-                    VStack(spacing: 0) {
-                        Button(action: {}) {
-                            HStack {
-                                Image(systemName: "heart")
-                                    .foregroundColor(.red)
-                                Text("Curtir")
-                                    .foregroundColor(colorScheme == .dark ? .white : .primary)
-                                Spacer()
-                            }
-                            .padding()
-                            .contentShape(Rectangle())
-                        }
-                        
-                        Divider()
-                        
-                        Button(action: {}) {
-                            HStack {
-                                Image(systemName: "folder.badge.plus")
-                                    .foregroundColor(.blue)
-                                Text("Salvar em Pasta")
-                                    .foregroundColor(colorScheme == .dark ? .white : .primary)
-                                Spacer()
-                            }
-                            .padding()
-                            .contentShape(Rectangle())
-                        }
-                        
-                        Divider()
-                        
-                        Button(action: {}) {
-                            HStack {
-                                Image(systemName: "speaker.wave.2")
-                                    .foregroundColor(.green)
-                                Text("Ouvir Post")
-                                    .foregroundColor(colorScheme == .dark ? .white : .primary)
-                                Spacer()
-                            }
-                            .padding()
-                            .contentShape(Rectangle())
-                        }
+                }
+                .animation(.easeOut(duration: 0.2), value: currentTip)
+
+                // Mesmo indicador do onboarding
+                HStack(spacing: 8) {
+                    ForEach(0..<tips.count, id: \.self) { index in
+                        Circle()
+                            .fill(currentTip == index ? Color.primary : Color.primary.opacity(0.3))
+                            .frame(width: 6, height: 6)
+                            .scaleEffect(currentTip == index ? 1.2 : 1)
+                            .animation(.spring(), value: currentTip)
                     }
-                    .background(colorScheme == .dark ? Color("PrimaryColor") : Color.white)
-                    .cornerRadius(14)
-                    .padding(.horizontal, 50)
-                    .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 10)
-                    
-                    Spacer()
                 }
-                .zIndex(1)
+                .padding()
+                .offset(y: geometry.size.height * 0.4)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Dica \(currentTip + 1) de \(tips.count)")
             }
-            
-            // Tooltip
-            GeometryReader { geometry in
-                if currentTip < tips.count {
-                    CoachMarkView(
-                        tip: tips[currentTip],
-                        currentStep: currentTip + 1,
-                        totalSteps: tips.count,
-                        onNext: nextTip,
-                        onSkip: completeOnboarding,
-                        screenSize: geometry.size
-                    )
-                }
-            }
-            .zIndex(2)
         }
     }
-    
-    private func nextTip() {
-        if currentTip < tips.count - 1 {
-            withAnimation(.spring(response: 0.3)) {
-                currentTip += 1
-                
-                if currentTip == 1 {
-                    onNavigateToLibrary?()
-                }
-                
-                if currentTip == 3 {
-                    NotificationCenter.default.post(name: .navigateToHome, object: nil)
-                }
-            }
-        } else {
-            completeOnboarding()
-        }
-    }
-    
-    private func completeOnboarding() {
+
+    private func completeTips() {
         UserDefaults.standard.set(true, forKey: "hasSeenTipsOnboarding")
         withAnimation {
             showOnboarding = false
         }
-    }
-}
-
-struct CoachMarkView: View {
-    let tip: CoachMark
-    let currentStep: Int
-    let totalSteps: Int
-    let onNext: () -> Void
-    let onSkip: () -> Void
-    let screenSize: CGSize
-    @Environment(\.colorScheme) var colorScheme
-    
-    var body: some View {
-        if tip.arrow == .none {
-            // Tela final centralizada
-            VStack(spacing: 20) {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(.green)
-                
-                Text(tip.title)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                
-                Text(tip.message)
-                    .font(.body)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal, 30)
-                
-                Button {
-                    onNext()
-                } label: {
-                    Text("Começar a usar")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color.blue)
-                        .cornerRadius(12)
-                }
-                .padding(.horizontal, 40)
-                .padding(.top, 20)
-            }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(colorScheme == .dark ? Color("PrimaryColor") : .white)
-                    .shadow(color: .black.opacity(0.3), radius: 30, x: 0, y: 10)
-            )
-            .padding(.horizontal, 30)
-            .position(x: screenSize.width / 2, y: screenSize.height / 2)
-        } else {
-            // Dicas contextuais
-            VStack(spacing: 0) {
-                if tip.arrow == .down {
-                    Image(systemName: "arrowtriangle.up.fill")
-                        .font(.title)
-                        .foregroundColor(colorScheme == .dark ? Color("PrimaryColor") : .white)
-                        .padding(.bottom, -5)
-                }
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text(tip.title)
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                        Spacer()
-                        Button("Pular") {
-                            onSkip()
-                        }
-                        .font(.caption)
-                        .foregroundColor(.blue)
-                    }
-                    
-                    Text(tip.message)
-                        .font(.subheadline)
-                        .foregroundColor(.primary)
-                        .fixedSize(horizontal: false, vertical: true)
-                    
-                    HStack {
-                        HStack(spacing: 6) {
-                            ForEach(0..<totalSteps, id: \.self) { index in
-                                Circle()
-                                    .fill(index < currentStep ? Color.blue : Color.gray.opacity(0.3))
-                                    .frame(width: 6, height: 6)
-                            }
-                        }
-                        Spacer()
-                        Button {
-                            onNext()
-                        } label: {
-                            Text(currentStep == totalSteps ? "Começar" : "Próximo")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 8)
-                                .background(Color.blue)
-                                .cornerRadius(20)
-                        }
-                    }
-                    .padding(.top, 4)
-                }
-                .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(colorScheme == .dark ? Color("PrimaryColor") : Color.white)
-                        .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 10)
-                )
-                .frame(maxWidth: 300)
-                
-                if tip.arrow == .up {
-                    Image(systemName: "arrowtriangle.down.fill")
-                        .font(.title)
-                        .foregroundColor(colorScheme == .dark ? Color("PrimaryColor") : .white)
-                        .padding(.top, -5)
-                }
-            }
-            .position(
-                x: screenSize.width / 2 + tip.xOffset,
-                y: screenSize.height / 2 + tip.yOffset
-            )
-        }
-    }
-}
-
-struct CoachMark {
-    let title: String
-    let message: String
-    let xOffset: CGFloat
-    let yOffset: CGFloat
-    let arrow: Arrow
-    
-    enum Arrow {
-        case none, up, down
     }
 }

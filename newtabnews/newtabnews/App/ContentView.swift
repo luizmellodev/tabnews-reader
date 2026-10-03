@@ -59,12 +59,7 @@ struct ContentView: View {
                     mainContent
 
                     if showTipsOnboarding {
-                        OnboardingTipsView(
-                            showOnboarding: $showTipsOnboarding,
-                            onNavigateToLibrary: {
-                                selectedTab = .library
-                            }
-                        )
+                        OnboardingTipsView(showOnboarding: $showTipsOnboarding)
                         .transition(.opacity)
                     }
                 }
@@ -346,14 +341,6 @@ struct ContentView: View {
             queue: .main
         ) { [self] _ in
             showRestGamesHub = true
-        }
-        
-        NotificationCenter.default.addObserver(
-            forName: .navigateToHome,
-            object: nil,
-            queue: .main
-        ) { [self] _ in
-            selectedTab = .home
         }
         
         NotificationCenter.default.addObserver(
