@@ -206,11 +206,27 @@ struct BigOView: View {
             .padding(.horizontal, 20)
             .id("\(viewModel.currentRound)-\(round.challenge.id)")
 
-            Text("Qual a complexidade?")
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.white.opacity(0.55))
-                .padding(.top, 20)
-                .padding(.bottom, 12)
+            VStack(spacing: 8) {
+                HStack(spacing: 5) {
+                    Image(systemName: round.challenge.isSpace ? "memorychip" : "timer")
+                    Text(round.challenge.questionBadge)
+                        .tracking(1)
+                }
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(round.challenge.isSpace ? BigOTheme.stringColor : BigOTheme.accentLight)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(
+                    (round.challenge.isSpace ? BigOTheme.stringColor : BigOTheme.accent).opacity(0.15),
+                    in: Capsule()
+                )
+
+                Text(round.challenge.questionPrompt)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+            .padding(.top, 18)
+            .padding(.bottom, 12)
 
             BigOOptionsView(
                 options: round.displayOptions,

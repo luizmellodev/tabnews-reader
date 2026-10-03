@@ -55,6 +55,10 @@ final class ToneGenerator {
         briefToneWorkItem?.cancel()
         isSustainMode = true
         sustainPurpose = purpose
+        // Partindo do silêncio, começa já no pitch certo (sem glide do tom anterior).
+        if !isRunning {
+            state.currentFrequency = max(20, frequency)
+        }
         state.targetFrequency = max(20, frequency)
         state.targetVolume = volume
         startEngineIfNeeded()

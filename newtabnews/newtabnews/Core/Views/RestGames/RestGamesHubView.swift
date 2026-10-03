@@ -24,6 +24,7 @@ struct RestGamesHubView: View {
     @State private var regexGolfSummary = RegexGolfViewModel.todaySummary()
     @State private var weeklySummary = DevLeetHubSummary.current()
     @State private var showLeaderboards = false
+    @State private var hubStreak = RestGamesHubStreak.current
 
     var body: some View {
         NavigationStack {
@@ -31,113 +32,53 @@ struct RestGamesHubView: View {
                 RestGameBackground()
 
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 32) {
-                        VStack(spacing: 10) {
-                            RestGamePhaseLabel(text: "TabNews")
+                    VStack(alignment: .leading, spacing: 28) {
+                        hubHeader
 
-                            Text("Jogos Dev")
-                                .font(.system(size: 34, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
-                        }
-                        .padding(.top, 8)
+                        VStack(alignment: .leading, spacing: 12) {
+                            if let next = nextDaily {
+                                sectionTitle("Continuar")
+                                dailyTile(next, large: true)
+                            } else {
+                                dailyCompleteBanner
+                            }
 
-                        RestGameFreeModeHubSetting()
+                            if !gridDailies.isEmpty {
+                                sectionTitle("Diários de hoje")
+                                    .padding(.top, 8)
 
-                        VStack(alignment: .leading, spacing: 14) {
-                            sectionTitle("Hoje")
-
-                            VStack(spacing: 12) {
-                                hubTile(
-                                    title: "DevWordle",
-                                    accent: .green,
-                                    destination: .devWordle,
-                                    aspectRatio: 2,
-                                    badge: { wordleBadge },
-                                    footer: {
-                                        if dailySummary.played {
-                                            DevWordleCountdownLabel(prefix: "Próxima em")
+                                // Pares lado a lado; se sobrar um, ele ocupa a linha inteira
+                                VStack(spacing: 12) {
+                                    ForEach(Array(stride(from: 0, to: gridDailies.count, by: 2)), id: \.self) { index in
+                                        if index + 1 < gridDailies.count {
+                                            HStack(spacing: 12) {
+                                                dailyTile(gridDailies[index], large: false)
+                                                dailyTile(gridDailies[index + 1], large: false)
+                                            }
+                                        } else {
+                                            dailyTile(gridDailies[index], large: false, wide: true)
                                         }
                                     }
-                                ) {
-                                    DevWordleHubPreview()
-                                }
-
-                                HStack(spacing: 12) {
-                                    hubTile(
-                                        title: "Big O",
-                                        accent: BigOTheme.accent,
-                                        destination: .bigO,
-                                        badge: { bigODailyBadge }
-                                    ) {
-                                        BigOHubPreview()
-                                    }
-
-                                    hubTile(
-                                        title: "AlgoSpot",
-                                        accent: AlgoSpotTheme.accent,
-                                        destination: .algoSpot,
-                                        badge: { algoSpotDailyBadge }
-                                    ) {
-                                        AlgoSpotHubPreview()
-                                    }
-                                }
-
-                                hubTile(
-                                    title: "Regex Golf",
-                                    accent: RegexGolfTheme.accent,
-                                    destination: .regexGolf,
-                                    aspectRatio: 2,
-                                    badge: { dailyBadge(regexGolfSummary, accent: RegexGolfTheme.accentLight) }
-                                ) {
-                                    RegexGolfHubPreview()
-                                }
-
-                                HStack(spacing: 12) {
-                                    hubTile(
-                                        title: "HTTP Status",
-                                        accent: HttpStatusTheme.accent,
-                                        destination: .httpStatus,
-                                        badge: { dailyBadge(httpStatusSummary, accent: HttpStatusTheme.accentLight) }
-                                    ) {
-                                        HttpStatusHubPreview()
-                                    }
-
-                                    hubTile(
-                                        title: "Git Rescue",
-                                        accent: GitRescueTheme.accent,
-                                        destination: .gitRescue,
-                                        badge: { dailyBadge(gitRescueSummary, accent: GitRescueTheme.accentLight) }
-                                    ) {
-                                        GitRescueHubPreview()
-                                    }
                                 }
                             }
                         }
 
-                        VStack(alignment: .leading, spacing: 14) {
-                            sectionTitle("Esta semana")
+                        VStack(alignment: .leading, spacing: 12) {
+                            sectionTitle("Mais jogos")
+                                .padding(.horizontal, 20)
 
-                            hubTile(
-                                title: "DevLeet",
-                                accent: .orange,
-                                destination: .devLeet,
-                                aspectRatio: 2,
-                                badge: { devLeetStatusBadge },
-                                footer: {
-                                    if weeklySummary.solved {
-                                        DevLeetCountdownLabel(prefix: "Próximo em")
-                                    }
-                                }
-                            ) {
-                                DevLeetHubPreview(summary: weeklySummary)
-                            }
-                        }
-
-                        VStack(alignment: .leading, spacing: 14) {
-                            sectionTitle("Mais")
-
-                            VStack(spacing: 12) {
+                            ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
+                                    hubTile(
+                                        title: "DevLeet",
+                                        accent: .orange,
+                                        destination: .devLeet,
+                                        badge: { devLeetStatusBadge }
+                                    ) {
+                                        DevLeetHubPreview(summary: weeklySummary, compact: true)
+                                    }
+                                    .frame(width: 168)
+
                                     hubTile(
                                         title: "DevSpot",
                                         accent: .mint,
@@ -146,6 +87,7 @@ struct RestGamesHubView: View {
                                     ) {
                                         DevSpotPreview()
                                     }
+                                    .frame(width: 168)
 
                                     hubTile(
                                         title: "Color Match",
@@ -154,25 +96,35 @@ struct RestGamesHubView: View {
                                     ) {
                                         ColorMatchHubPreview()
                                     }
-                                }
+                                    .frame(width: 168)
 
-                                hubTile(
-                                    title: "Sound Match",
-                                    accent: .cyan,
-                                    destination: .arcade(.sound),
-                                    aspectRatio: 2,
-                                    immersivePreview: true
-                                ) {
-                                    SoundMatchHubPreview()
+                                    hubTile(
+                                        title: "Sound Match",
+                                        accent: .cyan,
+                                        destination: .arcade(.sound),
+                                        immersivePreview: true
+                                    ) {
+                                        SoundMatchHubPreview()
+                                    }
+                                    .frame(width: 168)
                                 }
+                                .padding(.horizontal, 20)
                             }
+                            .scrollClipDisabled()
                         }
+                        .padding(.horizontal, -20)
+
+                        RestGameFreeModeHubSetting()
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 32)
+                    .animation(RestGameTheme.spring, value: nextDaily)
                 }
+                .scrollEdgeEffectStyle(.hard, for: .top)
             }
-            .safeAreaInset(edge: .top, spacing: 0) {
+            // safeAreaBar (e não safeAreaInset) para ganhar o efeito de borda do iOS 26:
+            // o conteúdo esmaece por baixo dos botões em vez de passar por cima do relógio
+            .safeAreaBar(edge: .top, spacing: 0) {
                 if destination == nil {
                     HStack {
                         rankingsButton
@@ -213,16 +165,194 @@ struct RestGamesHubView: View {
         }
         .onAppear {
             RestFeedbackManager.shared.prepare()
-            dailySummary = DevWordleViewModel.todaySummary()
-            bigOSummary = BigOViewModel.todaySummary()
-            algoSpotSummary = AlgoSpotViewModel.todaySummary()
-            httpStatusSummary = ScenarioQuizViewModel.todaySummary(for: .httpStatus)
-            gitRescueSummary = ScenarioQuizViewModel.todaySummary(for: .gitRescue)
-            regexGolfSummary = RegexGolfViewModel.todaySummary()
-            weeklySummary = DevLeetHubSummary.current()
+            refreshSummaries()
+        }
+        .onChange(of: destination) { _, newValue in
+            // Ao voltar de um jogo, o próximo diário sobe para "Continuar"
+            if newValue == nil {
+                refreshSummaries()
+            }
         }
         .sheet(isPresented: $showLeaderboards) {
             RestGameLeaderboardsSheet()
+        }
+    }
+
+    private func refreshSummaries() {
+        dailySummary = DevWordleViewModel.todaySummary()
+        bigOSummary = BigOViewModel.todaySummary()
+        algoSpotSummary = AlgoSpotViewModel.todaySummary()
+        httpStatusSummary = ScenarioQuizViewModel.todaySummary(for: .httpStatus)
+        gitRescueSummary = ScenarioQuizViewModel.todaySummary(for: .gitRescue)
+        regexGolfSummary = RegexGolfViewModel.todaySummary()
+        weeklySummary = DevLeetHubSummary.current()
+        hubStreak = RestGamesHubStreak.update(playedToday: playedDailyCount > 0)
+    }
+
+    // MARK: - Diários
+
+    private enum DailyGame: CaseIterable, Identifiable {
+        case devWordle, bigO, algoSpot, regexGolf, httpStatus, gitRescue
+
+        var id: Self { self }
+    }
+
+    private func isPlayed(_ game: DailyGame) -> Bool {
+        switch game {
+        case .devWordle: return dailySummary.played
+        case .bigO: return bigOSummary.played
+        case .algoSpot: return algoSpotSummary.played
+        case .regexGolf: return regexGolfSummary.played
+        case .httpStatus: return httpStatusSummary.played
+        case .gitRescue: return gitRescueSummary.played
+        }
+    }
+
+    private var playedDailyCount: Int {
+        DailyGame.allCases.filter(isPlayed).count
+    }
+
+    /// Primeiro diário ainda não jogado hoje (vai para o card grande)
+    private var nextDaily: DailyGame? {
+        DailyGame.allCases.first { !isPlayed($0) }
+    }
+
+    /// Demais diários: pendentes primeiro, jogados (esmaecidos) no fim
+    private var gridDailies: [DailyGame] {
+        let rest = DailyGame.allCases.filter { $0 != nextDaily }
+        return rest.filter { !isPlayed($0) } + rest.filter(isPlayed)
+    }
+
+    @ViewBuilder
+    private func dailyTile(_ game: DailyGame, large: Bool, wide: Bool = false) -> some View {
+        let ratio: CGFloat = large || wide ? 2 : 1
+        let played = isPlayed(game)
+
+        Group {
+            switch game {
+            case .devWordle:
+                hubTile(
+                    title: "DevWordle",
+                    accent: .green,
+                    destination: .devWordle,
+                    aspectRatio: ratio,
+                    badge: { wordleBadge },
+                    footer: {
+                        if dailySummary.played {
+                            DevWordleCountdownLabel(prefix: "Próxima em")
+                        }
+                    }
+                ) {
+                    DevWordleHubPreview()
+                }
+            case .bigO:
+                hubTile(title: "Big O", accent: BigOTheme.accent, destination: .bigO, aspectRatio: ratio, badge: { bigODailyBadge }) {
+                    BigOHubPreview()
+                }
+            case .algoSpot:
+                hubTile(title: "AlgoSpot", accent: AlgoSpotTheme.accent, destination: .algoSpot, aspectRatio: ratio, badge: { algoSpotDailyBadge }) {
+                    AlgoSpotHubPreview()
+                }
+            case .regexGolf:
+                hubTile(
+                    title: "Regex Golf",
+                    accent: RegexGolfTheme.accent,
+                    destination: .regexGolf,
+                    aspectRatio: ratio,
+                    badge: { dailyBadge(regexGolfSummary, accent: RegexGolfTheme.accentLight) }
+                ) {
+                    RegexGolfHubPreview()
+                }
+            case .httpStatus:
+                hubTile(
+                    title: "HTTP Status",
+                    accent: HttpStatusTheme.accent,
+                    destination: .httpStatus,
+                    aspectRatio: ratio,
+                    badge: { dailyBadge(httpStatusSummary, accent: HttpStatusTheme.accentLight) }
+                ) {
+                    HttpStatusHubPreview()
+                }
+            case .gitRescue:
+                hubTile(
+                    title: "Git Rescue",
+                    accent: GitRescueTheme.accent,
+                    destination: .gitRescue,
+                    aspectRatio: ratio,
+                    badge: { dailyBadge(gitRescueSummary, accent: GitRescueTheme.accentLight) }
+                ) {
+                    GitRescueHubPreview()
+                }
+            }
+        }
+        .saturation(played && !large ? 0.35 : 1)
+        .opacity(played && !large ? 0.6 : 1)
+    }
+
+    // MARK: - Header
+
+    private var hubHeader: some View {
+        HStack(alignment: .bottom, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("TABNEWS")
+                    .font(.caption2.weight(.bold))
+                    .tracking(2)
+                    .foregroundStyle(.white.opacity(0.45))
+                Text("Jogos Dev")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+            }
+
+            Spacer(minLength: 0)
+
+            VStack(alignment: .trailing, spacing: 6) {
+                if hubStreak > 0 {
+                    Label("\(hubStreak) \(hubStreak == 1 ? "dia" : "dias")", systemImage: "flame.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.orange)
+                        .accessibilityLabel("Sequência de \(hubStreak) \(hubStreak == 1 ? "dia" : "dias")")
+                }
+
+                HStack(spacing: 6) {
+                    HStack(spacing: 3) {
+                        ForEach(0..<DailyGame.allCases.count, id: \.self) { index in
+                            Circle()
+                                .fill(index < playedDailyCount ? Color.green : Color.white.opacity(0.2))
+                                .frame(width: 7, height: 7)
+                        }
+                    }
+                    Text("\(playedDailyCount)/\(DailyGame.allCases.count)")
+                        .font(.caption.weight(.bold))
+                        .monospacedDigit()
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(playedDailyCount) de \(DailyGame.allCases.count) diários jogados hoje")
+            }
+        }
+        .padding(.top, 4)
+    }
+
+    private var dailyCompleteBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.title2)
+                .foregroundStyle(.green)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Diários de hoje completos")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.white)
+                DevWordleCountdownLabel(prefix: "Novos em")
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(16)
+        .background(Color.green.opacity(0.1), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Color.green.opacity(0.25), lineWidth: 1)
         }
     }
 
@@ -306,7 +436,7 @@ struct RestGamesHubView: View {
                 Label("Resolvido", systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
             } else {
-                Text("New")
+                Text("Novo")
                     .foregroundStyle(.orange)
             }
         }
@@ -666,6 +796,8 @@ private struct HubPreviewShakeEffect: ViewModifier {
 
 private struct DevLeetHubPreview: View {
     let summary: DevLeetWeeklySummary
+    /// Card pequeno da linha "Mais jogos": só título, dificuldade e código
+    var compact = false
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
@@ -673,7 +805,7 @@ private struct DevLeetHubPreview: View {
                 Text(summary.problemTitle)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.white)
-                    .lineLimit(2)
+                    .lineLimit(compact ? 3 : 2)
                     .multilineTextAlignment(.leading)
 
                 HStack(spacing: 8) {
@@ -684,7 +816,7 @@ private struct DevLeetHubPreview: View {
                         .padding(.vertical, 4)
                         .background(summary.difficulty.color.opacity(0.14), in: Capsule())
 
-                    if summary.currentStreak > 0 {
+                    if summary.currentStreak > 0, !compact {
                         HStack(spacing: 3) {
                             Image(systemName: "flame.fill")
                                 .font(.caption2)
@@ -706,6 +838,7 @@ private struct DevLeetHubPreview: View {
                 .font(.system(size: 9, weight: .medium, design: .monospaced))
                 .foregroundStyle(.white.opacity(0.34))
 
+                if !compact {
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("IN")
@@ -725,10 +858,12 @@ private struct DevLeetHubPreview: View {
                             .foregroundStyle(.white.opacity(0.45))
                     }
                 }
+                }
             }
 
             Spacer(minLength: 0)
 
+            if !compact {
             VStack(spacing: 8) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -755,6 +890,7 @@ private struct DevLeetHubPreview: View {
                         .font(.caption2.weight(.semibold))
                 }
                 .foregroundStyle(.orange.opacity(0.75))
+            }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
@@ -1051,6 +1187,9 @@ private struct DevSpotPreview: View {
         Text(text)
             .font(.caption2.weight(.bold))
             .foregroundStyle(.white.opacity(highlighted ? 1 : 0.45))
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+            .padding(.horizontal, 4)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(
                 (highlighted ? Color.mint : Color.white).opacity(highlighted ? 0.2 : 0.06),
@@ -1065,4 +1204,36 @@ private struct DevSpotPreview: View {
 
 extension RestGameType: Identifiable {
     var id: Self { self }
+}
+
+/// Sequência de dias com pelo menos um desafio diário jogado (qualquer jogo)
+enum RestGamesHubStreak {
+    private static let countKey = "restGamesHubStreakCount"
+    private static let lastDayKey = "restGamesHubStreakLastDay"
+
+    static var current: Int {
+        let defaults = UserDefaults.standard
+        guard let last = defaults.string(forKey: lastDayKey),
+              last == dayKey(.now) || last == dayKey(yesterday) else { return 0 }
+        return defaults.integer(forKey: countKey)
+    }
+
+    static func update(playedToday: Bool) -> Int {
+        let defaults = UserDefaults.standard
+        let today = dayKey(.now)
+        guard playedToday, defaults.string(forKey: lastDayKey) != today else { return current }
+
+        let continues = defaults.string(forKey: lastDayKey) == dayKey(yesterday)
+        defaults.set(continues ? defaults.integer(forKey: countKey) + 1 : 1, forKey: countKey)
+        defaults.set(today, forKey: lastDayKey)
+        return current
+    }
+
+    private static var yesterday: Date {
+        Calendar.current.date(byAdding: .day, value: -1, to: .now) ?? .now
+    }
+
+    private static func dayKey(_ date: Date) -> String {
+        ScenarioQuizEngine.dateKey(for: date)
+    }
 }

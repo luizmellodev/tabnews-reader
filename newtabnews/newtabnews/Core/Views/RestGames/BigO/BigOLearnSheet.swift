@@ -134,7 +134,7 @@ struct BigOIntroLearnSheet: View {
                             introRow("O(n²)", "Quadrático — loops aninhados")
                         }
 
-                        Text("Analise loops, recursão e estruturas de dados. Sempre considere o pior caso, salvo indicação contrária.")
+                        Text("Analise loops, recursão e estruturas de dados. A etiqueta acima das opções diz o que medir: tempo no pior caso, tempo no caso médio ou espaço extra (memória além da entrada, incluindo a pilha de recursão).")
                             .font(.caption)
                             .foregroundStyle(.white.opacity(0.55))
 

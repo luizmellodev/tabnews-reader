@@ -503,6 +503,17 @@ struct HSLColorPickerView: View {
             }
             .padding(.leading, 16)
             .padding(.vertical, 80)
+
+            VStack {
+                HStack {
+                    Spacer()
+                    hexLabel
+                }
+                Spacer()
+            }
+            .padding(.trailing, 24)
+            .padding(.top, 4)
+            .allowsHitTesting(false)
         }
         .onAppear {
             ToneGenerator.shared.configureSessionIfNeeded()
@@ -510,6 +521,18 @@ struct HSLColorPickerView: View {
         .onDisappear {
             RestFeedbackManager.shared.endColorAdjust()
         }
+    }
+
+    /// Hex do palpite ao vivo, contrastando com o fundo.
+    private var hexLabel: some View {
+        let dark = color.prefersDarkForeground
+        return Text(color.hex)
+            .font(.system(.subheadline, design: .monospaced).weight(.semibold))
+            .foregroundStyle(dark ? .black.opacity(0.7) : .white.opacity(0.85))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background((dark ? Color.black : Color.white).opacity(0.12), in: Capsule())
+            .accessibilityLabel("Hex atual \(color.hex.dropFirst().map(String.init).joined(separator: " "))")
     }
 
     private func hueSlider(value: Binding<Double>) -> some View {

@@ -58,6 +58,11 @@ struct ScoreRevealView: View {
     let guessColor: HSLColor?
     let targetFrequency: Double?
     let guessFrequency: Double?
+    var roundKind: RestGameRoundKind = .recreate
+    var choiceColors: [HSLColor] = []
+    var choiceFrequencies: [Double] = []
+    var correctChoiceIndex = 0
+    var selectedChoiceIndex: Int?
     let onContinue: () -> Void
 
     @State private var displayedScore: Double = 0
@@ -123,16 +128,178 @@ struct ScoreRevealView: View {
 
     @ViewBuilder
     private var comparisonSection: some View {
-        switch gameType {
-        case .color:
+        switch roundKind {
+        case .hexRead:
             if let guessColor, let targetColor {
-                colorComparisonView(guess: guessColor, target: targetColor)
+                hexChoiceComparisonView(guess: guessColor, target: targetColor)
             }
-        case .sound:
-            if let guessFrequency, let targetFrequency {
-                frequencyComparisonView(guess: guessFrequency, target: targetFrequency)
+        case .higherPitch:
+            pitchChoiceComparisonView
+        case .recreate:
+            switch gameType {
+            case .color:
+                if let guessColor, let targetColor {
+                    colorComparisonView(guess: guessColor, target: targetColor)
+                }
+            case .sound:
+                if let guessFrequency, let targetFrequency {
+                    frequencyComparisonView(guess: guessFrequency, target: targetFrequency)
+                }
             }
         }
+    }
+
+    // MARK: Choice rounds
+
+    private var choiceWasCorrect: Bool {
+        selectedChoiceIndex == correctChoiceIndex
+    }
+
+    private var choiceVerdict: some View {
+        Text(choiceWasCorrect ? "Acertou!" : "Não foi dessa vez")
+            .font(.headline.weight(.bold))
+            .foregroundStyle(RestGameScoring.scoreColor(score))
+    }
+
+    private func hexChoiceComparisonView(guess: HSLColor, target: HSLColor) -> some View {
+        VStack(spacing: 14) {
+            choiceVerdict
+
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                ForEach(Array(choiceColors.enumerated()), id: \.offset) { index, option in
+                    VStack(spacing: 6) {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(option.swiftUIColor)
+                            .frame(height: 52)
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(choiceStroke(for: index), lineWidth: index == correctChoiceIndex || index == selectedChoiceIndex ? 3 : 1)
+                            }
+                            .overlay(alignment: .topTrailing) {
+                                choiceBadge(for: index)
+                                    .padding(6)
+                            }
+
+                        Text(option.hex)
+                            .font(.system(.caption, design: .monospaced).weight(.semibold))
+                            .foregroundStyle(.white.opacity(index == correctChoiceIndex ? 0.9 : 0.5))
+                    }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(choiceAccessibilityLabel(index: index, value: option.hex))
+                }
+            }
+
+            hexPairLine(guess: guess, target: target)
+        }
+        .padding(.horizontal, 24)
+    }
+
+    private var pitchChoiceComparisonView: some View {
+        VStack(spacing: 14) {
+            choiceVerdict
+
+            HStack(spacing: 12) {
+                ForEach(Array(choiceFrequencies.enumerated()), id: \.offset) { index, frequency in
+                    VStack(spacing: 10) {
+                        HStack(spacing: 6) {
+                            Text(index == 0 ? "Primeiro" : "Segundo")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(.white.opacity(0.55))
+                            choiceBadge(for: index)
+                        }
+
+                        SoundRibbonView(
+                            frequency: .constant(frequency),
+                            isInteractive: false,
+                            compact: true
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(choiceStroke(for: index), lineWidth: index == correctChoiceIndex || index == selectedChoiceIndex ? 2 : 1)
+                        }
+
+                        Text(RestGameScoring.formattedFrequencyWithNote(frequency))
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(.white.opacity(0.85))
+                            .monospacedDigit()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
+
+                        Text(index == correctChoiceIndex ? "mais agudo" : "mais grave")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.4))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 14)
+                    .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(choiceAccessibilityLabel(
+                        index: index,
+                        value: "\(index == 0 ? "Primeiro" : "Segundo") som, \(RestGameScoring.formattedFrequencyWithNote(frequency))"
+                    ))
+                }
+            }
+        }
+        .padding(.horizontal, 24)
+    }
+
+    private func choiceStroke(for index: Int) -> Color {
+        if index == correctChoiceIndex { return .green }
+        if index == selectedChoiceIndex { return .red }
+        return .white.opacity(0.15)
+    }
+
+    @ViewBuilder
+    private func choiceBadge(for index: Int) -> some View {
+        if index == correctChoiceIndex {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white, .green)
+        } else if index == selectedChoiceIndex {
+            Image(systemName: "xmark.circle.fill")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white, .red)
+        }
+    }
+
+    private func choiceAccessibilityLabel(index: Int, value: String) -> String {
+        var parts = [value]
+        if index == correctChoiceIndex { parts.append("resposta certa") }
+        if index == selectedChoiceIndex { parts.append("sua escolha") }
+        return parts.joined(separator: ", ")
+    }
+
+    /// "alvo #E5484D · você #D94A4F"
+    private func hexPairLine(guess: HSLColor, target: HSLColor) -> some View {
+        HStack(spacing: 8) {
+            hexTag(label: "alvo", color: target)
+            Text("·")
+                .foregroundStyle(.white.opacity(0.3))
+            hexTag(label: "você", color: guess)
+        }
+        .font(.caption.weight(.semibold))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Alvo \(spelledHex(target.hex)), você \(spelledHex(guess.hex))")
+    }
+
+    private func hexTag(label: String, color: HSLColor) -> some View {
+        HStack(spacing: 5) {
+            Circle()
+                .fill(color.swiftUIColor)
+                .frame(width: 10, height: 10)
+                .overlay(Circle().stroke(.white.opacity(0.3), lineWidth: 1))
+            Text(label)
+                .foregroundStyle(.white.opacity(0.45))
+            Text(color.hex)
+                .font(.system(.caption, design: .monospaced).weight(.semibold))
+                .foregroundStyle(.white.opacity(0.8))
+        }
+    }
+
+    private func spelledHex(_ hex: String) -> String {
+        hex.dropFirst().map(String.init).joined(separator: " ")
     }
 
     private func colorComparisonView(guess: HSLColor, target: HSLColor) -> some View {
@@ -141,6 +308,8 @@ struct ScoreRevealView: View {
                 colorComparisonCard(title: "Você", color: guess)
                 colorComparisonCard(title: "Esperada", color: target)
             }
+
+            hexPairLine(guess: guess, target: target)
 
             Text("H · S · L")
                 .font(.caption2.weight(.semibold))
@@ -213,10 +382,12 @@ struct ScoreRevealView: View {
                     .stroke(.white.opacity(0.1), lineWidth: 1)
             }
 
-            Text(RestGameScoring.formattedFrequency(frequency))
+            Text(RestGameScoring.formattedFrequencyWithNote(frequency))
                 .font(.subheadline.weight(.bold))
                 .foregroundStyle(.white.opacity(0.85))
                 .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 10)
@@ -239,6 +410,138 @@ struct ScoreRevealView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Choice rounds
+
+struct HexReadChoiceView: View {
+    let hex: String
+    let options: [HSLColor]
+    let onSelect: (Int) -> Void
+
+    private let columns = [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)]
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Spacer(minLength: 0)
+
+            RestGamePhaseLabel(text: "Ler o hex")
+
+            Text(hex)
+                .font(.system(size: 48, weight: .bold, design: .monospaced))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .accessibilityLabel("Código hex \(hex.dropFirst().map(String.init).joined(separator: " "))")
+
+            Text("Qual dessas cores é esse hex?")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.55))
+
+            LazyVGrid(columns: columns, spacing: 14) {
+                ForEach(Array(options.enumerated()), id: \.offset) { index, option in
+                    Button {
+                        onSelect(index)
+                    } label: {
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .fill(option.swiftUIColor)
+                            .frame(height: 120)
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .stroke(.white.opacity(0.22), lineWidth: 1)
+                            }
+                            .shadow(color: option.swiftUIColor.opacity(0.3), radius: 12, y: 4)
+                    }
+                    .buttonStyle(RestGameScaleButtonStyle())
+                    .accessibilityLabel("Cor \(index + 1) de \(options.count)")
+                    .accessibilityHint("Escolhe esta cor como resposta")
+                }
+            }
+            .padding(.horizontal, 24)
+
+            Spacer(minLength: 0)
+        }
+        .padding(.vertical, 32)
+    }
+}
+
+struct HigherPitchChoiceView: View {
+    let playingIndex: Int?
+    let canAnswer: Bool
+    let onReplay: () -> Void
+    let onSelect: (Int) -> Void
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var statusText: String {
+        switch playingIndex {
+        case 0: return "Tocando o primeiro…"
+        case 1: return "Tocando o segundo…"
+        default: return canAnswer ? "Toque no som mais agudo" : "Ouça os dois sons"
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Spacer(minLength: 0)
+
+            RestGamePhaseLabel(text: "Qual foi mais agudo?")
+
+            Text(statusText)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.55))
+                .contentTransition(.opacity)
+                .animation(reduceMotion ? nil : RestGameTheme.quickSpring, value: statusText)
+
+            HStack(spacing: 14) {
+                toneButton(index: 0, title: "Primeiro")
+                toneButton(index: 1, title: "Segundo")
+            }
+            .padding(.horizontal, 24)
+
+            RestGameSecondaryButton(title: "Ouvir de novo", action: onReplay)
+                .disabled(playingIndex != nil)
+                .opacity(playingIndex != nil ? 0.4 : 1)
+                .padding(.horizontal, 24)
+                .accessibilityHint("Toca os dois sons outra vez")
+
+            Spacer(minLength: 0)
+        }
+        .padding(.vertical, 32)
+    }
+
+    private func toneButton(index: Int, title: String) -> some View {
+        let isPlaying = playingIndex == index
+
+        return Button {
+            onSelect(index)
+        } label: {
+            VStack(spacing: 14) {
+                Image(systemName: "waveform")
+                    .font(.system(size: 36, weight: .semibold))
+                    .foregroundStyle(isPlaying ? .cyan : .white.opacity(0.6))
+                    .symbolEffect(.variableColor.iterative, isActive: isPlaying && !reduceMotion)
+
+                Text(title)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.white)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 150)
+            .background(.white.opacity(isPlaying ? 0.14 : 0.06), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .stroke(isPlaying ? Color.cyan.opacity(0.7) : .white.opacity(0.12), lineWidth: isPlaying ? 2 : 1)
+            }
+            .scaleEffect(isPlaying && !reduceMotion ? 1.04 : 1)
+            .animation(reduceMotion ? nil : RestGameTheme.quickSpring, value: isPlaying)
+        }
+        .buttonStyle(RestGameScaleButtonStyle())
+        .disabled(!canAnswer)
+        .accessibilityLabel("\(title) som")
+        .accessibilityValue(isPlaying ? "Tocando" : "")
+        .accessibilityHint(canAnswer ? "Toque se este foi o mais agudo" : "Aguarde os dois sons tocarem")
     }
 }
 
@@ -410,7 +713,8 @@ extension RestGameOnboardingOverlay {
             steps: [
                 "Memorize a cor por 3 segundos — preste atenção no tom.",
                 "Recrie a cor com os sliders à esquerda.",
-                "Toque ✓ quando achar que acertou. São 5 rounds."
+                "Toque ✓ quando achar que acertou. São 5 rounds.",
+                "Nos rounds 2 e 4, leia o hex e toque na cor certa."
             ],
             onPlay: onPlay
         )
@@ -424,7 +728,8 @@ extension RestGameOnboardingOverlay {
             steps: [
                 "Ouça o som por 3 segundos — grave o pitch na cabeça.",
                 "Arraste ↑↓ na onda para recriar a frequência.",
-                "Toque ✓ para confirmar. São 5 rounds."
+                "Toque ✓ para confirmar. São 5 rounds.",
+                "No round 3, diga qual de dois sons foi mais agudo."
             ],
             onPlay: onPlay
         )

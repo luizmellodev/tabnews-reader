@@ -31,7 +31,7 @@ struct RestGamePlayView: View {
                 } else {
                     FrequencyPickerView(frequency: $session.guessFrequency)
                 }
-            case .scoreReveal, .finalResults:
+            case .choosing, .scoreReveal, .finalResults:
                 RestGameBackground()
                 phaseContent
             }
@@ -117,6 +117,8 @@ struct RestGamePlayView: View {
         switch session.phase {
         case .memorizing, .recreating:
             EmptyView()
+        case .choosing:
+            choiceContent
         case .scoreReveal:
             ScoreRevealView(
                 gameType: session.gameType,
@@ -125,7 +127,12 @@ struct RestGamePlayView: View {
                 targetColor: session.targetColor,
                 guessColor: session.guessColor,
                 targetFrequency: session.targetFrequency,
-                guessFrequency: session.guessFrequency
+                guessFrequency: session.guessFrequency,
+                roundKind: session.roundKind,
+                choiceColors: session.hexOptions,
+                choiceFrequencies: session.pitchFrequencies,
+                correctChoiceIndex: session.correctChoiceIndex,
+                selectedChoiceIndex: session.selectedChoiceIndex
             ) {
                 session.advanceAfterScoreReveal()
             }
@@ -143,6 +150,28 @@ struct RestGamePlayView: View {
                     dismiss()
                 }
             )
+        }
+    }
+
+    @ViewBuilder
+    private var choiceContent: some View {
+        switch session.roundKind {
+        case .hexRead:
+            HexReadChoiceView(
+                hex: session.targetColor?.hex ?? "",
+                options: session.hexOptions
+            ) { index in
+                session.chooseOption(index)
+            }
+        case .higherPitch:
+            HigherPitchChoiceView(
+                playingIndex: session.pitchPlayingIndex,
+                canAnswer: session.hasHeardPitchPair,
+                onReplay: { session.playPitchPair() },
+                onSelect: { index in session.chooseOption(index) }
+            )
+        case .recreate:
+            EmptyView()
         }
     }
 

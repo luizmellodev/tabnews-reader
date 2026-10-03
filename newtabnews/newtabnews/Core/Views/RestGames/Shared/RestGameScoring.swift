@@ -18,6 +18,19 @@ struct HSLColor: Equatable {
         "\(displayHue) · \(displaySaturation) · \(displayLightness)"
     }
 
+    /// `#RRGGBB` em maiúsculas, a partir da conversão RGB.
+    var hex: String {
+        let rgb = rgbComponents
+        func byte(_ value: Double) -> Int { Int((min(1, max(0, value)) * 255).rounded()) }
+        return String(format: "#%02X%02X%02X", byte(rgb.r), byte(rgb.g), byte(rgb.b))
+    }
+
+    /// Texto escuro lê melhor por cima desta cor.
+    var prefersDarkForeground: Bool {
+        let rgb = rgbComponents
+        return (0.2126 * rgb.r + 0.7152 * rgb.g + 0.0722 * rgb.b) > 0.55
+    }
+
     static func randomEasy() -> HSLColor {
         HSLColor(
             hue: Double.random(in: 0...360),
@@ -31,6 +44,9 @@ enum RestGameScoring {
     static let frequencyRange: ClosedRange<Double> = 200...800
     static let memorizeDuration: TimeInterval = 3
     static let totalRounds = 5
+    static let choiceCorrectScore: Double = 10
+    static let pitchToneDuration: TimeInterval = 1
+    static let pitchToneGap: TimeInterval = 0.4
 
     static func randomEasyFrequency() -> Double {
         let logMin = log2(frequencyRange.lowerBound)
@@ -58,6 +74,96 @@ enum RestGameScoring {
 
     static func formattedFrequency(_ hz: Double) -> String {
         String(format: "%.0f Hz", hz)
+    }
+
+    private static let noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+
+    /// Nota temperada mais próxima (A4 = 440 Hz), com sustenidos.
+    static func noteName(for hz: Double) -> String {
+        guard hz > 0 else { return "—" }
+        let midi = Int((69 + 12 * log2(hz / 440)).rounded())
+        let name = noteNames[((midi % 12) + 12) % 12]
+        let octave = Int(floor(Double(midi) / 12)) - 1
+        return "\(name)\(octave)"
+    }
+
+    /// Ex.: "440 Hz · A4"
+    static func formattedFrequencyWithNote(_ hz: Double) -> String {
+        "\(formattedFrequency(hz)) · \(noteName(for: hz))"
+    }
+
+    // MARK: - Choice rounds
+
+    /// Alvo + 3 distratores para o round "Ler o hex", já embaralhados.
+    /// Longe: matizes ≥ 60° do alvo e entre si. Perto: ~30–40° com variação de luminosidade.
+    static func hexReadOptions(closeDistractors: Bool) -> (options: [HSLColor], correctIndex: Int) {
+        // Faixa mais saturada que `randomEasy` para os matizes ficarem legíveis lado a lado.
+        let target = HSLColor(
+            hue: Double.random(in: 0..<360),
+            saturation: Double.random(in: 55...85),
+            lightness: Double.random(in: 40...60)
+        )
+
+        let distractors: [HSLColor]
+        if closeDistractors {
+            let side: Double = Bool.random() ? 1 : -1
+            let near = Double.random(in: 30...40)
+            let offsets: [(hue: Double, lightness: Double)] = [
+                (side * near, Double.random(in: -6...6)),
+                (-side * Double.random(in: 30...40), Double.random(in: -6...6)),
+                (side * (near + Double.random(in: 30...40)), (Bool.random() ? 1 : -1) * 12)
+            ]
+            distractors = offsets.map { offset in
+                HSLColor(
+                    hue: wrappedHue(target.hue + offset.hue),
+                    saturation: target.saturation,
+                    lightness: min(70, max(30, target.lightness + offset.lightness))
+                )
+            }
+        } else {
+            var hues = [target.hue]
+            var attempts = 0
+            while hues.count < 4 && attempts < 200 {
+                let candidate = Double.random(in: 0..<360)
+                if hues.allSatisfy({ hueDistance($0, candidate) >= 60 }) {
+                    hues.append(candidate)
+                }
+                attempts += 1
+            }
+            if hues.count < 4 {
+                hues = [0, 90, 180, 270].map { wrappedHue(target.hue + $0) }
+            }
+            distractors = hues.dropFirst().map { hue in
+                HSLColor(
+                    hue: hue,
+                    saturation: min(90, max(40, target.saturation + Double.random(in: -8...8))),
+                    lightness: min(70, max(30, target.lightness + Double.random(in: -6...6)))
+                )
+            }
+        }
+
+        let options = ([target] + distractors).shuffled()
+        return (options, options.firstIndex(of: target) ?? 0)
+    }
+
+    /// Dois tons separados por 3–7 semitons, em ordem aleatória, dentro da faixa do jogo.
+    static func pitchPair() -> (frequencies: [Double], higherIndex: Int) {
+        let ratio = pow(2, Double(Int.random(in: 3...7)) / 12)
+        let logMin = log2(frequencyRange.lowerBound)
+        let logMax = log2(frequencyRange.upperBound / ratio)
+        let low = pow(2, Double.random(in: logMin...logMax))
+        let high = low * ratio
+        return Bool.random() ? ([high, low], 0) : ([low, high], 1)
+    }
+
+    private static func wrappedHue(_ hue: Double) -> Double {
+        let wrapped = hue.truncatingRemainder(dividingBy: 360)
+        return wrapped < 0 ? wrapped + 360 : wrapped
+    }
+
+    private static func hueDistance(_ a: Double, _ b: Double) -> Double {
+        let diff = abs(a - b).truncatingRemainder(dividingBy: 360)
+        return min(diff, 360 - diff)
     }
 
     static func scoreColor(_ score: Double) -> Color {

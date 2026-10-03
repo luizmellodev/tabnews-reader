@@ -629,6 +629,196 @@
       "hint": "Um único loop sobre n elementos.",
       "reference": "https://www.geeksforgeeks.org/dsa/minimum-element-in-an-array/",
       "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "daily-avg-quicksort",
+      "title": "Quicksort (pivô aleatório)",
+      "snippet": "function quicksort(arr, lo, hi):\n  if lo >= hi: return\n  p = partition(arr, lo, hi)  // pivô aleatório\n  quicksort(arr, lo, p - 1)\n  quicksort(arr, p + 1, hi)",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(log n)"
+      ],
+      "answer": "O(n log n)",
+      "difficulty": "medium",
+      "caseNote": "caso médio (pivô aleatório)",
+      "explanation": "Com pivô aleatório, as partições ficam equilibradas na média: cerca de log n níveis, cada um com O(n) de trabalho. O pior caso, com o pivô sempre extremo, é O(n²).",
+      "hint": "Na média, o pivô divide o array mais ou menos ao meio.",
+      "reference": "https://www.geeksforgeeks.org/dsa/quick-sort/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "time"
+    },
+    {
+      "id": "daily-avg-linear-search",
+      "title": "Busca linear (caso médio)",
+      "snippet": "function find(arr, target):\n  for i in 0..arr.length:\n    if arr[i] == target:\n      return i\n  return -1",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "easy",
+      "caseNote": "caso médio (alvo em posição aleatória)",
+      "explanation": "Na média o alvo está no meio, então são cerca de n/2 comparações. Constantes somem no Big O: n/2 ainda é O(n).",
+      "hint": "Metade de n continua crescendo junto com n.",
+      "reference": "https://www.geeksforgeeks.org/dsa/linear-search/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "time"
+    },
+    {
+      "id": "daily-avg-bst-insert",
+      "title": "Inserir em BST",
+      "snippet": "function insert(node, value):\n  if node == null: return Node(value)\n  if value < node.value:\n    node.left = insert(node.left, value)\n  else:\n    node.right = insert(node.right, value)\n  return node",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      "answer": "O(log n)",
+      "difficulty": "medium",
+      "caseNote": "caso médio (inserções em ordem aleatória)",
+      "explanation": "Com chaves em ordem aleatória, a altura esperada da BST é O(log n), e a inserção desce um caminho da raiz até uma folha. Se as chaves vierem ordenadas, a árvore vira uma lista e o pior caso é O(n).",
+      "hint": "Quantos níveis tem uma árvore 'aleatória'?",
+      "reference": "https://www.geeksforgeeks.org/dsa/binary-search-tree-data-structure/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "time"
+    },
+    {
+      "id": "daily-avg-two-sum-hash",
+      "title": "Two-sum com hash map",
+      "snippet": "function twoSum(arr, target):\n  seen = map()\n  for i in 0..arr.length:\n    if (target - arr[i]) in seen:\n      return [seen[target - arr[i]], i]\n    seen[arr[i]] = i",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "easy",
+      "caseNote": "caso médio (hash uniforme)",
+      "explanation": "Uma passada pelo array, e cada consulta/inserção no hash map custa O(1) na média. Com muitas colisões, cada operação pode degradar para O(n).",
+      "hint": "Quanto custa cada consulta ao map, em média?",
+      "reference": "https://www.geeksforgeeks.org/dsa/check-if-pair-with-given-sum-exists-in-array/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "time"
+    },
+    {
+      "id": "daily-space-reverse-inplace",
+      "title": "Inverter array no lugar",
+      "snippet": "function reverse(arr):\n  i = 0\n  j = arr.length - 1\n  while i < j:\n    swap(arr, i, j)\n    i = i + 1\n    j = j - 1",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "easy",
+      "caseNote": "espaço extra (pior caso)",
+      "explanation": "Só usa duas variáveis (i e j), não importa o tamanho do array. A troca acontece dentro do próprio array.",
+      "hint": "O algoritmo cria alguma estrutura nova?",
+      "reference": "https://www.geeksforgeeks.org/dsa/write-a-program-to-reverse-an-array-or-string/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "daily-space-merge-sort",
+      "title": "Merge sort",
+      "snippet": "function mergeSort(arr):\n  if arr.length <= 1: return arr\n  mid = arr.length / 2\n  left = mergeSort(arr[0..mid])\n  right = mergeSort(arr[mid..])\n  return merge(left, right)",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "espaço extra (pior caso)",
+      "explanation": "O merge precisa de arrays auxiliares do tamanho dos pedaços. A pilha de recursão é só O(log n), mas o buffer de merge domina: O(n) de espaço extra.",
+      "hint": "O merge consegue juntar as metades sem memória auxiliar?",
+      "reference": "https://www.geeksforgeeks.org/dsa/merge-sort/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "daily-space-fib-memo",
+      "title": "Fibonacci com memo",
+      "snippet": "function fib(n, memo):\n  if n <= 1: return n\n  if n in memo: return memo[n]\n  memo[n] = fib(n - 1, memo) + fib(n - 2, memo)\n  return memo[n]",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(2^n)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "espaço extra (pior caso)",
+      "explanation": "O memo guarda até n valores, e a recursão chega a n chamadas de profundidade. As duas coisas são O(n).",
+      "hint": "Quantas entradas o memo guarda no final?",
+      "reference": "https://www.geeksforgeeks.org/dsa/program-for-nth-fibonacci-number/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "daily-space-fib-iterative",
+      "title": "Fibonacci iterativo",
+      "snippet": "function fib(n):\n  a = 0\n  b = 1\n  for i in 0..n:\n    next = a + b\n    a = b\n    b = next\n  return a",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(2^n)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "easy",
+      "caseNote": "espaço extra (pior caso)",
+      "explanation": "O tempo é O(n), mas a memória é constante: só a, b e next, independente de n.",
+      "hint": "Tempo e espaço são perguntas diferentes.",
+      "reference": "https://www.geeksforgeeks.org/dsa/program-for-nth-fibonacci-number/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "daily-space-binary-search-rec",
+      "title": "Busca binária recursiva",
+      "snippet": "function search(arr, target, lo, hi):\n  if lo > hi: return -1\n  mid = (lo + hi) / 2\n  if arr[mid] == target: return mid\n  if arr[mid] < target:\n    return search(arr, target, mid + 1, hi)\n  return search(arr, target, lo, mid - 1)",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      "answer": "O(log n)",
+      "difficulty": "medium",
+      "caseNote": "espaço extra (pilha de recursão)",
+      "explanation": "Cada chamada ocupa um frame na pilha, e a recursão desce log n níveis. A versão iterativa da mesma busca usa O(1).",
+      "hint": "A pilha de chamadas também conta como memória.",
+      "reference": "https://www.geeksforgeeks.org/dsa/binary-search/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "daily-space-distance-matrix",
+      "title": "Matriz de distâncias",
+      "snippet": "function distances(points):\n  n = points.length\n  d = matrix(n, n)\n  for i in 0..n:\n    for j in 0..n:\n      d[i][j] = dist(points[i], points[j])\n  return d",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(2^n)"
+      ],
+      "answer": "O(n²)",
+      "difficulty": "easy",
+      "caseNote": "espaço extra (pior caso)",
+      "explanation": "A matriz guarda uma distância para cada par de pontos: n × n posições.",
+      "hint": "Qual o tamanho da estrutura que é retornada?",
+      "reference": "https://www.geeksforgeeks.org/dsa/matrix-multiplication/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
     }
   ]
 }

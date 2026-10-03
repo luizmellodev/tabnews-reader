@@ -50,20 +50,20 @@ struct SettingsView: View {
 
     private var settingsList: some View {
         List {
+            // Cada card em sua própria linha: botões dividindo a mesma linha da List não recebem toque
             Section {
-                VStack(spacing: 12) {
-                    profileSection
+                profileSection
+                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 6, trailing: 0))
 
-                    RestGamesProfileCard(
-                        onPlay: { showingGames = true },
-                        onRankings: { showingRankings = true }
-                    )
-                    .id(gamesCardRefreshID)
-                    .matchedTransitionSource(id: "restGames", in: gamesTransition)
-                }
+                RestGamesProfileCard(
+                    onPlay: { showingGames = true },
+                    onRankings: { showingRankings = true }
+                )
+                .id(gamesCardRefreshID)
+                .matchedTransitionSource(id: "restGames", in: gamesTransition)
+                .listRowInsets(EdgeInsets(top: 6, leading: 0, bottom: 16, trailing: 0))
             }
             .listRowBackground(Color.clear)
-            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 16, trailing: 0))
             .listRowSeparator(.hidden)
 
             activitySection
@@ -123,9 +123,6 @@ struct SettingsView: View {
     @ViewBuilder
     private func settingsModals<Content: View>(_ content: Content) -> some View {
         content
-            .sheet(isPresented: $showLoginSheet) {
-                NativeLoginView()
-            }
             .fullScreenCover(isPresented: $showingGames, onDismiss: {
                 // Atualiza o progresso diário do card ao voltar dos jogos
                 gamesCardRefreshID = UUID()
@@ -233,7 +230,8 @@ struct SettingsView: View {
                 Label("Sair da conta", systemImage: "rectangle.portrait.and.arrow.right")
             }
 
-            // Exigido pela App Store (guideline 5.1.1(v)) para apps com criação de conta
+            // O app não cria contas (só login), então a guideline 5.1.1(v) não exige isto; mantido como cortesia.
+            // Faz logout e abre o pedido de exclusão por email para o suporte do TabNews.
             Button {
                 showDeleteAccountAlert = true
             } label: {
@@ -680,8 +678,12 @@ struct SettingsView: View {
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
                             .stroke(Color.primary.opacity(0.06), lineWidth: 1)
                     }
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .sheet(isPresented: $showLoginSheet) {
+                    NativeLoginView()
+                }
             }
         }
     }

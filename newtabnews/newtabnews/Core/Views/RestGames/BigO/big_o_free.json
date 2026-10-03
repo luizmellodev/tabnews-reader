@@ -1169,6 +1169,405 @@
       "hint": "Operação direta no slot.",
       "reference": "https://www.geeksforgeeks.org/dsa/hashing-data-structure/",
       "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/"
+    },
+    {
+      "id": "free-avg-hash-insert",
+      "title": "Inserir em hash set",
+      "snippet": "function add(set, value):\n  bucket = hash(value) % set.capacity\n  set.buckets[bucket].append(value)",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "easy",
+      "caseNote": "caso médio (hash uniforme)",
+      "explanation": "Com hash bem distribuído, os buckets têm tamanho constante na média. Se tudo colidir no mesmo bucket, vira O(n).",
+      "hint": "Quantos itens existem em cada bucket, em média?",
+      "reference": "https://www.geeksforgeeks.org/dsa/hashing-data-structure/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "time"
+    },
+    {
+      "id": "free-avg-insertion-sort",
+      "title": "Insertion sort (caso médio)",
+      "snippet": "function insertionSort(arr):\n  for i in 1..arr.length:\n    j = i\n    while j > 0 and arr[j - 1] > arr[j]:\n      swap(arr, j, j - 1)\n      j = j - 1",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(log n)"
+      ],
+      "answer": "O(n²)",
+      "difficulty": "medium",
+      "caseNote": "caso médio (ordem aleatória)",
+      "explanation": "Em ordem aleatória, cada elemento anda em média metade do caminho para trás: cerca de n²/4 trocas, que é O(n²). Só o melhor caso (já ordenado) é O(n).",
+      "hint": "Em média, quantas posições cada elemento volta?",
+      "reference": "https://www.geeksforgeeks.org/dsa/insertion-sort/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "time"
+    },
+    {
+      "id": "free-avg-quickselect",
+      "title": "Quickselect",
+      "snippet": "function kth(arr, k, lo, hi):\n  p = partition(arr, lo, hi)  // pivô aleatório\n  if p == k: return arr[p]\n  if k < p: return kth(arr, k, lo, p - 1)\n  return kth(arr, k, p + 1, hi)",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(log n)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "hard",
+      "caseNote": "caso médio (pivô aleatório)",
+      "explanation": "Diferente do quicksort, só uma metade é visitada. Na média o trabalho é n + n/2 + n/4 + ..., que soma cerca de 2n, ou seja O(n). O pior caso é O(n²).",
+      "hint": "Some n + n/2 + n/4 + ...",
+      "reference": "https://www.geeksforgeeks.org/dsa/quick-sort/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "time"
+    },
+    {
+      "id": "free-avg-bst-search",
+      "title": "Buscar em BST",
+      "snippet": "function contains(node, value):\n  while node != null:\n    if value == node.value: return true\n    node = value < node.value ? node.left : node.right\n  return false",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      "answer": "O(log n)",
+      "difficulty": "easy",
+      "caseNote": "caso médio (árvore aleatória)",
+      "explanation": "Em uma BST construída com chaves aleatórias, a altura esperada é O(log n). A busca percorre um caminho da raiz para baixo.",
+      "hint": "A busca segue um único caminho na árvore.",
+      "reference": "https://www.geeksforgeeks.org/dsa/binary-search-tree-data-structure/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "time"
+    },
+    {
+      "id": "free-avg-dedupe-set",
+      "title": "Remover duplicatas com set",
+      "snippet": "function dedupe(arr):\n  seen = set()\n  result = []\n  for x in arr:\n    if not (x in seen):\n      seen.add(x)\n      result.append(x)\n  return result",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "easy",
+      "caseNote": "caso médio (hash uniforme)",
+      "explanation": "n iterações com operações de set O(1) na média resultam em O(n).",
+      "hint": "Quanto custa 'x in seen' em um hash set?",
+      "reference": "https://www.geeksforgeeks.org/dsa/check-if-array-elements-are-distinct/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "time"
+    },
+    {
+      "id": "free-avg-count-frequency",
+      "title": "Contar frequências",
+      "snippet": "function frequencies(words):\n  count = map()\n  for w in words:\n    count[w] = count.get(w, 0) + 1\n  return count",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "easy",
+      "caseNote": "caso médio (hash uniforme)",
+      "explanation": "Cada palavra faz uma leitura e uma escrita no map, O(1) na média, então n palavras custam O(n).",
+      "hint": "Um loop, operações de hash constantes.",
+      "reference": "https://www.geeksforgeeks.org/dsa/hashing-data-structure/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "time"
+    },
+    {
+      "id": "free-avg-bucket-sort",
+      "title": "Bucket sort",
+      "snippet": "function bucketSort(arr):  // valores em [0, 1)\n  buckets = array(n) of []\n  for x in arr:\n    buckets[floor(x * n)].append(x)\n  for b in buckets:\n    insertionSort(b)\n  return concat(buckets)",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(log n)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "hard",
+      "caseNote": "caso médio (distribuição uniforme)",
+      "explanation": "Com valores uniformes e n baldes, cada balde recebe O(1) elementos na média, então ordenar cada um é barato e o total fica O(n). Se tudo cair no mesmo balde, vira O(n²).",
+      "hint": "Quantos elementos cada balde recebe, em média?",
+      "reference": "https://www.geeksforgeeks.org/dsa/counting-sort/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "time"
+    },
+    {
+      "id": "free-space-bfs",
+      "title": "BFS em grafo",
+      "snippet": "function bfs(graph, start):\n  visited = set([start])\n  queue = [start]\n  while queue not empty:\n    u = queue.pop_front()\n    for v in graph[u]:\n      if not (v in visited):\n        visited.add(v)\n        queue.push(v)",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "espaço extra (n vértices)",
+      "explanation": "O set de visitados e a fila podem guardar todos os n vértices.",
+      "hint": "Quantos vértices podem estar em 'visited' no final?",
+      "reference": "https://www.geeksforgeeks.org/dsa/breadth-first-search-or-bfs-for-a-graph/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-dfs-unbalanced",
+      "title": "DFS recursivo (árvore qualquer)",
+      "snippet": "function height(node):\n  if node == null: return 0\n  return 1 + max(height(node.left), height(node.right))",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "medium",
+      "caseNote": "espaço extra (pior caso: árvore degenerada)",
+      "explanation": "A pilha de recursão cresce até a altura da árvore. Em uma árvore degenerada (que é basicamente uma lista), a altura é n.",
+      "hint": "Qual a altura máxima de uma árvore com n nós?",
+      "reference": "https://www.geeksforgeeks.org/dsa/write-a-c-program-to-find-the-maximum-depth-or-height-of-a-tree/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-dfs-balanced",
+      "title": "DFS recursivo (árvore balanceada)",
+      "snippet": "function sum(node):  // árvore balanceada\n  if node == null: return 0\n  return node.value + sum(node.left) + sum(node.right)",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      "answer": "O(log n)",
+      "difficulty": "medium",
+      "caseNote": "espaço extra (árvore balanceada)",
+      "explanation": "O tempo é O(n), porque visita todos os nós, mas a pilha só guarda o caminho atual, e a altura de uma árvore balanceada é log n.",
+      "hint": "A pilha guarda todos os nós ou só o caminho atual?",
+      "reference": "https://www.geeksforgeeks.org/dsa/tree-traversals-inorder-preorder-and-postorder/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-letter-count",
+      "title": "Contar letras (a–z)",
+      "snippet": "function letterCount(s):\n  count = array(26) of 0\n  for ch in s:\n    count[ch - 'a'] += 1\n  return count",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "medium",
+      "caseNote": "espaço extra (alfabeto fixo)",
+      "explanation": "O array tem sempre 26 posições, independente do tamanho da string. Tamanho fixo é O(1).",
+      "hint": "O tamanho do array depende de n?",
+      "reference": "https://www.geeksforgeeks.org/dsa/string-data-structure/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-freq-map",
+      "title": "Frequência de números",
+      "snippet": "function freq(nums):\n  count = map()\n  for x in nums:\n    count[x] = count.get(x, 0) + 1\n  return count",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "easy",
+      "caseNote": "espaço extra (pior caso: todos distintos)",
+      "explanation": "Se todos os números forem distintos, o map terá n chaves.",
+      "hint": "Quantas chaves o map pode ter?",
+      "reference": "https://www.geeksforgeeks.org/dsa/hashing-data-structure/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-lcs-table",
+      "title": "LCS com tabela completa",
+      "snippet": "function lcs(a, b):  // |a| = |b| = n\n  dp = matrix(n + 1, n + 1) of 0\n  for i in 1..n+1:\n    for j in 1..n+1:\n      dp[i][j] = a[i-1] == b[j-1] ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1])\n  return dp[n][n]",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n²)",
+        "O(2^n)"
+      ],
+      "answer": "O(n²)",
+      "difficulty": "medium",
+      "caseNote": "espaço extra (pior caso)",
+      "explanation": "A tabela de DP tem (n+1) × (n+1) células.",
+      "hint": "Qual o tamanho de dp?",
+      "reference": "https://www.geeksforgeeks.org/dsa/partition-problem-dp-18/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-lcs-two-rows",
+      "title": "LCS com duas linhas",
+      "snippet": "function lcs(a, b):  // |a| = |b| = n\n  prev = array(n + 1) of 0\n  for i in 1..n+1:\n    curr = array(n + 1) of 0\n    for j in 1..n+1:\n      curr[j] = a[i-1] == b[j-1] ? prev[j-1] + 1 : max(prev[j], curr[j-1])\n    prev = curr\n  return prev[n]",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "hard",
+      "caseNote": "espaço extra (pior caso)",
+      "explanation": "Cada linha só depende da anterior, então basta guardar duas linhas de n+1 posições. O tempo continua O(n²), mas o espaço cai para O(n).",
+      "hint": "Precisa da tabela inteira, ou só da linha anterior?",
+      "reference": "https://www.geeksforgeeks.org/dsa/partition-problem-dp-18/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-sum",
+      "title": "Somar array",
+      "snippet": "function sum(arr):\n  total = 0\n  for x in arr:\n    total = total + x\n  return total",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "easy",
+      "caseNote": "espaço extra (pior caso)",
+      "explanation": "Só um acumulador. O array de entrada não conta como espaço extra.",
+      "hint": "Espaço extra não inclui a entrada.",
+      "reference": "https://www.geeksforgeeks.org/dsa/maximum-element-in-an-array/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-prefix-sums",
+      "title": "Somas de prefixo",
+      "snippet": "function prefix(arr):\n  p = array(arr.length + 1) of 0\n  for i in 0..arr.length:\n    p[i + 1] = p[i] + arr[i]\n  return p",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "easy",
+      "caseNote": "espaço extra (pior caso)",
+      "explanation": "Cria um novo array com n+1 posições.",
+      "hint": "Qual o tamanho do array criado?",
+      "reference": "https://www.geeksforgeeks.org/dsa/window-sliding-technique/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-factorial-rec",
+      "title": "Fatorial recursivo",
+      "snippet": "function fact(n):\n  if n <= 1: return 1\n  return n * fact(n - 1)",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(n)",
+      "difficulty": "easy",
+      "caseNote": "espaço extra (pilha de recursão)",
+      "explanation": "São n chamadas empilhadas antes de qualquer uma retornar, e cada frame ocupa memória.",
+      "hint": "Quantas chamadas ficam na pilha ao mesmo tempo?",
+      "reference": "https://www.geeksforgeeks.org/dsa/program-for-nth-fibonacci-number/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-heapsort",
+      "title": "Heapsort",
+      "snippet": "function heapSort(arr):\n  buildMaxHeap(arr)\n  for end in arr.length-1 down to 1:\n    swap(arr, 0, end)\n    siftDown(arr, 0, end)  // iterativo",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "medium",
+      "caseNote": "espaço extra (siftDown iterativo)",
+      "explanation": "O heap é montado dentro do próprio array e o siftDown iterativo só usa índices. É por isso que o heapsort é um sort O(n log n) in-place.",
+      "hint": "O heap precisa de um array separado?",
+      "reference": "https://www.geeksforgeeks.org/dsa/heap-sort/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-transpose-copy",
+      "title": "Transpor em nova matriz",
+      "snippet": "function transpose(m):  // n × n\n  t = matrix(n, n)\n  for i in 0..n:\n    for j in 0..n:\n      t[j][i] = m[i][j]\n  return t",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(n²)",
+        "O(n³)"
+      ],
+      "answer": "O(n²)",
+      "difficulty": "easy",
+      "caseNote": "espaço extra (pior caso)",
+      "explanation": "Uma nova matriz n × n é alocada. Transpor no lugar (trocando m[i][j] com m[j][i]) usaria O(1).",
+      "hint": "Ele escreve na mesma matriz ou em uma nova?",
+      "reference": "https://www.geeksforgeeks.org/dsa/search-a-2d-matrix/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-bubble",
+      "title": "Bubble sort",
+      "snippet": "function bubbleSort(arr):\n  for i in 0..arr.length:\n    for j in 0..arr.length - i - 1:\n      if arr[j] > arr[j + 1]:\n        swap(arr, j, j + 1)",
+      "options": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n²)"
+      ],
+      "answer": "O(1)",
+      "difficulty": "easy",
+      "caseNote": "espaço extra (pior caso)",
+      "explanation": "O tempo é O(n²), mas as trocas acontecem dentro do próprio array e só usam os índices.",
+      "hint": "Tempo O(n²) não significa memória O(n²).",
+      "reference": "https://www.geeksforgeeks.org/dsa/bubble-sort/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
+    },
+    {
+      "id": "free-space-power-set",
+      "title": "Gerar todos os subconjuntos",
+      "snippet": "function subsets(arr):\n  result = [[]]\n  for x in arr:\n    for s in copy(result):\n      result.append(s + [x])\n  return result",
+      "options": [
+        "O(n)",
+        "O(n²)",
+        "O(2^n)",
+        "O(n!)"
+      ],
+      "answer": "O(2^n)",
+      "difficulty": "hard",
+      "caseNote": "espaço extra (número de subconjuntos)",
+      "explanation": "O resultado tem 2^n subconjuntos. Contando o tamanho de cada um, o total é O(n·2^n), mas o fator dominante entre as opções é 2^n.",
+      "hint": "Quantos subconjuntos existem para n elementos?",
+      "reference": "https://www.geeksforgeeks.org/dsa/power-set/",
+      "learnMoreURL": "https://www.freecodecamp.org/news/big-o-notation-examples-time-complexity-explained/",
+      "measure": "space"
     }
   ]
 }

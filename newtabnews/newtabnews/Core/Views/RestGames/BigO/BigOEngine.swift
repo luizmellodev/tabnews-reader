@@ -37,6 +37,23 @@ struct BigOChallenge: Decodable, Equatable, Identifiable {
     let hint: String?
     let reference: String
     let learnMoreURL: String?
+    /// "time" (padrão) ou "space" (espaço extra)
+    var measure: String? = nil
+
+    var isSpace: Bool { measure == "space" }
+
+    /// Etiqueta do que está sendo perguntado, ex.: "TEMPO · CASO MÉDIO"
+    var questionBadge: String {
+        if isSpace { return "ESPAÇO EXTRA" }
+        let note = caseNote?.lowercased() ?? ""
+        if note.hasPrefix("caso médio") { return "TEMPO · CASO MÉDIO" }
+        if note.hasPrefix("caso amortizado") { return "TEMPO · AMORTIZADO" }
+        return "TEMPO · PIOR CASO"
+    }
+
+    var questionPrompt: String {
+        isSpace ? "Quanta memória extra ele usa?" : "Qual a complexidade?"
+    }
 
     func shuffledOptions() -> [String] {
         options.shuffled()

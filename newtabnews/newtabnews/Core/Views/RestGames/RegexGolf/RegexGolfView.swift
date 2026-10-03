@@ -21,7 +21,6 @@ struct RegexGolfView: View {
     @State private var showResult = false
     @State private var showGiveUpConfirm = false
     @State private var showFreeModeLockedHint = false
-    @FocusState private var inputFocused: Bool
 
     var body: some View {
         ZStack {
@@ -46,6 +45,18 @@ struct RegexGolfView: View {
             }
         }
         .animation(RestGameTheme.spring, value: playMode)
+        .toolbar {
+            // Na barra de navegação para sobrar espaço vertical para o teclado
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showIntro = true
+                } label: {
+                    Label("Dica", systemImage: "lightbulb.fill")
+                        .labelStyle(.titleAndIcon)
+                        .font(.caption.weight(.bold))
+                }
+            }
+        }
         .onAppear {
             RestFeedbackManager.shared.prepare()
             if playMode == .free, !isFreeModeUnlocked {
@@ -70,7 +81,6 @@ struct RegexGolfView: View {
         }
         .onChange(of: activeViewModel.phase) { _, phase in
             guard phase == .revealing else { return }
-            inputFocused = false
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 if activeViewModel.phase == .revealing {
                     showResult = true
@@ -161,7 +171,6 @@ struct RegexGolfView: View {
                         .padding(.top, 16)
                         .padding(.bottom, 12)
                 }
-                .scrollDismissesKeyboard(.interactively)
 
                 inputBar(viewModel: viewModel, puzzle: puzzle)
             } else {
@@ -226,19 +235,8 @@ struct RegexGolfView: View {
             HStack(spacing: 8) {
                 Text("/")
                     .foregroundStyle(RegexGolfTheme.accent)
-                TextField(
-                    "",
-                    text: Binding(get: { viewModel.pattern }, set: { viewModel.updatePattern($0) }),
-                    prompt: Text("sua regex").foregroundStyle(.white.opacity(0.3))
-                )
-                .focused($inputFocused)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .keyboardType(.asciiCapable)
-                .submitLabel(.done)
-                .onSubmit { viewModel.submit() }
-                .foregroundStyle(.white)
-                .disabled(!isPlaying)
+                RegexGolfPatternDisplay(pattern: viewModel.pattern, isActive: isPlaying)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 Text("/")
                     .foregroundStyle(RegexGolfTheme.accent)
 
@@ -250,7 +248,7 @@ struct RegexGolfView: View {
             }
             .font(.system(size: 18, weight: .semibold, design: .monospaced))
             .padding(.horizontal, 14)
-            .padding(.vertical, 12)
+            .padding(.vertical, 10)
             .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -265,11 +263,13 @@ struct RegexGolfView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            RegexGolfTokenBar(
-                onToken: { viewModel.append($0) },
-                onDelete: { viewModel.deleteLast() }
+            RegexGolfKeyboard(
+                onInsert: { viewModel.append($0) },
+                onDelete: { viewModel.deleteLast() },
+                onClear: { viewModel.updatePattern("") }
             )
             .disabled(!isPlaying)
+            .opacity(isPlaying ? 1 : 0.5)
 
             HStack(spacing: 10) {
                 Button {
@@ -305,22 +305,6 @@ struct RegexGolfView: View {
 
     private var header: some View {
         VStack(spacing: 8) {
-            HStack {
-                Spacer()
-                Button {
-                    showIntro = true
-                } label: {
-                    Label("Dica", systemImage: "lightbulb.fill")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.white.opacity(0.8))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(.white.opacity(0.08), in: Capsule())
-                }
-                .buttonStyle(RestGameScaleButtonStyle())
-            }
-            .padding(.horizontal, 20)
-
             Text("Regex Golf")
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
@@ -417,44 +401,183 @@ private struct RegexGolfWordColumn: View {
     }
 }
 
-// MARK: - Token bar
+// MARK: - Input
 
-private struct RegexGolfTokenBar: View {
-    let onToken: (String) -> Void
-    let onDelete: () -> Void
-
-    private let tokens = ["^", "$", ".", "*", "+", "?", "|", "(", ")", "[", "]", "{", "}", "\\d", "\\w", "\\s", "\\b", "-"]
+/// Mostra a regex digitada com um cursor piscando (o teclado é próprio, sem TextField)
+private struct RegexGolfPatternDisplay: View {
+    let pattern: String
+    let isActive: Bool
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 6) {
-                ForEach(tokens, id: \.self) { token in
-                    Button {
-                        RestFeedbackManager.shared.tap()
-                        onToken(token)
-                    } label: {
-                        Text(token)
-                            .font(.system(size: 15, weight: .semibold, design: .monospaced))
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 1) {
+                    if !pattern.isEmpty {
+                        Text(pattern)
                             .foregroundStyle(.white)
-                            .frame(minWidth: 34, minHeight: 34)
-                            .padding(.horizontal, 2)
-                            .background(.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                     }
-                    .buttonStyle(RestGameScaleButtonStyle())
-                    .accessibilityLabel("Inserir \(token)")
-                }
 
-                Button(action: onDelete) {
-                    Image(systemName: "delete.left")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.8))
-                        .frame(width: 40, height: 34)
-                        .background(.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    if isActive {
+                        cursor
+                            .id("cursor")
+                    }
+
+                    if pattern.isEmpty {
+                        Text("sua regex")
+                            .foregroundStyle(.white.opacity(0.3))
+                    }
                 }
-                .buttonStyle(RestGameScaleButtonStyle())
-                .accessibilityLabel("Apagar último caractere")
+                .lineLimit(1)
+            }
+            .onChange(of: pattern) {
+                proxy.scrollTo("cursor", anchor: .trailing)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(pattern.isEmpty ? "Regex vazia" : "Regex: \(pattern)")
+    }
+
+    private var cursor: some View {
+        TimelineView(.periodic(from: .now, by: 0.5)) { context in
+            let visible = Int(context.date.timeIntervalSinceReferenceDate * 2) % 2 == 0
+            RoundedRectangle(cornerRadius: 1)
+                .fill(RegexGolfTheme.accent)
+                .frame(width: 2, height: 20)
+                .opacity(visible ? 1 : 0)
+        }
+    }
+}
+
+// MARK: - Keyboard
+
+/// Teclado próprio: duas linhas fixas de regex + letras (com shift) ou números/símbolos
+private struct RegexGolfKeyboard: View {
+    let onInsert: (String) -> Void
+    let onDelete: () -> Void
+    let onClear: () -> Void
+
+    @State private var isShifted = false
+    @State private var showsSymbols = false
+
+    private let spacing: CGFloat = 5
+    private let keyHeight: CGFloat = 36
+
+    private let regexRows: [[String]] = [
+        ["^", "$", ".", "*", "+", "?", "|", "\\", "(", ")"],
+        ["[", "]", "{", "}", "-", ",", "\\d", "\\w", "\\s", "\\b"]
+    ]
+    private let letterRows: [[String]] = [
+        Array("qwertyuiop").map(String.init),
+        Array("asdfghjkl").map(String.init),
+        Array("zxcvbnm").map(String.init)
+    ]
+    private let symbolRows: [[String]] = [
+        Array("1234567890").map(String.init),
+        ["/", ":", ";", "=", "_", "@", "#", "<", ">"],
+        ["'", "\"", "!", "%", "&", "~", " "]
+    ]
+
+    var body: some View {
+        GeometryReader { geometry in
+            let keyWidth = (geometry.size.width - spacing * 9) / 10
+            let rows = showsSymbols ? symbolRows : letterRows
+
+            VStack(spacing: spacing) {
+                ForEach(regexRows, id: \.self) { row in
+                    keyRow(row, keyWidth: keyWidth, style: .regex)
+                }
+
+                keyRow(rows[0], keyWidth: keyWidth, style: .plain)
+                keyRow(rows[1], keyWidth: keyWidth, style: .plain)
+
+                HStack(spacing: spacing) {
+                    specialKey(width: keyWidth, label: Text(showsSymbols ? "abc" : "123").font(.system(size: 12, weight: .bold)), accessibility: showsSymbols ? "Letras" : "Números e símbolos") {
+                        showsSymbols.toggle()
+                        isShifted = false
+                    }
+
+                    if showsSymbols {
+                        Color.clear.frame(width: keyWidth, height: keyHeight)
+                    } else {
+                        specialKey(width: keyWidth, label: Image(systemName: isShifted ? "shift.fill" : "shift"), accessibility: "Maiúscula") {
+                            isShifted.toggle()
+                        }
+                    }
+
+                    ForEach(rows[2], id: \.self) { key in
+                        characterKey(key, width: keyWidth, style: .plain, title: key == " " ? "␣" : nil)
+                    }
+
+                    // Segurar o apagar limpa a regex inteira
+                    specialKey(width: keyWidth * CGFloat(8 - rows[2].count) + spacing * CGFloat(7 - rows[2].count), label: Image(systemName: "delete.left"), accessibility: "Apagar (segure para limpar)") {
+                        onDelete()
+                    }
+                    .simultaneousGesture(
+                        LongPressGesture(minimumDuration: 0.5).onEnded { _ in
+                            RestFeedbackManager.shared.tap()
+                            onClear()
+                        }
+                    )
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .frame(height: keyHeight * 5 + spacing * 4)
+    }
+
+    private enum KeyStyle {
+        case regex
+        case plain
+    }
+
+    private func keyRow(_ keys: [String], keyWidth: CGFloat, style: KeyStyle) -> some View {
+        HStack(spacing: spacing) {
+            ForEach(keys, id: \.self) { key in
+                characterKey(key, width: keyWidth, style: style)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func characterKey(_ key: String, width: CGFloat, style: KeyStyle, title: String? = nil) -> some View {
+        let appliesShift = style == .plain && !showsSymbols
+        let label = isShifted && appliesShift ? key.uppercased() : key
+
+        return Button {
+            RestFeedbackManager.shared.tap()
+            // Lê o shift no momento do toque (não no último render) para digitação rápida
+            let uppercase = isShifted && appliesShift
+            onInsert(uppercase ? key.uppercased() : key)
+            if uppercase {
+                isShifted = false
+            }
+        } label: {
+            Text(title ?? label)
+                .font(.system(size: title == nil ? 17 : 14, weight: style == .regex ? .bold : .medium, design: .monospaced))
+                .foregroundStyle(style == .regex ? RegexGolfTheme.accentLight : .white)
+                .frame(width: width, height: keyHeight)
+                .background(
+                    style == .regex ? RegexGolfTheme.accent.opacity(0.16) : Color.white.opacity(0.12),
+                    in: RoundedRectangle(cornerRadius: 7, style: .continuous)
+                )
+        }
+        .buttonStyle(RestGameScaleButtonStyle())
+        .accessibilityLabel(title ?? "Inserir \(label)")
+    }
+
+    private func specialKey<Label: View>(width: CGFloat, label: Label, accessibility: String, action: @escaping () -> Void) -> some View {
+        Button {
+            RestFeedbackManager.shared.tap()
+            action()
+        } label: {
+            label
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.85))
+                .frame(width: width, height: keyHeight)
+                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+        }
+        .buttonStyle(RestGameScaleButtonStyle())
+        .accessibilityLabel(accessibility)
     }
 }
 
@@ -691,12 +814,41 @@ struct RegexGolfHubPreview: View {
     @State private var typed = 0
 
     var body: some View {
-        HStack(alignment: .center, spacing: 14) {
-            Text("/" + String(pattern.prefix(typed)) + "/")
-                .font(.system(size: 15, weight: .bold, design: .monospaced))
-                .foregroundStyle(RegexGolfTheme.accentLight)
-                .frame(minWidth: 110, alignment: .leading)
+        // Lado a lado no card largo; empilhado no card quadrado da grade
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .center, spacing: 14) {
+                patternText
+                    .frame(minWidth: 110, alignment: .leading)
+                wordList
+                Spacer(minLength: 0)
+            }
 
+            VStack(alignment: .leading, spacing: 10) {
+                patternText
+                wordList
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .task {
+            while !Task.isCancelled {
+                typed = 0
+                for index in 1...pattern.count {
+                    try? await Task.sleep(for: .milliseconds(140))
+                    withAnimation(.easeOut(duration: 0.12)) { typed = index }
+                }
+                try? await Task.sleep(for: .seconds(2.2))
+            }
+        }
+    }
+
+    private var patternText: some View {
+        Text("/" + String(pattern.prefix(typed)) + "/")
+            .font(.system(size: 15, weight: .bold, design: .monospaced))
+            .foregroundStyle(RegexGolfTheme.accentLight)
+    }
+
+    private var wordList: some View {
             VStack(alignment: .leading, spacing: 5) {
                 ForEach(Array(words.enumerated()), id: \.offset) { index, word in
                     let lit = typed == pattern.count && index < 2
@@ -711,18 +863,5 @@ struct RegexGolfHubPreview: View {
                     }
                 }
             }
-            Spacer(minLength: 0)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        .task {
-            while !Task.isCancelled {
-                typed = 0
-                for index in 1...pattern.count {
-                    try? await Task.sleep(for: .milliseconds(140))
-                    withAnimation(.easeOut(duration: 0.12)) { typed = index }
-                }
-                try? await Task.sleep(for: .seconds(2.2))
-            }
-        }
     }
 }
