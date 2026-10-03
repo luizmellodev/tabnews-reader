@@ -6,6 +6,9 @@ private enum HubDestination: Hashable {
     case devSpot
     case bigO
     case algoSpot
+    case httpStatus
+    case gitRescue
+    case regexGolf
     case arcade(RestGameType)
 }
 
@@ -16,6 +19,9 @@ struct RestGamesHubView: View {
     @State private var dailySummary = DevWordleViewModel.todaySummary()
     @State private var bigOSummary = BigOViewModel.todaySummary()
     @State private var algoSpotSummary = AlgoSpotViewModel.todaySummary()
+    @State private var httpStatusSummary = ScenarioQuizViewModel.todaySummary(for: .httpStatus)
+    @State private var gitRescueSummary = ScenarioQuizViewModel.todaySummary(for: .gitRescue)
+    @State private var regexGolfSummary = RegexGolfViewModel.todaySummary()
     @State private var weeklySummary = DevLeetHubSummary.current()
     @State private var showLeaderboards = false
 
@@ -73,6 +79,36 @@ struct RestGamesHubView: View {
                                         badge: { algoSpotDailyBadge }
                                     ) {
                                         AlgoSpotHubPreview()
+                                    }
+                                }
+
+                                hubTile(
+                                    title: "Regex Golf",
+                                    accent: RegexGolfTheme.accent,
+                                    destination: .regexGolf,
+                                    aspectRatio: 2,
+                                    badge: { dailyBadge(regexGolfSummary, accent: RegexGolfTheme.accentLight) }
+                                ) {
+                                    RegexGolfHubPreview()
+                                }
+
+                                HStack(spacing: 12) {
+                                    hubTile(
+                                        title: "HTTP Status",
+                                        accent: HttpStatusTheme.accent,
+                                        destination: .httpStatus,
+                                        badge: { dailyBadge(httpStatusSummary, accent: HttpStatusTheme.accentLight) }
+                                    ) {
+                                        HttpStatusHubPreview()
+                                    }
+
+                                    hubTile(
+                                        title: "Git Rescue",
+                                        accent: GitRescueTheme.accent,
+                                        destination: .gitRescue,
+                                        badge: { dailyBadge(gitRescueSummary, accent: GitRescueTheme.accentLight) }
+                                    ) {
+                                        GitRescueHubPreview()
                                     }
                                 }
                             }
@@ -159,6 +195,12 @@ struct RestGamesHubView: View {
                     BigOView()
                 case .algoSpot:
                     AlgoSpotView()
+                case .httpStatus:
+                    HttpStatusView()
+                case .gitRescue:
+                    GitRescueView()
+                case .regexGolf:
+                    RegexGolfView()
                 case .arcade(let gameType):
                     switch gameType {
                     case .color:
@@ -174,6 +216,9 @@ struct RestGamesHubView: View {
             dailySummary = DevWordleViewModel.todaySummary()
             bigOSummary = BigOViewModel.todaySummary()
             algoSpotSummary = AlgoSpotViewModel.todaySummary()
+            httpStatusSummary = ScenarioQuizViewModel.todaySummary(for: .httpStatus)
+            gitRescueSummary = ScenarioQuizViewModel.todaySummary(for: .gitRescue)
+            regexGolfSummary = RegexGolfViewModel.todaySummary()
             weeklySummary = DevLeetHubSummary.current()
         }
         .sheet(isPresented: $showLeaderboards) {
@@ -281,6 +326,23 @@ struct RestGamesHubView: View {
             } else {
                 Text("Novo")
                     .foregroundStyle(BigOTheme.accentLight)
+            }
+        }
+        .font(.caption2.weight(.bold))
+        .labelStyle(.titleAndIcon)
+    }
+
+    private func dailyBadge(_ summary: ScenarioQuizDailySummary, accent: Color) -> some View {
+        Group {
+            if summary.won {
+                Label("Acertou", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            } else if summary.played {
+                Label("Errou", systemImage: "xmark.circle.fill")
+                    .foregroundStyle(.orange)
+            } else {
+                Text("Novo")
+                    .foregroundStyle(accent)
             }
         }
         .font(.caption2.weight(.bold))

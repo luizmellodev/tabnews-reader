@@ -27,6 +27,8 @@ struct SettingsView: View {
     @State private var deletedAccount: DeletedAccountInfo?
     @State private var showingGames = false
     @State private var showingRankings = false
+    @State private var gamesCardRefreshID = UUID()
+    @Namespace private var gamesTransition
     @StateObject private var authService = AuthService.shared
     @AppStorage("showReadOnTabNewsButton") private var showReadOnTabNewsButton = false
     @AppStorage("isBetaTester") private var isBetaTester = false
@@ -52,18 +54,25 @@ struct SettingsView: View {
                 VStack(spacing: 12) {
                     profileSection
 
-                    RestGamesHubBanner(onTap: { showingGames = true })
-                    RestGamesRankingsBanner(onTap: { showingRankings = true })
+                    RestGamesProfileCard(
+                        onPlay: { showingGames = true },
+                        onRankings: { showingRankings = true }
+                    )
+                    .id(gamesCardRefreshID)
+                    .matchedTransitionSource(id: "restGames", in: gamesTransition)
                 }
             }
             .listRowBackground(Color.clear)
             .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 16, trailing: 0))
             .listRowSeparator(.hidden)
 
-            gamificationSection
-            libraryStatsSection
+            activitySection
             preferencesSection
             moreSection
+
+            if authService.isAuthenticated {
+                accountSection
+            }
 
             #if DEBUG
             debugSection
@@ -117,8 +126,12 @@ struct SettingsView: View {
             .sheet(isPresented: $showLoginSheet) {
                 NativeLoginView()
             }
-            .fullScreenCover(isPresented: $showingGames) {
+            .fullScreenCover(isPresented: $showingGames, onDismiss: {
+                // Atualiza o progresso diário do card ao voltar dos jogos
+                gamesCardRefreshID = UUID()
+            }) {
                 RestGamesHubView(onClose: { showingGames = false })
+                    .navigationTransition(.zoom(sourceID: "restGames", in: gamesTransition))
             }
             .sheet(isPresented: $showingRankings) {
                 RestGameLeaderboardsSheet()
@@ -176,75 +189,59 @@ struct SettingsView: View {
             }
     }
 
-    private var gamificationSection: some View {
+    private var activitySection: some View {
         Section {
+            HStack(spacing: 0) {
+                activityStat(viewModel.likedList.count, label: "Curtidos", icon: "heart")
+                activityStat(highlights.count, label: "Destaques", icon: "highlighter")
+                activityStat(notes.count, label: "Anotações", icon: "note.text")
+                activityStat(folders.count, label: "Pastas", icon: "folder")
+            }
+            .padding(.vertical, 4)
+
             NavigationLink {
                 GamificationView()
             } label: {
-                HStack(spacing: 12) {
-                    ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [.purple, .blue],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 32, height: 32)
-
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 16))
-                            .foregroundStyle(.white)
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Badges & Desafios")
-                            .font(.headline)
-                        Text("Veja suas conquistas e desafios semanais")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Spacer()
-                }
+                Label("Badges & Desafios", systemImage: "star")
             }
         } header: {
-            Label("Gamificação", systemImage: "trophy.fill")
+            Label("Atividade", systemImage: "chart.bar")
         }
     }
 
-    private var libraryStatsSection: some View {
+    private func activityStat(_ value: Int, label: String, icon: String) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(height: 16)
+            Text("\(value)")
+                .font(.headline.monospacedDigit())
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var accountSection: some View {
         Section {
-            HStack {
-                Label("Posts Curtidos", systemImage: "heart")
-                Spacer()
-                Text("\(viewModel.likedList.count)")
-                    .foregroundStyle(.secondary)
+            Button(role: .destructive) {
+                showLogoutAlert = true
+            } label: {
+                Label("Sair da conta", systemImage: "rectangle.portrait.and.arrow.right")
             }
 
-            HStack {
-                Label("Destaques", systemImage: "highlighter")
-                Spacer()
-                Text("\(highlights.count)")
-                    .foregroundStyle(.secondary)
-            }
-
-            HStack {
-                Label("Anotações", systemImage: "note.text")
-                Spacer()
-                Text("\(notes.count)")
-                    .foregroundStyle(.secondary)
-            }
-
-            HStack {
-                Label("Pastas Criadas", systemImage: "folder")
-                Spacer()
-                Text("\(folders.count)")
+            // Exigido pela App Store (guideline 5.1.1(v)) para apps com criação de conta
+            Button {
+                showDeleteAccountAlert = true
+            } label: {
+                Label("Excluir conta", systemImage: "person.crop.circle.badge.xmark")
                     .foregroundStyle(.secondary)
             }
         } header: {
-            Label("Sua Biblioteca", systemImage: "chart.bar")
+            Label("Conta", systemImage: "person.crop.circle")
         }
     }
 
@@ -562,232 +559,154 @@ struct SettingsView: View {
     private var profileSection: some View {
         Group {
             if authService.isAuthenticated, let user = authService.currentUser {
-                VStack(spacing: 12) {
-                    VStack(spacing: 16) {
-                        HStack(spacing: 12) {
-                            ZStack(alignment: .bottomTrailing) {
-                                Circle()
-                                    .fill(Color.primary.opacity(0.1))
-                                    .frame(width: 48, height: 48)
-                                    .overlay(
-                                        Text(String(user.username.prefix(1).uppercased()))
-                                            .font(.title3)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.primary)
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack(spacing: 14) {
+                        ZStack(alignment: .bottomTrailing) {
+                            Circle()
+                                .fill(Color.primary.opacity(0.08))
+                                .frame(width: 60, height: 60)
+                                .overlay(
+                                    Text(String(user.username.prefix(1).uppercased()))
+                                        .font(.title2.weight(.bold))
+                                        .foregroundStyle(.primary)
+                                )
+
+                            if isBetaTester {
+                                Image(systemName: "trophy.fill")
+                                    .font(.system(size: 9))
+                                    .foregroundStyle(.white)
+                                    .frame(width: 20, height: 20)
+                                    .background(
+                                        LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing),
+                                        in: Circle()
                                     )
-                                
-                                if isBetaTester {
-                                    ZStack {
-                                        Circle()
-                                            .fill(
-                                                LinearGradient(
-                                                    colors: [.purple, .blue],
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
-                                            )
-                                            .frame(width: 18, height: 18)
-                                            .shadow(color: .purple.opacity(0.4), radius: 2, x: 0, y: 1)
-                                        
-                                        Image(systemName: "trophy.fill")
-                                            .font(.system(size: 9))
-                                            .foregroundColor(.white)
-                                    }
                                     .offset(x: 2, y: 2)
-                                }
                             }
-                            
-                            // Username e badge
-                            VStack(alignment: .leading, spacing: 2) {
-                                HStack(spacing: 6) {
-                                    Text("@\(user.username)")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
-                                    
-                                    // Badge Beta Tester - design de troféu
-                                    if isBetaTester {
-                                        HStack(spacing: 3) {
-                                            Image(systemName: "trophy.fill")
-                                                .font(.system(size: 10))
-                                            Text("BETA")
-                                                .font(.system(size: 9, weight: .bold))
-                                                .tracking(0.5)
-                                        }
+                        }
+
+                        VStack(alignment: .leading, spacing: 3) {
+                            HStack(spacing: 6) {
+                                Text("@\(user.username)")
+                                    .font(.title3.weight(.bold))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+
+                                if isBetaTester {
+                                    Text("BETA")
+                                        .font(.system(size: 9, weight: .bold))
+                                        .tracking(0.5)
                                         .foregroundStyle(.white)
                                         .padding(.horizontal, 6)
                                         .padding(.vertical, 3)
                                         .background(
-                                            LinearGradient(
-                                                colors: [.purple, .blue],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
+                                            LinearGradient(colors: [.purple, .blue], startPoint: .leading, endPoint: .trailing),
+                                            in: RoundedRectangle(cornerRadius: 6)
                                         )
-                                        .cornerRadius(6)
-                                        .shadow(color: .purple.opacity(0.3), radius: 3, x: 0, y: 1)
-                                    }
-                                }
-                                
-                                Text("TabNews")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            
-                            Spacer()
-                        }
-                        
-                        // Stats (TabCoins, TabCash e Publicações) - horizontal compacto
-                        HStack(spacing: 20) {
-                            if let tabcoins = user.tabcoins {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "star.fill")
-                                        .font(.caption)
-                                        .foregroundStyle(.orange)
-                                    VStack(alignment: .leading, spacing: 0) {
-                                        Text("\(tabcoins)")
-                                            .font(.subheadline)
-                                            .fontWeight(.semibold)
-                                        Text("TabCoins")
-                                            .font(.caption2)
-                                            .foregroundStyle(.secondary)
-                                    }
                                 }
                             }
-                            
-                            if let tabcash = user.tabcash {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "dollarsign.circle.fill")
-                                        .font(.caption)
-                                        .foregroundStyle(.green)
-                                    VStack(alignment: .leading, spacing: 0) {
-                                        Text("\(tabcash)")
-                                            .font(.subheadline)
-                                            .fontWeight(.semibold)
-                                        Text("TabCash")
-                                            .font(.caption2)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                            }
-                            
-                            Spacer()
-                        }
-                        
-                        // Botão de Publicações
-                        NavigationLink {
-                            UserPublicationsView(username: user.username)
-                        } label: {
-                            HStack {
-                                Image(systemName: "doc.text.fill")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.primary)
-                                
-                                VStack(alignment: .leading, spacing: 2) {
-                                    if let count = userPublicationsCount {
-                                        Text("\(count) \(count == 1 ? "Publicação" : "Publicações")")
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .foregroundStyle(.primary)
-                                    } else {
-                                        Text("Minhas Publicações")
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .foregroundStyle(.primary)
-                                    }
-                                    Text("Ver todas")
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                }
-                                
-                                Spacer()
-                            }
-                            .padding(.vertical, 12)
-                            .padding(.horizontal, 16)
-                            .background(Color(.systemGray5).opacity(0.5))
-                            .cornerRadius(10)
-                        }
-                        .buttonStyle(.borderless)
-                    }
-                    .padding(16)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(12)
-                    
-                    // Botão de Logout separado - minimalista
-                    Button {
-                        showLogoutAlert = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                                .font(.subheadline)
-                            Text("Sair")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            Spacer()
-                        }
-                        .foregroundStyle(.red)
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 16)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                    }
-                    .buttonStyle(.borderless)
 
-                    // Exigido pela App Store (guideline 5.1.1(v)) para apps com criação de conta
-                    Button {
-                        showDeleteAccountAlert = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "person.crop.circle.badge.xmark")
-                                .font(.subheadline)
-                            Text("Excluir conta")
-                                .font(.subheadline)
-                            Spacer()
+                            Text(user.memberSince.map { "No TabNews desde \($0)" } ?? "TabNews")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                        .foregroundStyle(.secondary)
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 16)
+
+                        Spacer(minLength: 0)
                     }
-                    .buttonStyle(.borderless)
-                }
-            } else {
-                VStack(spacing: 10) {
-                    Button {
-                        showLoginSheet = true
+
+                    HStack(spacing: 10) {
+                        profileStat(user.tabcoins, label: "TabCoins", icon: "star.fill", tint: .orange)
+                        profileStat(user.tabcash, label: "TabCash", icon: "dollarsign.circle.fill", tint: .green)
+                    }
+
+                    NavigationLink {
+                        UserPublicationsView(username: user.username)
                     } label: {
                         HStack(spacing: 10) {
-                            Circle()
-                                .fill(Color.primary.opacity(0.1))
-                                .frame(width: 32, height: 32)
-                                .overlay(
-                                    Image(systemName: "person.fill")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                )
-                            
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Entrar")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.primary)
-                                
-                                Text("O login é opcional e libera recursos da conta.")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            
+                            Image(systemName: "doc.text")
+                                .font(.subheadline)
+                            Text(userPublicationsCount == 0 ? "Nenhuma publicação ainda" : "Minhas Publicações")
+                                .font(.subheadline.weight(.medium))
                             Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.tertiary)
                         }
-                        .padding(12)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
+                        .foregroundStyle(.primary)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 14)
+                        .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                     }
-                    .buttonStyle(.plain)
-                    .foregroundColor(.primary)
+                    .buttonStyle(.borderless)
                 }
+                .padding(16)
+                .background(Color("CardColor"), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+                }
+            } else {
+                Button {
+                    showLoginSheet = true
+                } label: {
+                    HStack(spacing: 12) {
+                        Circle()
+                            .fill(Color.primary.opacity(0.08))
+                            .frame(width: 44, height: 44)
+                            .overlay(
+                                Image(systemName: "person.fill")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            )
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Entrar no TabNews")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.primary)
+
+                            Text("Opcional: libera votos, TabCoins e suas publicações.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Spacer(minLength: 0)
+
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(14)
+                    .background(Color("CardColor"), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+                    }
+                }
+                .buttonStyle(.plain)
             }
         }
     }
-    
+
+    private func profileStat(_ value: Int?, label: String, icon: String, tint: Color) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.subheadline)
+                .foregroundStyle(tint)
+            VStack(alignment: .leading, spacing: 0) {
+                Text(value.map(String.init) ?? "—")
+                    .font(.headline.monospacedDigit())
+                Text(label)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .frame(maxWidth: .infinity)
+        .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .accessibilityElement(children: .combine)
+    }
+
     private var betaTesterBadgeCard: some View {
         HStack(spacing: 16) {
             // Ícone animado com gradiente

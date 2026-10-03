@@ -324,6 +324,9 @@ enum RestGameOnboardingID: String {
     case devSpot
     case bigO
     case algoSpot
+    case httpStatus
+    case gitRescue
+    case regexGolf
 }
 
 enum RestGameOnboarding {
@@ -478,6 +481,20 @@ extension RestGameOnboardingOverlay {
                 "Leia o snippet de pseudocódigo no card.",
                 "Escolha a complexidade correta entre 4 opções.",
                 "Diário: 1 desafio por dia. Livre: 10 rounds."
+            ],
+            onPlay: onPlay
+        )
+    }
+
+    static func regexGolf(onPlay: @escaping () -> Void) -> RestGameOnboardingOverlay {
+        RestGameOnboardingOverlay(
+            title: "Regex Golf",
+            icon: "chevron.left.forwardslash.chevron.right",
+            accent: RegexGolfTheme.accent,
+            steps: [
+                "Escreva uma regex que case com todas as palavras da esquerda.",
+                "E com nenhuma da direita. Cada palavra acende ao vivo.",
+                "Quanto mais curta a regex, mais pontos. Bata o par!"
             ],
             onPlay: onPlay
         )

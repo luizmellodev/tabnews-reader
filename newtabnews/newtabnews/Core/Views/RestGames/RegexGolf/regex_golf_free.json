@@ -1,0 +1,1153 @@
+{
+  "puzzles": [
+    {
+      "id": "regex-free-001",
+      "title": "Arquivos Swift",
+      "prompt": "Pegue só os arquivos de código Swift.",
+      "match": [
+        "App.swift",
+        "ContentView.swift",
+        "Model.swift",
+        "main.swift"
+      ],
+      "noMatch": [
+        "swift.md",
+        "App.kt",
+        "swiftlint.yml",
+        "Main.java",
+        "App.swift.orig"
+      ],
+      "solution": "\\.swift$",
+      "par": 8,
+      "difficulty": "easy",
+      "hint": "A extensão fica no fim",
+      "explanation": "\\.swift$ exige o ponto literal seguido de swift no final do nome."
+    },
+    {
+      "id": "regex-free-002",
+      "title": "Métodos de escrita",
+      "prompt": "Selecione as requisições que alteram dados (POST, PUT, PATCH, DELETE).",
+      "match": [
+        "POST /users",
+        "PUT /users/1",
+        "PATCH /me",
+        "DELETE /x/2"
+      ],
+      "noMatch": [
+        "GET /users",
+        "HEAD /",
+        "OPTIONS /",
+        "GET /POST"
+      ],
+      "solution": "^[PD]",
+      "par": 5,
+      "difficulty": "easy",
+      "hint": "Repare na primeira letra de cada método",
+      "explanation": "Todos os métodos de escrita começam com P ou D, então ^[PD] resolve."
+    },
+    {
+      "id": "regex-free-003",
+      "title": "Logs de aviso",
+      "prompt": "Pegue as linhas com level=warn.",
+      "match": [
+        "level=warn msg=x",
+        "t=1 level=warn",
+        "level=warn",
+        "a=1 level=warn b=2"
+      ],
+      "noMatch": [
+        "level=info",
+        "warn=level",
+        "level=error warn",
+        "lvl=warn",
+        "LEVEL=WARN"
+      ],
+      "solution": "level=warn",
+      "par": 10,
+      "difficulty": "easy",
+      "hint": "Procure o par chave=valor exato",
+      "explanation": "level=warn é um literal; como a busca é em qualquer posição, a ordem dos outros campos não importa."
+    },
+    {
+      "id": "regex-free-004",
+      "title": "Services",
+      "prompt": "Selecione as classes que terminam em Service.",
+      "match": [
+        "UserService",
+        "AuthService",
+        "PaymentService",
+        "ApiService"
+      ],
+      "noMatch": [
+        "ServiceLocator",
+        "UserController",
+        "service",
+        "Services",
+        "AuthServiceImpl"
+      ],
+      "solution": "Service$",
+      "par": 8,
+      "difficulty": "easy",
+      "hint": "O sufixo precisa ser o fim",
+      "explanation": "Service$ exige que a palavra Service esteja no fim do nome."
+    },
+    {
+      "id": "regex-free-005",
+      "title": "Hooks do React",
+      "prompt": "Pegue os nomes que seguem a convenção de hooks.",
+      "match": [
+        "useState",
+        "useEffect",
+        "useMemo",
+        "useRef",
+        "useAuth"
+      ],
+      "noMatch": [
+        "user",
+        "username",
+        "reuseState",
+        "Use",
+        "used"
+      ],
+      "solution": "^use[A-Z]",
+      "par": 9,
+      "difficulty": "easy",
+      "hint": "Depois do use vem uma maiúscula",
+      "explanation": "^use exige o prefixo no início e [A-Z] obriga a próxima letra a ser maiúscula."
+    },
+    {
+      "id": "regex-free-006",
+      "title": "Markdown",
+      "prompt": "Selecione os arquivos .md ou .mdx.",
+      "match": [
+        "README.md",
+        "post.mdx",
+        "CHANGELOG.md",
+        "docs.mdx"
+      ],
+      "noMatch": [
+        "md.txt",
+        "readme.mdown",
+        "app.js",
+        "index.md.bak"
+      ],
+      "solution": "\\.mdx?$",
+      "par": 7,
+      "difficulty": "easy",
+      "hint": "Uma letra pode ser opcional",
+      "explanation": "\\.md casa a extensão, x? torna o x opcional e $ trava no fim."
+    },
+    {
+      "id": "regex-free-007",
+      "title": "Comentários //",
+      "prompt": "Pegue as linhas que são comentários de linha inteira.",
+      "match": [
+        "// comentario",
+        "//sem espaco",
+        "// TODO",
+        "//"
+      ],
+      "noMatch": [
+        "x = 1 // fim",
+        "/ nao",
+        "code()",
+        "# python"
+      ],
+      "solution": "^//",
+      "par": 3,
+      "difficulty": "easy",
+      "hint": "O comentário precisa abrir a linha",
+      "explanation": "^// exige duas barras logo no início."
+    },
+    {
+      "id": "regex-free-008",
+      "title": "Nome com espaço",
+      "prompt": "Selecione os nomes de arquivo que têm espaço.",
+      "match": [
+        "meu arquivo.txt",
+        "foto 1.png",
+        "nova pasta",
+        "a b"
+      ],
+      "noMatch": [
+        "meu_arquivo.txt",
+        "foto-1.png",
+        "novapasta",
+        "ab"
+      ],
+      "solution": "\\s",
+      "par": 2,
+      "difficulty": "easy",
+      "hint": "Existe um atalho para espaços",
+      "explanation": "\\s casa com qualquer caractere de espaço em branco."
+    },
+    {
+      "id": "regex-free-009",
+      "title": "Domínios .br",
+      "prompt": "Pegue os domínios brasileiros.",
+      "match": [
+        "tabnews.com.br",
+        "gov.br",
+        "site.org.br",
+        "loja.net.br"
+      ],
+      "noMatch": [
+        "brasil.com",
+        "br.dev",
+        "site.br.com",
+        "bravo.io"
+      ],
+      "solution": "\\.br$",
+      "par": 5,
+      "difficulty": "easy",
+      "hint": "O .br precisa ser o final",
+      "explanation": "\\.br$ exige ponto literal e br no fim do domínio."
+    },
+    {
+      "id": "regex-free-010",
+      "title": "Começa com dígito",
+      "prompt": "Selecione os nomes que começam com número.",
+      "match": [
+        "404",
+        "3d-model",
+        "1st",
+        "2fa-setup"
+      ],
+      "noMatch": [
+        "v404",
+        "model3d",
+        "first",
+        "fa2"
+      ],
+      "solution": "^\\d",
+      "par": 3,
+      "difficulty": "easy",
+      "hint": "Só importa o primeiro caractere",
+      "explanation": "^\\d exige um dígito na primeira posição."
+    },
+    {
+      "id": "regex-free-011",
+      "title": "Tags de versão",
+      "prompt": "Pegue as tags git de versão (v + número).",
+      "match": [
+        "v1.0",
+        "v2.3.1",
+        "v10",
+        "v0.9-beta"
+      ],
+      "noMatch": [
+        "1.0",
+        "version1",
+        "av1",
+        "V2.0",
+        "dev1"
+      ],
+      "solution": "^v\\d",
+      "par": 4,
+      "difficulty": "easy",
+      "hint": "v minúsculo e logo um número",
+      "explanation": "^v\\d exige v no início seguido imediatamente por um dígito."
+    },
+    {
+      "id": "regex-free-012",
+      "title": "JS ou TS",
+      "prompt": "Selecione os arquivos .js ou .ts.",
+      "match": [
+        "app.js",
+        "index.ts",
+        "server.js",
+        "types.ts"
+      ],
+      "noMatch": [
+        "app.jsx",
+        "ts.json",
+        "main.rs",
+        "app.json",
+        "script.sh"
+      ],
+      "solution": "\\.[jt]s$",
+      "par": 8,
+      "difficulty": "easy",
+      "hint": "Só a primeira letra da extensão muda",
+      "explanation": "[jt] aceita j ou t, seguido de s e do fim da linha."
+    },
+    {
+      "id": "regex-free-013",
+      "title": "Menções",
+      "prompt": "Pegue os textos que mencionam um usuário.",
+      "match": [
+        "valeu @filipe",
+        "@ana bom post",
+        "cc @dev_br",
+        "oi @x"
+      ],
+      "noMatch": [
+        "email: a (at) b",
+        "sem mencao",
+        "@ sozinho",
+        "100% certo"
+      ],
+      "solution": "@\\w",
+      "par": 3,
+      "difficulty": "easy",
+      "hint": "O @ precisa vir colado em um nome",
+      "explanation": "@\\w exige um caractere de palavra logo depois da arroba."
+    },
+    {
+      "id": "regex-free-014",
+      "title": "Branches protegidas",
+      "prompt": "Selecione exatamente main, master, develop ou staging.",
+      "match": [
+        "main",
+        "master",
+        "develop",
+        "staging"
+      ],
+      "noMatch": [
+        "main2",
+        "feature/main",
+        "mainline",
+        "dev",
+        "old-master"
+      ],
+      "solution": "^(main|master|develop|staging)$",
+      "par": 31,
+      "difficulty": "easy",
+      "hint": "Nada antes, nada depois",
+      "explanation": "A alternância lista os nomes e ^...$ exige que a linha seja exatamente um deles."
+    },
+    {
+      "id": "regex-free-015",
+      "title": "Perguntas",
+      "prompt": "Pegue as frases que terminam com interrogação.",
+      "match": [
+        "funciona?",
+        "como faz?",
+        "bug ou feature?",
+        "pq?"
+      ],
+      "noMatch": [
+        "funciona!",
+        "? no inicio",
+        "sim",
+        "e ai? vamos"
+      ],
+      "solution": "\\?$",
+      "par": 3,
+      "difficulty": "easy",
+      "hint": "O ? é especial em regex",
+      "explanation": "\\? escapa a interrogação e $ exige que ela seja o último caractere."
+    },
+    {
+      "id": "regex-free-016",
+      "title": "Lockfiles",
+      "prompt": "Selecione os arquivos de lock de dependências.",
+      "match": [
+        "package-lock.json",
+        "yarn.lock",
+        "Podfile.lock",
+        "Cargo.lock",
+        "pnpm-lock.yaml"
+      ],
+      "noMatch": [
+        "package.json",
+        "lockfile.md",
+        "Podfile",
+        "unlocked.sh",
+        "locker.js"
+      ],
+      "solution": "lock(\\.|$)",
+      "par": 10,
+      "difficulty": "medium",
+      "hint": "lock vem antes de um ponto ou no fim",
+      "explanation": "lock seguido de (\\.|$) aceita lock antes da extensão ou como extensão final."
+    },
+    {
+      "id": "regex-free-017",
+      "title": "Horário 24h",
+      "prompt": "Pegue os horários válidos no formato HH:MM.",
+      "match": [
+        "09:30",
+        "23:59",
+        "00:00",
+        "14:05",
+        "19:45"
+      ],
+      "noMatch": [
+        "24:00",
+        "9:30",
+        "12:60",
+        "25:10",
+        "12:5"
+      ],
+      "solution": "^([01]\\d|2[0-3]):[0-5]\\d$",
+      "par": 25,
+      "difficulty": "medium",
+      "hint": "Depois das 19 só vai até 23",
+      "explanation": "([01]\\d|2[0-3]) cobre 00-23 e [0-5]\\d cobre os minutos 00-59."
+    },
+    {
+      "id": "regex-free-018",
+      "title": "Hexadecimal 0x",
+      "prompt": "Selecione os literais hexadecimais.",
+      "match": [
+        "0xFF",
+        "0x1a2b",
+        "0x0",
+        "0xDEADBEEF"
+      ],
+      "noMatch": [
+        "xFF",
+        "0x",
+        "0xG1",
+        "FF",
+        "0b101"
+      ],
+      "solution": "^0x[\\da-fA-F]+$",
+      "par": 15,
+      "difficulty": "medium",
+      "hint": "Hex vai de 0 a F, maiúsculo ou minúsculo",
+      "explanation": "^0x exige o prefixo e [\\da-fA-F]+$ aceita só dígitos hex até o fim."
+    },
+    {
+      "id": "regex-free-019",
+      "title": "kebab-case",
+      "prompt": "Pegue os nomes em kebab-case.",
+      "match": [
+        "user-card",
+        "nav-bar",
+        "my-cool-button",
+        "app-header"
+      ],
+      "noMatch": [
+        "UserCard",
+        "user_card",
+        "navbar",
+        "-start",
+        "end-",
+        "My-Card"
+      ],
+      "solution": "^[a-z]+(-[a-z]+)+$",
+      "par": 18,
+      "difficulty": "medium",
+      "hint": "Hífen só entre palavras",
+      "explanation": "[a-z]+ inicia e (-[a-z]+)+ exige pelo menos um bloco hífen + letras, sem hífen nas pontas."
+    },
+    {
+      "id": "regex-free-020",
+      "title": "Booleanos na config",
+      "prompt": "Selecione as chaves com valor true ou false.",
+      "match": [
+        "debug=true",
+        "cache=false",
+        "ssl=true",
+        "dark=false"
+      ],
+      "noMatch": [
+        "debug=1",
+        "cache=yes",
+        "true=debug",
+        "ssl=truely",
+        "dark=False"
+      ],
+      "solution": "=(true|false)$",
+      "par": 14,
+      "difficulty": "medium",
+      "hint": "O valor vem depois do = e termina a linha",
+      "explanation": "=(true|false)$ exige igual seguido de true ou false como final."
+    },
+    {
+      "id": "regex-free-021",
+      "title": "Tamanho de arquivo",
+      "prompt": "Pegue os tamanhos em KB, MB ou GB.",
+      "match": [
+        "12KB",
+        "3.5MB",
+        "1GB",
+        "512KB",
+        "0.5GB"
+      ],
+      "noMatch": [
+        "12 KB",
+        "3.5mb",
+        "MB",
+        "1TBB",
+        "12KiB"
+      ],
+      "solution": "^[\\d.]+[KMG]B$",
+      "par": 14,
+      "difficulty": "medium",
+      "hint": "Número colado na unidade",
+      "explanation": "[\\d.]+ é o número e [KMG]B$ a unidade, sem espaço e no fim."
+    },
+    {
+      "id": "regex-free-022",
+      "title": "Placeholders",
+      "prompt": "Selecione os textos com um placeholder {{nome}} válido.",
+      "match": [
+        "Ola {{nome}}",
+        "{{user}}",
+        "id: {{id}}!",
+        "{{a}} e {{b}}"
+      ],
+      "noMatch": [
+        "{nome}",
+        "{{}}",
+        "{{ nome",
+        "nome}}",
+        "{{na me}}"
+      ],
+      "solution": "\\{\\{\\w+\\}\\}",
+      "par": 11,
+      "difficulty": "medium",
+      "hint": "Chaves também precisam de escape",
+      "explanation": "\\{\\{ e \\}\\} casam as chaves literais e \\w+ exige um nome sem espaços dentro."
+    },
+    {
+      "id": "regex-free-023",
+      "title": "Durações",
+      "prompt": "Pegue as durações como 1h30m ou 45s.",
+      "match": [
+        "1h",
+        "30m",
+        "1h30m",
+        "2h5m",
+        "45s"
+      ],
+      "noMatch": [
+        "h1",
+        "1hora",
+        "m30",
+        "1h30",
+        "30"
+      ],
+      "solution": "^(\\d+[hms])+$",
+      "par": 13,
+      "difficulty": "medium",
+      "hint": "Cada número precisa da sua unidade",
+      "explanation": "(\\d+[hms])+ repete blocos de número + unidade e as âncoras impedem sobras."
+    },
+    {
+      "id": "regex-free-024",
+      "title": "Query strings",
+      "prompt": "Selecione as query strings bem formadas.",
+      "match": [
+        "?page=2",
+        "?q=regex",
+        "?id=1&sort=asc",
+        "?a=b&c=d"
+      ],
+      "noMatch": [
+        "page=2",
+        "?page",
+        "?=2",
+        "?a=b&",
+        "&a=b"
+      ],
+      "solution": "^\\?\\w+=\\w+(&\\w+=\\w+)*$",
+      "par": 22,
+      "difficulty": "medium",
+      "hint": "Pares chave=valor separados por &",
+      "explanation": "^\\? abre, \\w+=\\w+ é o primeiro par e (&\\w+=\\w+)* permite pares extras."
+    },
+    {
+      "id": "regex-free-025",
+      "title": "Imports relativos",
+      "prompt": "Pegue os caminhos de import relativos.",
+      "match": [
+        "./utils",
+        "../api/client",
+        "./components/Button",
+        "../../lib"
+      ],
+      "noMatch": [
+        "react",
+        "@/utils",
+        "lodash/map",
+        ".env",
+        "/abs/path"
+      ],
+      "solution": "^\\.\\.?/",
+      "par": 7,
+      "difficulty": "medium",
+      "hint": "Um ou dois pontos e uma barra",
+      "explanation": "^\\. exige um ponto, \\.? permite um segundo e / fecha o prefixo."
+    },
+    {
+      "id": "regex-free-026",
+      "title": "Pré-release",
+      "prompt": "Selecione as versões semver de pré-release.",
+      "match": [
+        "1.0.0-beta",
+        "2.1.0-rc.1",
+        "3.0.0-alpha.2",
+        "0.9.0-beta.3"
+      ],
+      "noMatch": [
+        "1.0.0",
+        "2.1.0",
+        "beta-1.0.0",
+        "1.0.0-",
+        "1.0-beta"
+      ],
+      "solution": "^\\d+\\.\\d+\\.\\d+-\\w",
+      "par": 17,
+      "difficulty": "medium",
+      "hint": "Depois do patch vem um hífen",
+      "explanation": "Três números separados por ponto, depois - e pelo menos um caractere de identificador."
+    },
+    {
+      "id": "regex-free-027",
+      "title": "Erros 4xx e 5xx",
+      "prompt": "Pegue os códigos HTTP de erro.",
+      "match": [
+        "404",
+        "500",
+        "403",
+        "503",
+        "418"
+      ],
+      "noMatch": [
+        "200",
+        "301",
+        "40",
+        "4040",
+        "600"
+      ],
+      "solution": "^[45]\\d\\d$",
+      "par": 10,
+      "difficulty": "medium",
+      "hint": "Exatamente três dígitos",
+      "explanation": "[45] cobre erros de cliente e servidor e \\d\\d$ fecha os três dígitos."
+    },
+    {
+      "id": "regex-free-028",
+      "title": "Números decimais",
+      "prompt": "Selecione os números com parte decimal.",
+      "match": [
+        "3.14",
+        "0.5",
+        "-2.75",
+        "10.0"
+      ],
+      "noMatch": [
+        "3",
+        "3.",
+        "-.5",
+        ".5",
+        "3.1.4"
+      ],
+      "solution": "^-?\\d+\\.\\d+$",
+      "par": 12,
+      "difficulty": "medium",
+      "hint": "O sinal é opcional, os dígitos não",
+      "explanation": "-? permite sinal, \\d+\\.\\d+ exige dígitos dos dois lados do ponto."
+    },
+    {
+      "id": "regex-free-029",
+      "title": "Testes em Python",
+      "prompt": "Pegue os nomes de função de teste do pytest.",
+      "match": [
+        "test_login",
+        "test_api_ok",
+        "test_user_create",
+        "test_x"
+      ],
+      "noMatch": [
+        "testLogin",
+        "my_test_login",
+        "test_",
+        "tests_login",
+        "Test_login"
+      ],
+      "solution": "^test_\\w",
+      "par": 8,
+      "difficulty": "medium",
+      "hint": "Precisa ter algo depois do underscore",
+      "explanation": "^test_ exige o prefixo no início e \\w garante que haja nome depois."
+    },
+    {
+      "id": "regex-free-030",
+      "title": "Imagens Docker",
+      "prompt": "Selecione as imagens com tag.",
+      "match": [
+        "nginx:latest",
+        "node:20",
+        "redis:7.2",
+        "postgres:16-alpine"
+      ],
+      "noMatch": [
+        "nginx",
+        "node:",
+        "ubuntu latest",
+        ":20",
+        "Node:20"
+      ],
+      "solution": "^[a-z]+:.",
+      "par": 9,
+      "difficulty": "medium",
+      "hint": "Nome, dois-pontos e algo depois",
+      "explanation": "[a-z]+ é o nome minúsculo, : separa e . exige que a tag não seja vazia."
+    },
+    {
+      "id": "regex-free-031",
+      "title": "Comandos git",
+      "prompt": "Pegue as linhas que são comandos git.",
+      "match": [
+        "git push",
+        "git commit -m x",
+        "git pull --rebase",
+        "git status"
+      ],
+      "noMatch": [
+        "gitpush",
+        "git",
+        "npm push",
+        "github push",
+        "sudo git push"
+      ],
+      "solution": "^git \\w",
+      "par": 7,
+      "difficulty": "medium",
+      "hint": "git, espaço e um subcomando",
+      "explanation": "^git exige o comando no início e \\w obriga um subcomando depois do espaço."
+    },
+    {
+      "id": "regex-free-032",
+      "title": "CEP",
+      "prompt": "Selecione os CEPs no formato 00000-000.",
+      "match": [
+        "01310-100",
+        "90010-000",
+        "88015-600",
+        "20040-020"
+      ],
+      "noMatch": [
+        "01310100",
+        "1310-100",
+        "01310-10",
+        "AB310-100",
+        "01310-1000"
+      ],
+      "solution": "^\\d{5}-\\d{3}$",
+      "par": 13,
+      "difficulty": "medium",
+      "hint": "Cinco, hífen, três",
+      "explanation": "\\d{5} e \\d{3} fixam a quantidade de dígitos e as âncoras impedem sobras."
+    },
+    {
+      "id": "regex-free-033",
+      "title": "Arquivos de config",
+      "prompt": "Pegue os arquivos YAML, JSON ou TOML.",
+      "match": [
+        "config.yml",
+        "docker-compose.yaml",
+        "tsconfig.json",
+        "Cargo.toml"
+      ],
+      "noMatch": [
+        "config.js",
+        "yaml.md",
+        "app.ymlx",
+        "json.txt",
+        "index.html"
+      ],
+      "solution": "\\.(ya?ml|json|toml)$",
+      "par": 20,
+      "difficulty": "medium",
+      "hint": "yml e yaml diferem por uma letra",
+      "explanation": "ya?ml cobre yml e yaml, e a alternância junta com json e toml no fim do nome."
+    },
+    {
+      "id": "regex-free-034",
+      "title": "Membros privados",
+      "prompt": "Selecione os nomes com um único underscore inicial.",
+      "match": [
+        "_count",
+        "_isReady",
+        "_cache",
+        "_id"
+      ],
+      "noMatch": [
+        "count",
+        "__init__",
+        "id_",
+        "_",
+        "__proto__"
+      ],
+      "solution": "^_[a-zA-Z]",
+      "par": 10,
+      "difficulty": "medium",
+      "hint": "Depois do _ precisa vir uma letra",
+      "explanation": "^_ exige o underscore inicial e [a-zA-Z] impede um segundo underscore."
+    },
+    {
+      "id": "regex-free-035",
+      "title": "Referência a issue",
+      "prompt": "Pegue os textos que citam uma issue pelo número.",
+      "match": [
+        "fix: bug #42",
+        "feat: login (#7)",
+        "closes #123",
+        "refs #1"
+      ],
+      "noMatch": [
+        "fix: bug 42",
+        "#hashtag",
+        "color #fff",
+        "issue # 5",
+        "C# rocks"
+      ],
+      "solution": "#\\d",
+      "par": 3,
+      "difficulty": "medium",
+      "hint": "Cerquilha colada em um número",
+      "explanation": "#\\d exige um dígito imediatamente depois do #."
+    },
+    {
+      "id": "regex-free-036",
+      "title": "Chamadas de função",
+      "prompt": "Selecione as linhas que terminam numa chamada de função.",
+      "match": [
+        "print()",
+        "foo(1, 2)",
+        "console.log(x)",
+        "run(a)"
+      ],
+      "noMatch": [
+        "print",
+        "foo (1)",
+        "(x)",
+        "x = y",
+        "foo("
+      ],
+      "solution": "\\w\\(.*\\)$",
+      "par": 9,
+      "difficulty": "medium",
+      "hint": "O nome encosta no parêntese",
+      "explanation": "\\w\\( exige o nome colado no parêntese e .*\\)$ exige o fechamento no fim."
+    },
+    {
+      "id": "regex-free-037",
+      "title": "Datas BR",
+      "prompt": "Pegue as datas no formato DD/MM/AAAA.",
+      "match": [
+        "03/10/2026",
+        "25/12/1999",
+        "01/01/2000",
+        "31/07/2024"
+      ],
+      "noMatch": [
+        "3/10/2026",
+        "2026/10/03",
+        "03-10-2026",
+        "03/10/26",
+        "03/10/20261"
+      ],
+      "solution": "^\\d\\d/\\d\\d/\\d{4}$",
+      "par": 17,
+      "difficulty": "medium",
+      "hint": "Dois, dois, quatro",
+      "explanation": "\\d\\d para dia e mês, \\d{4} para o ano, separados por barra e ancorados."
+    },
+    {
+      "id": "regex-free-038",
+      "title": "Endereço MAC",
+      "prompt": "Selecione os endereços MAC com seis pares hex maiúsculos.",
+      "match": [
+        "00:1A:2B:3C:4D:5E",
+        "AA:BB:CC:DD:EE:FF",
+        "01:23:45:67:89:AB",
+        "FF:00:FF:00:FF:00"
+      ],
+      "noMatch": [
+        "00:1A:2B:3C:4D",
+        "001A2B3C4D5E",
+        "GG:00:11:22:33:44",
+        "00-1A-2B-3C-4D-5E",
+        "00:1A:2B:3C:4D:5E:6F"
+      ],
+      "solution": "^([\\dA-F]{2}:){5}[\\dA-F]{2}$",
+      "par": 28,
+      "difficulty": "hard",
+      "hint": "Cinco pares com dois-pontos e um sem",
+      "explanation": "([\\dA-F]{2}:){5} repete cinco pares seguidos de : e [\\dA-F]{2}$ fecha com o sexto."
+    },
+    {
+      "id": "regex-free-039",
+      "title": "Triplas",
+      "prompt": "Pegue os textos com o mesmo caractere três vezes seguidas.",
+      "match": [
+        "zzz sleep",
+        "aaargh",
+        "logs!!!",
+        "hmmm"
+      ],
+      "noMatch": [
+        "zz sleep",
+        "aargh",
+        "logs!!",
+        "hmm",
+        "ababab"
+      ],
+      "solution": "(.)\\1\\1",
+      "par": 7,
+      "difficulty": "hard",
+      "hint": "Reuse o grupo mais de uma vez",
+      "explanation": "(.) captura um caractere e \\1\\1 exige mais duas cópias logo depois."
+    },
+    {
+      "id": "regex-free-040",
+      "title": "Eco de pares",
+      "prompt": "Selecione os textos com um par de letras repetido em seguida.",
+      "match": [
+        "haha",
+        "lolo",
+        "bababa",
+        "nanana",
+        "xyxy"
+      ],
+      "noMatch": [
+        "hah",
+        "abba",
+        "lol",
+        "abcd",
+        "heha"
+      ],
+      "solution": "(..)\\1",
+      "par": 6,
+      "difficulty": "hard",
+      "hint": "Capture dois caracteres de uma vez",
+      "explanation": "(..) captura um par e \\1 exige o mesmo par na sequência."
+    },
+    {
+      "id": "regex-free-041",
+      "title": "Strings entre aspas",
+      "prompt": "Pegue as strings abertas e fechadas com o mesmo tipo de aspas.",
+      "match": [
+        "\"ola\"",
+        "'mundo'",
+        "\"a b c\"",
+        "'x'"
+      ],
+      "noMatch": [
+        "\"ola'",
+        "'mundo\"",
+        "ola",
+        "\"sem fim",
+        "''x"
+      ],
+      "solution": "^([\"']).*\\1$",
+      "par": 12,
+      "difficulty": "hard",
+      "hint": "A aspa de fechamento depende da de abertura",
+      "explanation": "([\"']) captura a aspa inicial e \\1$ exige a mesma aspa no fim."
+    },
+    {
+      "id": "regex-free-042",
+      "title": "Octeto 0-255",
+      "prompt": "Selecione os números de 0 a 255 sem zeros à esquerda.",
+      "match": [
+        "0",
+        "9",
+        "42",
+        "199",
+        "255"
+      ],
+      "noMatch": [
+        "256",
+        "300",
+        "999",
+        "-1",
+        "007"
+      ],
+      "solution": "^(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$",
+      "par": 35,
+      "difficulty": "hard",
+      "hint": "Divida em faixas: 250s, 200s, 100s e o resto",
+      "explanation": "Cada alternativa cobre uma faixa (250-255, 200-249, 100-199, 0-99) e as âncoras impedem sobras."
+    },
+    {
+      "id": "regex-free-043",
+      "title": "Comentário de bloco",
+      "prompt": "Pegue as linhas com um comentário /* */ completo.",
+      "match": [
+        "/* oi */",
+        "/**/",
+        "/* a * b */",
+        "x /* y */ z"
+      ],
+      "noMatch": [
+        "/* oi",
+        "oi */",
+        "// oi",
+        "/ * oi * /"
+      ],
+      "solution": "/\\*.*\\*/",
+      "par": 8,
+      "difficulty": "hard",
+      "hint": "O asterisco precisa de escape",
+      "explanation": "/\\* abre, .* aceita qualquer conteúdo e \\*/ exige o fechamento."
+    },
+    {
+      "id": "regex-free-044",
+      "title": "Hora AM/PM",
+      "prompt": "Selecione os horários válidos de 12 horas.",
+      "match": [
+        "9:30 AM",
+        "12:00 PM",
+        "1:05 PM",
+        "11:59 AM"
+      ],
+      "noMatch": [
+        "13:00 PM",
+        "9:30",
+        "9:60 AM",
+        "09:30 AM",
+        "9:30 am"
+      ],
+      "solution": "^(1[0-2]|[1-9]):[0-5]\\d [AP]M$",
+      "par": 30,
+      "difficulty": "hard",
+      "hint": "A hora vai de 1 a 12, sem zero à esquerda",
+      "explanation": "(1[0-2]|[1-9]) cobre 1-12, [0-5]\\d os minutos e [AP]M o período em maiúsculas."
+    },
+    {
+      "id": "regex-free-045",
+      "title": "Hash de commit",
+      "prompt": "Pegue os hashes hex minúsculos de 7 a 40 caracteres.",
+      "match": [
+        "a1b2c3d",
+        "5557593",
+        "deadbeef12",
+        "0123456789abcdef"
+      ],
+      "noMatch": [
+        "a1b2c3",
+        "g1b2c3d",
+        "A1B2C3D",
+        "a1b2 c3d",
+        "5557593x"
+      ],
+      "solution": "^[\\da-f]{7,40}$",
+      "par": 15,
+      "difficulty": "hard",
+      "hint": "Quantificadores aceitam um intervalo",
+      "explanation": "[\\da-f] aceita dígitos hex minúsculos e {7,40} limita o tamanho, com âncoras na linha toda."
+    },
+    {
+      "id": "regex-free-046",
+      "title": "Milhares com vírgula",
+      "prompt": "Selecione os números com separador de milhar bem colocado.",
+      "match": [
+        "1,000",
+        "12,345",
+        "999",
+        "1,234,567"
+      ],
+      "noMatch": [
+        "1000",
+        "12,34",
+        "1,2345",
+        ",123",
+        "1,,000"
+      ],
+      "solution": "^\\d{1,3}(,\\d{3})*$",
+      "par": 18,
+      "difficulty": "hard",
+      "hint": "Cada vírgula é seguida de exatos três dígitos",
+      "explanation": "\\d{1,3} é o primeiro grupo e (,\\d{3})* repete blocos de vírgula + três dígitos."
+    },
+    {
+      "id": "regex-free-047",
+      "title": "Sem debug",
+      "prompt": "Pegue as linhas que NÃO mencionam debug.",
+      "match": [
+        "build ok",
+        "deploy feito",
+        "rodando testes",
+        "lint passou"
+      ],
+      "noMatch": [
+        "debug on",
+        "build debug",
+        "modo debug",
+        "debugger;",
+        "rodar debug"
+      ],
+      "solution": "^(?!.*debug)",
+      "par": 12,
+      "difficulty": "hard",
+      "hint": "Olhe adiante sem consumir",
+      "explanation": "(?!.*debug) é um lookahead negativo: no início da linha, falha se debug aparecer em qualquer lugar."
+    },
+    {
+      "id": "regex-free-048",
+      "title": "Senha razoável",
+      "prompt": "Selecione as senhas com 8+ caracteres, um dígito e uma maiúscula.",
+      "match": [
+        "Senha123",
+        "Abcdefg1",
+        "Xx12345678",
+        "Regex4Ever"
+      ],
+      "noMatch": [
+        "senha123",
+        "SENHAforte",
+        "Ab1",
+        "abcdefgh",
+        "Abc12"
+      ],
+      "solution": "^(?=.*\\d)(?=.*[A-Z]).{8,}$",
+      "par": 26,
+      "difficulty": "hard",
+      "hint": "Dá para checar várias condições no mesmo ponto",
+      "explanation": "Os lookaheads (?=.*\\d) e (?=.*[A-Z]) testam cada exigência e .{8,}$ garante o tamanho."
+    },
+    {
+      "id": "regex-free-049",
+      "title": "Tags autofechadas",
+      "prompt": "Pegue as tags HTML que se fecham sozinhas.",
+      "match": [
+        "<br/>",
+        "<img src=x />",
+        "<input />",
+        "<hr/>"
+      ],
+      "noMatch": [
+        "<br>",
+        "<div></div>",
+        "<p>/</p>",
+        "/>",
+        "< br/>"
+      ],
+      "solution": "^<\\w[^>]*/>$",
+      "par": 12,
+      "difficulty": "hard",
+      "hint": "Nada de > antes do />",
+      "explanation": "<\\w abre a tag, [^>]* consome atributos sem fechar antes da hora e />$ termina."
+    },
+    {
+      "id": "regex-free-050",
+      "title": "CSV circular",
+      "prompt": "Selecione as linhas CSV cuja primeira e última coluna são iguais.",
+      "match": [
+        "a,b,a",
+        "1,2,3,1",
+        "x,x",
+        "foo,bar,foo"
+      ],
+      "noMatch": [
+        "a,b,c",
+        "1,2,3,4",
+        "foo,bar,fo",
+        "a,b,ab"
+      ],
+      "solution": "^([^,]+),(.*,)?\\1$",
+      "par": 18,
+      "difficulty": "hard",
+      "hint": "Capture a primeira coluna inteira",
+      "explanation": "([^,]+) captura a primeira coluna, (.*,)? pula as do meio e \\1$ exige a mesma coluna no fim."
+    }
+  ]
+}

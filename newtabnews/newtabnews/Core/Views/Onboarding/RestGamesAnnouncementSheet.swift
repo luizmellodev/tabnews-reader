@@ -3,7 +3,8 @@ import SwiftUI
 enum RestGamesAnnouncement {
     static let storageKey = "hasSeenRestGamesAnnouncement"
     static let seenVersionKey = "restGamesAnnouncementSeenVersion"
-    static let introVersion = "3.0"
+    // Mudar a versão faz o sheet aparecer de novo para todo mundo (4.0: Regex Golf, HTTP Status, Git Rescue)
+    static let introVersion = "4.0"
 
     static var shouldShow: Bool {
         UserDefaults.standard.string(forKey: seenVersionKey) != introVersion
@@ -53,7 +54,7 @@ struct RestGamesAnnouncementSheet: View {
                     .tracking(3)
                     .foregroundStyle(.white)
 
-                Text("Mini games entre as leituras.\nRankings no Game Center.")
+                Text("3 jogos novos: Regex Golf,\nHTTP Status e Git Rescue.")
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.55))
                     .multilineTextAlignment(.center)
@@ -82,7 +83,7 @@ struct RestGamesAnnouncementSheet: View {
         }
         .padding(.horizontal, 24)
         .padding(.top, 12)
-        .padding(.bottom, 20)
+        .padding(.bottom, 2)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             ArcadeBlackBannerBackground()

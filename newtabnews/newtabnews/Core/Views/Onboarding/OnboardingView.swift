@@ -109,8 +109,13 @@ private struct OnboardingPageView: View {
     let screenSize: CGSize
     let completion: () -> Void
     
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    
     @State private var showContent = false
+    @State private var showIcon = false
     @State private var showSecondaryImage = false
+    @State private var iconBounce = 0
+    @State private var secondaryWiggle = 0
     @State private var entranceTask: Task<Void, Never>?
     
     private var isActive: Bool { currentPage == pageIndex }
@@ -121,20 +126,25 @@ private struct OnboardingPageView: View {
             
             // Animated icons
             ZStack {
-                Image(systemName: page.imageName)
-                    .font(.system(size: 65, weight: .light))
-                    .foregroundStyle(.primary)
-                    .rotationEffect(.degrees(showContent ? 360 : 0))
-                    .opacity(showContent ? 1 : 0)
-                    .scaleEffect(showContent ? 1 : 0.5)
-                
+                // Secundário fica atrás e "sai" de trás do principal até o canto
                 Image(systemName: page.secondaryImageName)
                     .font(.system(size: 35, weight: .light))
                     .foregroundStyle(.primary.opacity(0.7))
-                    .offset(x: showSecondaryImage ? 30 : 0, y: showSecondaryImage ? -30 : 0)
-                    .rotationEffect(.degrees(showSecondaryImage ? 15 : 0))
+                    .symbolEffect(.wiggle, value: secondaryWiggle)
+                    .rotationEffect(.degrees(showSecondaryImage ? 15 : -20))
+                    .scaleEffect(showSecondaryImage ? 1 : 0.4)
+                    .offset(x: showSecondaryImage ? 38 : 0, y: showSecondaryImage ? -38 : 0)
                     .opacity(showSecondaryImage ? 1 : 0)
-                    .scaleEffect(showSecondaryImage ? 1 : 0.5)
+                
+                // Principal sobe saindo do desfoque e dá um bounce ao assentar
+                Image(systemName: page.imageName)
+                    .font(.system(size: 65, weight: .light))
+                    .foregroundStyle(.primary)
+                    .symbolEffect(.bounce.up, value: iconBounce)
+                    .scaleEffect(showIcon ? 1 : 0.6)
+                    .offset(y: showIcon ? 0 : 24)
+                    .blur(radius: showIcon ? 0 : 12)
+                    .opacity(showIcon ? 1 : 0)
             }
             .frame(height: screenSize.height * 0.2)
             
@@ -201,29 +211,53 @@ private struct OnboardingPageView: View {
     private func resetContent() {
         entranceTask?.cancel()
         showContent = false
+        showIcon = false
         showSecondaryImage = false
     }
 
     private func playEntranceAnimation() {
         entranceTask?.cancel()
         showContent = false
+        showIcon = false
         showSecondaryImage = false
+
+        if reduceMotion {
+            withAnimation(.easeOut(duration: 0.3)) {
+                showIcon = true
+                showContent = true
+                showSecondaryImage = true
+            }
+            return
+        }
 
         entranceTask = Task { @MainActor in
             // Aguarda um frame para o SwiftUI registrar o estado "oculto" antes de animar
             try? await Task.sleep(nanoseconds: 50_000_000)
             guard !Task.isCancelled, isActive else { return }
 
+            withAnimation(.spring(response: 0.55, dampingFraction: 0.72)) {
+                showIcon = true
+            }
+
+            try? await Task.sleep(nanoseconds: 150_000_000)
+            guard !Task.isCancelled, isActive else { return }
+
             withAnimation(.spring(duration: 0.7)) {
                 showContent = true
             }
 
-            try? await Task.sleep(nanoseconds: 300_000_000)
+            try? await Task.sleep(nanoseconds: 250_000_000)
             guard !Task.isCancelled, isActive else { return }
 
-            withAnimation(.spring(duration: 0.7)) {
+            iconBounce += 1
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
                 showSecondaryImage = true
             }
+
+            try? await Task.sleep(nanoseconds: 450_000_000)
+            guard !Task.isCancelled, isActive else { return }
+
+            secondaryWiggle += 1
         }
     }
 }

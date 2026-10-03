@@ -1,0 +1,666 @@
+{
+  "challenges": [
+    {
+      "id": "http-daily-001",
+      "title": "Listando posts",
+      "scenario": "O app abre o feed e pede a primeira página de conteúdos. O servidor encontra os posts e devolve um array JSON com 30 itens.",
+      "context": "GET /api/v1/contents?page=1\nAccept: application/json",
+      "options": [
+        "204 No Content",
+        "202 Accepted",
+        "200 OK",
+        "201 Created"
+      ],
+      "answer": "200 OK",
+      "difficulty": "easy",
+      "explanation": "Requisição GET bem-sucedida com representação no corpo é o caso clássico do 200. O 204 seria para sucesso sem corpo, e aqui o corpo é justamente o que importa.",
+      "hint": "Deu tudo certo e veio conteúdo de volta. Nada de especial.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/200"
+    },
+    {
+      "id": "http-daily-002",
+      "title": "Comentário publicado",
+      "scenario": "Você envia um novo comentário em um post. O servidor salva no banco e responde com o comentário recém-gerado e o cabeçalho Location apontando para a URL dele.",
+      "context": "POST /api/v1/contents/abc/comments\nContent-Type: application/json\n\n{\"body\": \"Ótimo artigo!\"}",
+      "options": [
+        "200 OK",
+        "202 Accepted",
+        "204 No Content",
+        "201 Created"
+      ],
+      "answer": "201 Created",
+      "difficulty": "easy",
+      "explanation": "Quando um POST resulta em um recurso novo, o código certo é o 201, normalmente acompanhado de Location. O 200 até funcionaria, mas não comunica que algo foi criado.",
+      "hint": "Repare no cabeçalho Location: algo passou a existir.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/201"
+    },
+    {
+      "id": "http-daily-003",
+      "title": "Exportar relatório",
+      "scenario": "O usuário pede um CSV com todo o histórico da conta. O servidor coloca o pedido numa fila e responde na hora com um link para acompanhar o processamento, que deve levar uns minutos.",
+      "context": "POST /api/v1/exports\nContent-Type: application/json\n\n{\"format\": \"csv\"}",
+      "options": [
+        "204 No Content",
+        "200 OK",
+        "202 Accepted",
+        "201 Created"
+      ],
+      "answer": "202 Accepted",
+      "difficulty": "easy",
+      "explanation": "O 202 diz que a requisição foi aceita, mas ainda não foi processada. O 201 seria errado porque o arquivo ainda não existe no momento da resposta.",
+      "hint": "O trabalho ainda nem começou de verdade.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/202"
+    },
+    {
+      "id": "http-daily-004",
+      "title": "Remover favorito",
+      "scenario": "O app manda remover um post da lista de salvos. O servidor apaga o registro e responde sem nenhum corpo, só os cabeçalhos.",
+      "options": [
+        "204 No Content",
+        "205 Reset Content",
+        "200 OK",
+        "202 Accepted"
+      ],
+      "answer": "204 No Content",
+      "difficulty": "easy",
+      "explanation": "Sucesso sem nada para devolver no corpo é exatamente o 204. O 200 exigiria uma representação no corpo, e o 202 indicaria processamento pendente.",
+      "hint": "Deu certo, mas o corpo veio vazio de propósito.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/204"
+    },
+    {
+      "id": "http-daily-005",
+      "title": "Pulando o vídeo",
+      "scenario": "O player do app pede só um trecho de um vídeo de 300 MB porque o usuário arrastou a barra para o meio. O servidor suporta a faixa pedida e devolve apenas esses bytes com Content-Range.",
+      "context": "GET /media/talk.mp4\nRange: bytes=150000000-150999999",
+      "options": [
+        "200 OK",
+        "204 No Content",
+        "206 Partial Content",
+        "416 Range Not Satisfiable"
+      ],
+      "answer": "206 Partial Content",
+      "difficulty": "medium",
+      "explanation": "Requisições com Range atendidas parcialmente recebem 206 com Content-Range. O 416 só aparece quando a faixa pedida não pode ser satisfeita, o que não é o caso.",
+      "hint": "O cliente não queria o arquivo inteiro e foi atendido.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/206"
+    },
+    {
+      "id": "http-daily-006",
+      "title": "Sinal verde para o upload",
+      "scenario": "Um cliente vai enviar um arquivo de 2 GB e, antes de mandar o corpo, envia só os cabeçalhos com Expect pedindo confirmação. O servidor valida autenticação e tamanho e quer dizer: pode mandar.",
+      "options": [
+        "102 Processing",
+        "103 Early Hints",
+        "100 Continue",
+        "202 Accepted"
+      ],
+      "answer": "100 Continue",
+      "difficulty": "hard",
+      "explanation": "O 100 é a resposta interina que libera o cliente para enviar o corpo após um Expect. O 202 é uma resposta final e só faria sentido depois de receber o conteúdo.",
+      "hint": "É uma resposta provisória, antes da resposta final.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/100"
+    },
+    {
+      "id": "http-daily-007",
+      "title": "Chat em tempo real",
+      "scenario": "O app abre o chat ao vivo de uma live e pede para trocar a conexão HTTP/1.1 por WebSocket. O servidor aceita a troca e, a partir dali, os dois passam a falar outro protocolo na mesma conexão.",
+      "options": [
+        "426 Upgrade Required",
+        "200 OK",
+        "101 Switching Protocols",
+        "100 Continue"
+      ],
+      "answer": "101 Switching Protocols",
+      "difficulty": "medium",
+      "explanation": "Aceitar um Upgrade de protocolo é papel do 101. O 426 é o oposto: o servidor exige que o cliente faça upgrade, e não confirma uma troca.",
+      "hint": "A conexão vai continuar, mas em outra língua.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/101"
+    },
+    {
+      "id": "http-daily-008",
+      "title": "Adiantando o CSS",
+      "scenario": "O servidor ainda está montando o HTML de uma página pesada, mas já sabe quais folhas de estilo ela vai usar. Ele manda uma resposta preliminar com cabeçalhos Link de preload para o navegador ir buscando.",
+      "options": [
+        "103 Early Hints",
+        "200 OK",
+        "202 Accepted",
+        "100 Continue"
+      ],
+      "answer": "103 Early Hints",
+      "difficulty": "hard",
+      "explanation": "O 103 é uma resposta informativa que envia dicas (geralmente Link) antes da resposta final. O 100 só serve para liberar o envio do corpo após um Expect.",
+      "hint": "É uma resposta provisória que carrega dicas para o navegador.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/103"
+    },
+    {
+      "id": "http-daily-009",
+      "title": "Slug mudou de vez",
+      "scenario": "Um autor renomeou o título do artigo e o slug mudou para sempre. Quem acessar a URL antiga pelo navegador deve ir para a nova, e buscadores devem atualizar o índice.",
+      "context": "GET /filipedeschamps/meu-artigo-antigo\nHost: www.tabnews.com.br",
+      "options": [
+        "301 Moved Permanently",
+        "302 Found",
+        "307 Temporary Redirect",
+        "303 See Other"
+      ],
+      "answer": "301 Moved Permanently",
+      "difficulty": "easy",
+      "explanation": "Mudança permanente de URL para requisições GET é o caso clássico do 301, que também orienta buscadores a transferir o índice. O 302 e o 307 são temporários.",
+      "hint": "A mudança não tem volta.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/301"
+    },
+    {
+      "id": "http-daily-010",
+      "title": "Campanha temporária",
+      "scenario": "Durante a Black Friday, a home de uma loja manda os visitantes para a página da campanha. Na segunda-feira tudo volta ao normal e a home original continua sendo a URL oficial.",
+      "context": "GET /\nHost: loja.exemplo.com",
+      "options": [
+        "304 Not Modified",
+        "302 Found",
+        "301 Moved Permanently",
+        "308 Permanent Redirect"
+      ],
+      "answer": "302 Found",
+      "difficulty": "medium",
+      "explanation": "Redirecionamento temporário de uma página acessada via GET é o 302. O 301 e o 308 diriam aos buscadores que a home mudou de vez.",
+      "hint": "Daqui a uns dias isso acaba.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/302"
+    },
+    {
+      "id": "http-daily-011",
+      "title": "Depois do formulário",
+      "scenario": "O usuário envia um formulário de denúncia via POST. O servidor registra e quer mandar o navegador para a página de confirmação, garantindo que ela seja carregada com GET para evitar reenvio no F5.",
+      "context": "POST /denuncias\nContent-Type: application/x-www-form-urlencoded\n\nmotivo=spam&post=42",
+      "options": [
+        "301 Moved Permanently",
+        "302 Found",
+        "303 See Other",
+        "307 Temporary Redirect"
+      ],
+      "answer": "303 See Other",
+      "difficulty": "hard",
+      "explanation": "O 303 existe para dizer ao cliente que busque outro recurso usando GET, o padrão Post/Redirect/Get. O 302 é ambíguo historicamente quanto ao método, e o 307 preservaria o POST.",
+      "hint": "O método da próxima requisição precisa mudar obrigatoriamente.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/303"
+    },
+    {
+      "id": "http-daily-012",
+      "title": "Nada mudou por aqui",
+      "scenario": "O app já tem o perfil de um usuário em cache com um ETag. Ele refaz a requisição com If-None-Match e o servidor verifica que o ETag atual é o mesmo.",
+      "context": "GET /api/v1/users/filipedeschamps\nIf-None-Match: \"a1b2c3\"",
+      "options": [
+        "200 OK",
+        "412 Precondition Failed",
+        "204 No Content",
+        "304 Not Modified"
+      ],
+      "answer": "304 Not Modified",
+      "difficulty": "medium",
+      "explanation": "Em uma requisição GET condicional cujo validador ainda bate, o servidor responde 304 sem corpo e o cliente usa o cache. O 412 é para pré-condições como If-Match que falham.",
+      "hint": "O cliente já tem a versão certa guardada.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/304"
+    },
+    {
+      "id": "http-daily-013",
+      "title": "Pagamento em migração",
+      "scenario": "O endpoint de pagamentos está sendo migrado e, por algumas horas, os POSTs precisam ir para outro host. O cliente deve reenviar exatamente o mesmo método e corpo, e a URL original volta a valer depois.",
+      "context": "POST /api/payments\nContent-Type: application/json\n\n{\"amount\": 4990}",
+      "options": [
+        "308 Permanent Redirect",
+        "301 Moved Permanently",
+        "307 Temporary Redirect",
+        "302 Found"
+      ],
+      "answer": "307 Temporary Redirect",
+      "difficulty": "hard",
+      "explanation": "O 307 é o redirecionamento temporário que garante a preservação do método e do corpo. Com 302, muitos clientes trocam POST por GET, e o 308 seria permanente.",
+      "hint": "Temporário, e o método não pode mudar de jeito nenhum.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/307"
+    },
+    {
+      "id": "http-daily-014",
+      "title": "API v1 aposentada",
+      "scenario": "A API mudou de /v1 para /v2 em definitivo. Integrações antigas fazem PUT nos endpoints velhos e o servidor precisa mandá-las para o novo endereço sem que o PUT vire GET.",
+      "context": "PUT /v1/profile\nContent-Type: application/json",
+      "options": [
+        "308 Permanent Redirect",
+        "301 Moved Permanently",
+        "302 Found",
+        "307 Temporary Redirect"
+      ],
+      "answer": "308 Permanent Redirect",
+      "difficulty": "medium",
+      "explanation": "O 308 é o redirecionamento permanente que preserva método e corpo. O 301 é permanente também, mas clientes podem trocar o método para GET.",
+      "hint": "Permanente, e o verbo tem que ser mantido.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/308"
+    },
+    {
+      "id": "http-daily-015",
+      "title": "JSON quebrado",
+      "scenario": "O cliente envia um corpo que deveria ser JSON, mas esqueceu de fechar uma chave. O parser do servidor nem consegue ler a mensagem.",
+      "context": "POST /api/v1/contents\nContent-Type: application/json\n\n{\"title\": \"Olá\"",
+      "options": [
+        "415 Unsupported Media Type",
+        "500 Internal Server Error",
+        "422 Unprocessable Content",
+        "400 Bad Request"
+      ],
+      "answer": "400 Bad Request",
+      "difficulty": "easy",
+      "explanation": "Sintaxe inválida na mensagem é caso de 400. O 422 serve para conteúdo bem formado mas semanticamente inválido, e aqui nem dá para interpretar o JSON.",
+      "hint": "O problema está na sintaxe, não nas regras de negócio.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/400"
+    },
+    {
+      "id": "http-daily-016",
+      "title": "Esqueceu o token",
+      "scenario": "O app tenta criar um post, mas a requisição chegou sem cabeçalho Authorization e sem cookie de sessão. O servidor não faz ideia de quem está pedindo.",
+      "context": "POST /api/v1/contents\nContent-Type: application/json",
+      "options": [
+        "403 Forbidden",
+        "401 Unauthorized",
+        "404 Not Found",
+        "407 Proxy Authentication Required"
+      ],
+      "answer": "401 Unauthorized",
+      "difficulty": "easy",
+      "explanation": "Faltou autenticação, então é 401 (que deve vir com WWW-Authenticate). O 403 é para quando o servidor sabe quem você é e mesmo assim nega.",
+      "hint": "O servidor não sabe quem você é.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/401"
+    },
+    {
+      "id": "http-daily-017",
+      "title": "Token expirado",
+      "scenario": "O usuário deixou o app aberto a noite toda e, de manhã, tenta curtir um post. O JWT enviado expirou há 6 horas e o servidor rejeita a credencial.",
+      "context": "POST /api/v1/contents/42/tabcoins\nAuthorization: Bearer eyJhbGciOi...",
+      "options": [
+        "400 Bad Request",
+        "403 Forbidden",
+        "401 Unauthorized",
+        "410 Gone"
+      ],
+      "answer": "401 Unauthorized",
+      "difficulty": "medium",
+      "explanation": "Credencial inválida ou expirada também é 401: o cliente precisa se autenticar de novo. O 403 sugeriria que, mesmo autenticado, ele não teria permissão.",
+      "hint": "Renovar a credencial resolveria o problema.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/401"
+    },
+    {
+      "id": "http-daily-018",
+      "title": "Post dos outros",
+      "scenario": "Uma usuária logada, com token válido, tenta apagar um post que pertence a outra pessoa. O servidor sabe exatamente quem ela é, mas ela não tem essa permissão.",
+      "context": "DELETE /api/v1/contents/outro-autor/post-legal\nAuthorization: Bearer eyJhbGciOi...",
+      "options": [
+        "401 Unauthorized",
+        "409 Conflict",
+        "404 Not Found",
+        "403 Forbidden"
+      ],
+      "answer": "403 Forbidden",
+      "difficulty": "easy",
+      "explanation": "Autenticado porém sem permissão é 403. O 401 não ajuda aqui, porque se autenticar de novo não mudaria nada.",
+      "hint": "Logar de novo não vai resolver.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/403"
+    },
+    {
+      "id": "http-daily-019",
+      "title": "Escopo insuficiente",
+      "scenario": "Um app de terceiros recebeu um token OAuth válido apenas com escopo de leitura. Ele tenta publicar um conteúdo em nome do usuário.",
+      "options": [
+        "405 Method Not Allowed",
+        "403 Forbidden",
+        "401 Unauthorized",
+        "422 Unprocessable Content"
+      ],
+      "answer": "403 Forbidden",
+      "difficulty": "medium",
+      "explanation": "O token é válido, mas não concede a ação pedida, então é 403 (insufficient_scope na RFC 6750). O 405 seria se o método não fosse suportado pelo recurso para ninguém.",
+      "hint": "A identidade é válida, o problema é o que ela pode fazer.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/403"
+    },
+    {
+      "id": "http-daily-020",
+      "title": "Usuário fantasma",
+      "scenario": "Alguém acessa o perfil /api/v1/users/ninguem-aqui. Não existe e nunca existiu usuário com esse nome no banco.",
+      "options": [
+        "410 Gone",
+        "204 No Content",
+        "404 Not Found",
+        "400 Bad Request"
+      ],
+      "answer": "404 Not Found",
+      "difficulty": "easy",
+      "explanation": "Recurso que o servidor não encontra é 404. O 410 só se aplica quando o servidor sabe que o recurso existiu e foi removido de forma permanente.",
+      "hint": "Nunca existiu nada nesse endereço.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/404"
+    },
+    {
+      "id": "http-daily-021",
+      "title": "Status é só leitura",
+      "scenario": "O endpoint /api/v1/status só aceita GET e HEAD. Um script tenta mandar um DELETE para ele e o servidor responde listando os métodos aceitos no cabeçalho Allow.",
+      "options": [
+        "405 Method Not Allowed",
+        "501 Not Implemented",
+        "403 Forbidden",
+        "404 Not Found"
+      ],
+      "answer": "405 Method Not Allowed",
+      "difficulty": "easy",
+      "explanation": "O recurso existe, mas não suporta aquele método, e a resposta traz Allow: esse é o 405. O 501 seria se o servidor não reconhecesse o método para nenhum recurso.",
+      "hint": "O cabeçalho Allow entrega a pista.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/405"
+    },
+    {
+      "id": "http-daily-022",
+      "title": "Pediu XML",
+      "scenario": "Um cliente legado só aceita XML e manda isso no Accept. A API só sabe gerar JSON e decide não devolver um formato que o cliente recusou.",
+      "context": "GET /api/v1/contents\nAccept: application/xml",
+      "options": [
+        "406 Not Acceptable",
+        "415 Unsupported Media Type",
+        "400 Bad Request",
+        "422 Unprocessable Content"
+      ],
+      "answer": "406 Not Acceptable",
+      "difficulty": "medium",
+      "explanation": "Quando o servidor não consegue produzir uma representação aceitável segundo o Accept, cabe o 406. O 415 é o inverso: trata do formato que o cliente enviou no corpo.",
+      "hint": "O problema está no formato da resposta, não no que foi enviado.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/406"
+    },
+    {
+      "id": "http-daily-023",
+      "title": "Conexão parada",
+      "scenario": "Um cliente abre a conexão, manda metade dos cabeçalhos e some. Depois de 60 segundos esperando o resto da requisição, o servidor desiste e fecha a conexão.",
+      "options": [
+        "504 Gateway Timeout",
+        "429 Too Many Requests",
+        "400 Bad Request",
+        "408 Request Timeout"
+      ],
+      "answer": "408 Request Timeout",
+      "difficulty": "medium",
+      "explanation": "O 408 indica que o servidor cansou de esperar o cliente terminar de enviar a requisição. O 504 é sobre um gateway que esperou demais por um servidor upstream.",
+      "hint": "Quem demorou foi o cliente, não o backend.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/408"
+    },
+    {
+      "id": "http-daily-024",
+      "title": "Edição desatualizada",
+      "scenario": "Dois moderadores editam a mesma página. O segundo envia a alteração com o campo version: 3 no corpo, mas o registro já está na versão 5, e o servidor percebe que aplicar isso apagaria mudanças alheias. Nenhum cabeçalho condicional foi usado.",
+      "context": "PUT /api/v1/pages/regras\nContent-Type: application/json\n\n{\"version\": 3, \"body\": \"...\"}",
+      "options": [
+        "428 Precondition Required",
+        "409 Conflict",
+        "412 Precondition Failed",
+        "422 Unprocessable Content"
+      ],
+      "answer": "409 Conflict",
+      "difficulty": "medium",
+      "explanation": "O pedido conflita com o estado atual do recurso, e o cliente pode resolver e tentar de novo: isso é 409. O 412 só se aplica quando uma pré-condição de cabeçalho, como If-Match, falha.",
+      "hint": "Repare que não há If-Match nem nada parecido na requisição.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/409"
+    },
+    {
+      "id": "http-daily-025",
+      "title": "Apagado para sempre",
+      "scenario": "Um autor excluiu definitivamente seu post. O servidor mantém um registro indicando que aquele conteúdo existiu e não vai voltar, e quer que caches e buscadores removam o link.",
+      "options": [
+        "403 Forbidden",
+        "410 Gone",
+        "404 Not Found",
+        "451 Unavailable For Legal Reasons"
+      ],
+      "answer": "410 Gone",
+      "difficulty": "medium",
+      "explanation": "O 410 comunica que o recurso foi removido de propósito e de forma permanente. O 404 é mais genérico e não diz se a ausência é temporária ou definitiva.",
+      "hint": "O servidor tem certeza de que aquilo existiu e acabou.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/410"
+    },
+    {
+      "id": "http-daily-026",
+      "title": "ETag velho",
+      "scenario": "O app envia um PUT para atualizar um post com If-Match contendo o ETag que tinha em cache. Nesse meio tempo, outra pessoa editou o post e o ETag atual é outro.",
+      "context": "PUT /api/v1/contents/autor/post\nIf-Match: \"v7-abc\"\nContent-Type: application/json",
+      "options": [
+        "428 Precondition Required",
+        "412 Precondition Failed",
+        "422 Unprocessable Content",
+        "409 Conflict"
+      ],
+      "answer": "412 Precondition Failed",
+      "difficulty": "hard",
+      "explanation": "Uma pré-condição de cabeçalho (If-Match) avaliada como falsa resulta em 412. O 409 é para conflitos de estado detectados sem cabeçalhos condicionais.",
+      "hint": "Olhe o cabeçalho condicional da requisição.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/412"
+    },
+    {
+      "id": "http-daily-027",
+      "title": "Avatar gigante",
+      "scenario": "O usuário tenta subir uma foto de perfil de 48 MB, mas o servidor aceita no máximo 5 MB por upload e recusa o corpo.",
+      "options": [
+        "413 Content Too Large",
+        "415 Unsupported Media Type",
+        "400 Bad Request",
+        "414 URI Too Long"
+      ],
+      "answer": "413 Content Too Large",
+      "difficulty": "easy",
+      "explanation": "Corpo maior do que o servidor aceita processar é 413. O 414 trata de URI longa demais, não do corpo.",
+      "hint": "O problema é o tamanho do que vai no corpo.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/413"
+    },
+    {
+      "id": "http-daily-028",
+      "title": "Filtro sem fim",
+      "scenario": "Uma tela de busca coloca todos os filtros na query string. Um usuário marcou centenas de tags e a URL do GET passou de 20 mil caracteres, além do que o servidor aceita.",
+      "context": "GET /api/v1/search?tags=js,ts,go,rust,elixir,...(20k chars)",
+      "options": [
+        "400 Bad Request",
+        "413 Content Too Large",
+        "414 URI Too Long",
+        "431 Request Header Fields Too Large"
+      ],
+      "answer": "414 URI Too Long",
+      "difficulty": "medium",
+      "explanation": "Quando o alvo da requisição (URI) é maior do que o servidor aceita interpretar, a resposta é 414. O 413 é sobre o tamanho do corpo, que nem existe nesse GET.",
+      "hint": "O problema está no endereço, não no corpo nem nos cabeçalhos.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/414"
+    },
+    {
+      "id": "http-daily-029",
+      "title": "Texto puro no JSON",
+      "scenario": "Um script manda um POST para um endpoint que só entende JSON, mas declara Content-Type: text/plain. O servidor se recusa a processar esse formato.",
+      "context": "POST /api/v1/contents\nContent-Type: text/plain\n\ntitulo=Olá",
+      "options": [
+        "422 Unprocessable Content",
+        "406 Not Acceptable",
+        "400 Bad Request",
+        "415 Unsupported Media Type"
+      ],
+      "answer": "415 Unsupported Media Type",
+      "difficulty": "easy",
+      "explanation": "Formato do corpo enviado não suportado pelo recurso é 415. O 406 é sobre o formato da resposta que o cliente aceita receber.",
+      "hint": "Olhe o Content-Type que o cliente declarou.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/415"
+    },
+    {
+      "id": "http-daily-030",
+      "title": "Datas invertidas",
+      "scenario": "O cliente envia um JSON perfeitamente válido para criar um evento, com tipo correto, mas a data de término é anterior à data de início. O servidor entende a mensagem e mesmo assim não consegue processar.",
+      "context": "POST /api/v1/events\nContent-Type: application/json\n\n{\"start\": \"2026-10-10\", \"end\": \"2026-10-01\"}",
+      "options": [
+        "422 Unprocessable Content",
+        "409 Conflict",
+        "400 Bad Request",
+        "415 Unsupported Media Type"
+      ],
+      "answer": "422 Unprocessable Content",
+      "difficulty": "medium",
+      "explanation": "Conteúdo sintaticamente correto, no formato certo, mas com erro semântico: 422. O 400 seria mais adequado se o JSON estivesse malformado.",
+      "hint": "A sintaxe está impecável, o problema é o significado.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/422"
+    },
+    {
+      "id": "http-daily-031",
+      "title": "Pressa no 0-RTT",
+      "scenario": "Com TLS 1.3, o cliente reaproveitou a sessão e mandou um POST de transferência ainda nos dados iniciais do handshake. O servidor não quer arriscar processar algo que pode ser repetido por um atacante.",
+      "options": [
+        "400 Bad Request",
+        "429 Too Many Requests",
+        "409 Conflict",
+        "425 Too Early"
+      ],
+      "answer": "425 Too Early",
+      "difficulty": "hard",
+      "explanation": "O 425 diz que o servidor não quer processar uma requisição que pode ser replay de early data. O 429 é sobre excesso de requisições, que não é o problema aqui.",
+      "hint": "Foi tudo cedo demais no handshake.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/425"
+    },
+    {
+      "id": "http-daily-032",
+      "title": "Cadê o If-Match?",
+      "scenario": "Para evitar que uma edição sobrescreva outra, a API exige que todo PUT em artigos venha com cabeçalho condicional. Um cliente manda um PUT sem If-Match nenhum.",
+      "context": "PUT /api/v1/articles/77\nContent-Type: application/json",
+      "options": [
+        "409 Conflict",
+        "428 Precondition Required",
+        "412 Precondition Failed",
+        "400 Bad Request"
+      ],
+      "answer": "428 Precondition Required",
+      "difficulty": "hard",
+      "explanation": "O 428 indica que o servidor exige uma requisição condicional e ela não veio. O 412 seria para quando a condição foi enviada e falhou.",
+      "hint": "Não é que a condição falhou: ela nem existe.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/428"
+    },
+    {
+      "id": "http-daily-033",
+      "title": "Bot apressado",
+      "scenario": "Um bot dispara 500 requisições por minuto contra a API, cujo limite é 100. O servidor começa a responder com Retry-After: 60.",
+      "options": [
+        "429 Too Many Requests",
+        "403 Forbidden",
+        "503 Service Unavailable",
+        "408 Request Timeout"
+      ],
+      "answer": "429 Too Many Requests",
+      "difficulty": "easy",
+      "explanation": "Limite de taxa excedido por um cliente é 429, normalmente com Retry-After. O 503 indica que o servidor está indisponível para todo mundo, não só para esse cliente.",
+      "hint": "O problema é a quantidade, não a permissão.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/429"
+    },
+    {
+      "id": "http-daily-034",
+      "title": "Cookies acumulados",
+      "scenario": "Um usuário acumulou dezenas de cookies de experimentos A/B no domínio e cada requisição leva mais de 16 KB só de cabeçalho Cookie. O servidor recusa antes de olhar o resto.",
+      "options": [
+        "413 Content Too Large",
+        "431 Request Header Fields Too Large",
+        "400 Bad Request",
+        "414 URI Too Long"
+      ],
+      "answer": "431 Request Header Fields Too Large",
+      "difficulty": "medium",
+      "explanation": "Cabeçalhos grandes demais (individualmente ou no total) resultam em 431. O 413 é sobre o tamanho do corpo, não dos cabeçalhos.",
+      "hint": "Não é a URL nem o corpo que estão grandes demais.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/431"
+    },
+    {
+      "id": "http-daily-035",
+      "title": "Ordem judicial",
+      "scenario": "Um post foi bloqueado no Brasil por decisão da Justiça. Quem tenta acessar pelo país recebe uma resposta explicando que o conteúdo está indisponível por exigência legal.",
+      "options": [
+        "403 Forbidden",
+        "451 Unavailable For Legal Reasons",
+        "404 Not Found",
+        "410 Gone"
+      ],
+      "answer": "451 Unavailable For Legal Reasons",
+      "difficulty": "easy",
+      "explanation": "O 451 existe justamente para bloqueios por demanda legal (o número é uma homenagem a Fahrenheit 451). O 403 é genérico demais e não comunica o motivo jurídico.",
+      "hint": "Pense em Ray Bradbury.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/451"
+    },
+    {
+      "id": "http-daily-036",
+      "title": "Exceção não tratada",
+      "scenario": "Um endpoint tenta acessar uma propriedade de um objeto nulo e estoura uma exceção que ninguém capturou. O framework devolve uma página genérica de erro.",
+      "options": [
+        "502 Bad Gateway",
+        "500 Internal Server Error",
+        "503 Service Unavailable",
+        "400 Bad Request"
+      ],
+      "answer": "500 Internal Server Error",
+      "difficulty": "easy",
+      "explanation": "Erro inesperado no próprio servidor é 500. O 502 só se aplica quando o servidor atua como gateway e recebe uma resposta inválida de outro serviço.",
+      "hint": "A culpa é do código de quem respondeu.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/500"
+    },
+    {
+      "id": "http-daily-037",
+      "title": "Método desconhecido",
+      "scenario": "Um servidor de origem simples recebe uma requisição com o método PURGE, que ele não reconhece nem implementa para nenhum recurso.",
+      "context": "PURGE /assets/app.css\nHost: origem.exemplo.com",
+      "options": [
+        "503 Service Unavailable",
+        "501 Not Implemented",
+        "405 Method Not Allowed",
+        "400 Bad Request"
+      ],
+      "answer": "501 Not Implemented",
+      "difficulty": "hard",
+      "explanation": "Quando o servidor não reconhece o método e não o suporta em lugar nenhum, o código é 501. O 405 é para métodos conhecidos que só não são permitidos naquele recurso específico.",
+      "hint": "Não é questão de rota: o servidor nem sabe o que esse verbo faz.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/501"
+    },
+    {
+      "id": "http-daily-038",
+      "title": "Backend caiu no meio",
+      "scenario": "O Nginx repassa a requisição para a aplicação Node, que trava e fecha a conexão sem mandar uma resposta HTTP válida. O Nginx precisa responder alguma coisa ao cliente.",
+      "options": [
+        "502 Bad Gateway",
+        "500 Internal Server Error",
+        "503 Service Unavailable",
+        "504 Gateway Timeout"
+      ],
+      "answer": "502 Bad Gateway",
+      "difficulty": "medium",
+      "explanation": "Gateway que recebe resposta inválida (ou nenhuma resposta válida) do upstream responde 502. O 504 seria se o Nginx tivesse esperado até estourar o tempo limite.",
+      "hint": "Quem responde é o intermediário, e o upstream mandou lixo.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/502"
+    },
+    {
+      "id": "http-daily-039",
+      "title": "Manutenção programada",
+      "scenario": "O time está migrando o banco e tirou a API do ar por 30 minutos. Toda requisição recebe uma resposta com Retry-After: 1800.",
+      "options": [
+        "504 Gateway Timeout",
+        "500 Internal Server Error",
+        "502 Bad Gateway",
+        "503 Service Unavailable"
+      ],
+      "answer": "503 Service Unavailable",
+      "difficulty": "easy",
+      "explanation": "Indisponibilidade temporária, como manutenção ou sobrecarga, é 503, idealmente com Retry-After. O 500 sugere um erro inesperado, não uma pausa planejada.",
+      "hint": "É temporário e tem hora para voltar.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/503"
+    },
+    {
+      "id": "http-daily-040",
+      "title": "Django lento",
+      "scenario": "O Nginx repassou a requisição para um serviço Django que está rodando uma query enorme. Depois de 60 segundos sem resposta, o Nginx desiste de esperar.",
+      "options": [
+        "502 Bad Gateway",
+        "504 Gateway Timeout",
+        "503 Service Unavailable",
+        "408 Request Timeout"
+      ],
+      "answer": "504 Gateway Timeout",
+      "difficulty": "medium",
+      "explanation": "Gateway que não recebe resposta do upstream a tempo responde 504. O 408 é quando o servidor cansa de esperar o cliente, não o backend.",
+      "hint": "Quem demorou foi o servidor de trás.",
+      "reference": "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/504"
+    }
+  ]
+}

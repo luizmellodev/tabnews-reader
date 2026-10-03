@@ -136,7 +136,7 @@ struct ContentView: View {
                     showRestGamesAnnouncement = false
                 }
             )
-            .presentationDetents([.height(288)])
+            .presentationDetents([.height(272)])
             .presentationDragIndicator(.visible)
             .presentationCornerRadius(24)
             .interactiveDismissDisabled(false)

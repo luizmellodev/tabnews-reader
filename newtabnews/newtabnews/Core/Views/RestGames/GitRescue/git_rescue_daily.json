@@ -1,0 +1,599 @@
+{
+  "challenges": [
+    {
+      "id": "git-daily-001",
+      "title": "Typo na mensagem do commit",
+      "scenario": "Você acabou de commitar e percebeu um erro de digitação na mensagem. O commit ainda não foi enviado pro remoto.",
+      "context": "$ git log --oneline -2\na1b2c3d (HEAD -> feature/login) Ajsuta validação do form\n9e8d7c6 Cria tela de login\n$ git status\nYour branch is ahead of 'origin/feature/login' by 1 commit.",
+      "options": [
+        "git reset --hard HEAD~1",
+        "git revert HEAD",
+        "git rebase --continue",
+        "git commit --amend"
+      ],
+      "answer": "git commit --amend",
+      "difficulty": "easy",
+      "explanation": "O --amend reescreve o último commit e abre o editor pra corrigir a mensagem. Como nada foi enviado, reescrever é seguro; o revert criaria um commit novo e deixaria o typo no histórico.",
+      "hint": "Dá pra emendar o último commit.",
+      "reference": "https://git-scm.com/docs/git-commit"
+    },
+    {
+      "id": "git-daily-002",
+      "title": "Arquivo esquecido no commit",
+      "scenario": "Você commitou a feature, mas esqueceu o utils.js. Já rodou git add nele e quer incluí-lo no mesmo commit, sem mudar a mensagem.",
+      "context": "$ git status\nOn branch feature/busca\nChanges to be committed:\n  new file:   src/utils.js",
+      "options": [
+        "git stash",
+        "git reset --soft HEAD~1",
+        "git commit --amend --no-edit",
+        "git commit -m \"add utils\""
+      ],
+      "answer": "git commit --amend --no-edit",
+      "difficulty": "easy",
+      "explanation": "O --amend --no-edit junta o que está no stage ao último commit e mantém a mensagem. Um commit novo funcionaria, mas deixaria o histórico com um \"esqueci o arquivo\" sobrando.",
+      "hint": "Emende sem abrir o editor.",
+      "reference": "https://git-scm.com/docs/git-commit"
+    },
+    {
+      "id": "git-daily-003",
+      "title": "Desfazer commit, manter o stage",
+      "scenario": "O último commit foi cedo demais: você quer desfazê-lo, mas deixar todas as alterações ainda no stage pra commitar de novo. Nada foi enviado.",
+      "context": "$ git log --oneline -3\nf4e3d2c (HEAD -> main) WIP checkout\nb1c2d3e Adiciona carrinho\n7a6b5c4 (origin/main) Ajusta header",
+      "options": [
+        "git reset --hard HEAD~1",
+        "git restore .",
+        "git revert HEAD",
+        "git reset --soft HEAD~1"
+      ],
+      "answer": "git reset --soft HEAD~1",
+      "difficulty": "easy",
+      "explanation": "O --soft move a branch um commit pra trás e mantém tudo no stage. O --hard apagaria as alterações de vez, e o revert criaria um commit extra em vez de desfazer.",
+      "hint": "Existe um reset que não toca no index.",
+      "reference": "https://git-scm.com/docs/git-reset"
+    },
+    {
+      "id": "git-daily-004",
+      "title": "Descartar mudanças de um arquivo",
+      "scenario": "Você mexeu no app.js tentando um experimento que não deu certo. Quer voltar o arquivo exatamente como está no último commit.",
+      "context": "$ git status\nChanges not staged for commit:\n  modified:   src/app.js\n  modified:   src/styles.css",
+      "options": [
+        "git restore --staged src/app.js",
+        "git rm src/app.js",
+        "git restore src/app.js",
+        "git reset --soft HEAD"
+      ],
+      "answer": "git restore src/app.js",
+      "difficulty": "easy",
+      "explanation": "O git restore <arquivo> descarta as mudanças na working tree só daquele arquivo. O --staged mexe apenas no index, então suas mudanças continuariam lá.",
+      "hint": "Restaure só o arquivo, sem flags.",
+      "reference": "https://git-scm.com/docs/git-restore"
+    },
+    {
+      "id": "git-daily-005",
+      "title": "Tirar o .env do stage",
+      "scenario": "Você rodou git add . e o .env foi junto pro stage. Quer tirá-lo do próximo commit sem perder o conteúdo local.",
+      "context": "$ git status\nChanges to be committed:\n  modified:   src/api.js\n  new file:   .env",
+      "options": [
+        "git rm .env",
+        "git restore .env",
+        "git reset --hard",
+        "git restore --staged .env"
+      ],
+      "answer": "git restore --staged .env",
+      "difficulty": "easy",
+      "explanation": "O restore --staged remove o arquivo do index e deixa ele intacto no disco. O git rm apagaria o arquivo, e o reset --hard jogaria fora todas as mudanças.",
+      "hint": "Mexa só no stage.",
+      "reference": "https://git-scm.com/docs/git-restore"
+    },
+    {
+      "id": "git-daily-006",
+      "title": "Branch apagada por engano",
+      "scenario": "Você apagou a branch feature/pagamento com -D achando que já tinha sido mergeada. Não foi, e ela nunca foi enviada pro remoto.",
+      "context": "$ git branch -D feature/pagamento\nDeleted branch feature/pagamento (was 9f8e7d6).",
+      "options": [
+        "git restore feature/pagamento",
+        "git revert 9f8e7d6",
+        "git fetch origin",
+        "git branch feature/pagamento 9f8e7d6"
+      ],
+      "answer": "git branch feature/pagamento 9f8e7d6",
+      "difficulty": "medium",
+      "explanation": "Os commits continuam no repositório; basta recriar a branch apontando pro hash que o próprio Git mostrou. O fetch não ajuda, porque a branch nunca existiu no remoto.",
+      "hint": "O hash está na mensagem de deleção.",
+      "reference": "https://git-scm.com/docs/git-branch"
+    },
+    {
+      "id": "git-daily-007",
+      "title": "Commit quebrado já na main",
+      "scenario": "Um commit seu foi pra main remota e quebrou o build. O time já fez pull. Você precisa desfazer o efeito dele sem reescrever o histórico.",
+      "context": "$ git log --oneline -3\n4c5d6e7 (HEAD -> main, origin/main) Troca lib de datas\n3b4c5d6 Ajusta testes\n2a3b4c5 Release 2.1",
+      "options": [
+        "git commit --amend",
+        "git reset --hard HEAD~1",
+        "git revert 4c5d6e7",
+        "git rebase -i HEAD~2"
+      ],
+      "answer": "git revert 4c5d6e7",
+      "difficulty": "medium",
+      "explanation": "O revert cria um novo commit que desfaz as mudanças, sem mexer no histórico que os outros já têm. Um reset --hard exigiria force push e bagunçaria o repositório de todo mundo.",
+      "hint": "Desfaça criando, não apagando.",
+      "reference": "https://git-scm.com/docs/git-revert"
+    },
+    {
+      "id": "git-daily-008",
+      "title": "Commit feito na branch errada",
+      "scenario": "O commit b7c8d9e foi feito na main por engano; ele pertence à feature/header. Você já está na feature/header e quer trazer só esse commit pra cá.",
+      "context": "$ git log main --oneline -2\nb7c8d9e (main) Novo menu responsivo\n1a2b3c4 (origin/main) Corrige footer\n$ git branch --show-current\nfeature/header",
+      "options": [
+        "git merge main",
+        "git revert b7c8d9e",
+        "git cherry-pick b7c8d9e",
+        "git rebase b7c8d9e"
+      ],
+      "answer": "git cherry-pick b7c8d9e",
+      "difficulty": "medium",
+      "explanation": "O cherry-pick aplica um commit específico na branch atual; depois é só tirar ele da main com um reset. O merge main traria tudo o que está na main, não só o commit desejado.",
+      "hint": "Escolha a dedo um único commit.",
+      "reference": "https://git-scm.com/docs/git-cherry-pick"
+    },
+    {
+      "id": "git-daily-009",
+      "title": "Trocar de branch com mudanças",
+      "scenario": "Você está no meio de uma feature e precisa ir correndo pra branch hotfix. O Git bloqueou a troca e você não quer commitar trabalho pela metade.",
+      "context": "$ git switch hotfix\nerror: Your local changes to the following files\nwould be overwritten by checkout:\n\tsrc/cart.js\nAborting",
+      "options": [
+        "git stash",
+        "git reset --hard",
+        "git switch -f hotfix",
+        "git commit --amend"
+      ],
+      "answer": "git stash",
+      "difficulty": "easy",
+      "explanation": "O stash guarda as mudanças numa pilha e limpa a working tree, liberando a troca de branch. O switch -f descartaria seu trabalho sem perguntar.",
+      "hint": "Guarde na gaveta por um tempo.",
+      "reference": "https://git-scm.com/docs/git-stash"
+    },
+    {
+      "id": "git-daily-010",
+      "title": "Voltar com o trabalho guardado",
+      "scenario": "Você resolveu o hotfix e voltou pra sua feature. Agora quer reaplicar as mudanças que guardou e tirá-las da pilha.",
+      "context": "$ git stash list\nstash@{0}: WIP on feature/cart: 3c4d5e6 Adiciona carrinho",
+      "options": [
+        "git stash clear",
+        "git stash show",
+        "git stash pop",
+        "git stash drop"
+      ],
+      "answer": "git stash pop",
+      "difficulty": "easy",
+      "explanation": "O pop aplica o stash mais recente e o remove da lista. O drop e o clear apagam o stash sem aplicar nada, e aí o trabalho vai embora.",
+      "hint": "Aplicar e remover num passo só.",
+      "reference": "https://git-scm.com/docs/git-stash"
+    },
+    {
+      "id": "git-daily-011",
+      "title": "Bug apareceu em algum commit",
+      "scenario": "A tela de login funcionava na v1.4 e quebrou na versão atual. São mais de 200 commits no meio e você quer achar o culpado sem testar um por um.",
+      "context": "$ git log --oneline v1.4..HEAD | wc -l\n     213\n$ npm test -- login\nFAIL  login.spec.js",
+      "options": [
+        "git log --oneline",
+        "git blame src/login.js",
+        "git reflog",
+        "git bisect start"
+      ],
+      "answer": "git bisect start",
+      "difficulty": "medium",
+      "explanation": "O bisect faz busca binária no histórico: com ~213 commits, você acha o culpado em umas 8 rodadas. O blame mostra quem mexeu por último em cada linha, o que não é necessariamente quem introduziu o bug.",
+      "hint": "Busca binária no histórico.",
+      "reference": "https://git-scm.com/docs/git-bisect"
+    },
+    {
+      "id": "git-daily-012",
+      "title": "Desistir do merge",
+      "scenario": "Você começou um merge da develop e apareceram conflitos em 12 arquivos. Percebeu que não era a hora e quer voltar ao estado de antes do merge.",
+      "context": "$ git merge develop\nCONFLICT (content): Merge conflict in src/api.js\nCONFLICT (content): Merge conflict in src/db.js\nAutomatic merge failed; fix conflicts and then\ncommit the result.",
+      "options": [
+        "git reset --soft HEAD~1",
+        "git merge --continue",
+        "git rebase --abort",
+        "git merge --abort"
+      ],
+      "answer": "git merge --abort",
+      "difficulty": "medium",
+      "explanation": "O merge --abort cancela o merge em andamento e restaura a branch como estava. O rebase --abort não serve, porque não há rebase rolando, e o --continue tentaria concluir com conflitos pendentes.",
+      "hint": "Cancele a operação em andamento.",
+      "reference": "https://git-scm.com/docs/git-merge"
+    },
+    {
+      "id": "git-daily-013",
+      "title": "Conflito resolvido no rebase",
+      "scenario": "No meio de um rebase, você resolveu o conflito no api.js e já rodou git add. Quer seguir pros próximos commits.",
+      "context": "$ git status\ninteractive rebase in progress; onto 8f9e0d1\nAll conflicts fixed but you are still merging.\nChanges to be committed:\n  modified:   src/api.js",
+      "options": [
+        "git commit -m \"fix\"",
+        "git rebase --skip",
+        "git rebase --continue",
+        "git rebase --abort"
+      ],
+      "answer": "git rebase --continue",
+      "difficulty": "medium",
+      "explanation": "O --continue finaliza o commit atual com a resolução e segue aplicando os próximos. O --skip descartaria esse commit inteiro, junto com a sua resolução.",
+      "hint": "Você já resolveu, só falta seguir.",
+      "reference": "https://git-scm.com/docs/git-rebase"
+    },
+    {
+      "id": "git-daily-014",
+      "title": "Push depois de rebase",
+      "scenario": "Você rebaseou sua branch de PR em cima da main e o push foi rejeitado. Um colega às vezes empurra commits nessa branch, então você não quer sobrescrever nada que não viu.",
+      "context": "$ git push\n ! [rejected]  feature/api -> feature/api (non-fast-forward)\nerror: failed to push some refs\nhint: Updates were rejected because the tip of your\nhint: current branch is behind its remote counterpart.",
+      "options": [
+        "git pull",
+        "git push -u origin feature/api",
+        "git push --force",
+        "git push --force-with-lease"
+      ],
+      "answer": "git push --force-with-lease",
+      "difficulty": "hard",
+      "explanation": "O --force-with-lease só sobrescreve o remoto se ele ainda estiver no ponto que você conhece; se o colega empurrou algo, o push falha. O --force passaria por cima de qualquer coisa, e o pull misturaria de volta os commits antigos.",
+      "hint": "Force, mas com uma trava.",
+      "reference": "https://git-scm.com/docs/git-push"
+    },
+    {
+      "id": "git-daily-015",
+      "title": "Juntar commits antes do PR",
+      "scenario": "Sua branch tem 3 commits do tipo \"wip\", \"ajuste\" e \"agora vai\". Antes de abrir o PR, você quer transformá-los num commit só. Nada foi enviado.",
+      "context": "$ git log --oneline -4\nd3e4f5a (HEAD -> feature/perfil) agora vai\nc2d3e4f ajuste\nb1c2d3e wip perfil\na0b1c2d (origin/main) Release 3.0",
+      "options": [
+        "git rebase -i HEAD~3",
+        "git reset --hard HEAD~3",
+        "git merge --squash HEAD",
+        "git commit --amend"
+      ],
+      "answer": "git rebase -i HEAD~3",
+      "difficulty": "medium",
+      "explanation": "O rebase interativo abre a lista dos 3 commits e você marca os dois últimos como squash/fixup. O reset --hard HEAD~3 jogaria fora o código desses commits.",
+      "hint": "Rebase com a lista na sua mão.",
+      "reference": "https://git-scm.com/docs/git-rebase"
+    },
+    {
+      "id": "git-daily-016",
+      "title": "Arquivo continua rastreado",
+      "scenario": "Você adicionou o config.local.json ao .gitignore, mas ele continua aparecendo como modificado: já tinha sido commitado antes. Quer parar de versioná-lo e manter o arquivo no disco.",
+      "context": "$ cat .gitignore\nconfig.local.json\n$ git status\nChanges not staged for commit:\n  modified:   config.local.json",
+      "options": [
+        "git clean -f",
+        "git rm --cached config.local.json",
+        "git restore --staged config.local.json",
+        "git rm config.local.json"
+      ],
+      "answer": "git rm --cached config.local.json",
+      "difficulty": "easy",
+      "explanation": "O --cached tira o arquivo do índice (ele para de ser rastreado) e mantém sua cópia local; depois é só commitar. Sem o --cached, o git rm apagaria o arquivo do disco.",
+      "hint": "Remova só do índice.",
+      "reference": "https://git-scm.com/docs/git-rm"
+    },
+    {
+      "id": "git-daily-017",
+      "title": "Renomear a branch atual",
+      "scenario": "Você criou a branch feature/login, mas o time decidiu chamá-la feature/login-oauth. Ela ainda não foi enviada.",
+      "context": "$ git branch --show-current\nfeature/login",
+      "options": [
+        "git switch -c feature/login-oauth",
+        "git tag feature/login-oauth",
+        "git branch -d feature/login",
+        "git branch -m feature/login-oauth"
+      ],
+      "answer": "git branch -m feature/login-oauth",
+      "difficulty": "easy",
+      "explanation": "O branch -m renomeia a branch atual mantendo todo o histórico. O switch -c criaria uma cópia e deixaria a antiga sobrando.",
+      "hint": "Pense em \"move\".",
+      "reference": "https://git-scm.com/docs/git-branch"
+    },
+    {
+      "id": "git-daily-018",
+      "title": "Apagar branch no remoto",
+      "scenario": "A branch feature/old já foi mergeada e apagada localmente, mas continua no GitHub. Você quer removê-la do remoto.",
+      "context": "$ git branch -r\n  origin/main\n  origin/feature/old",
+      "options": [
+        "git branch -d feature/old",
+        "git fetch --prune",
+        "git push origin --delete feature/old",
+        "git branch -D feature/old"
+      ],
+      "answer": "git push origin --delete feature/old",
+      "difficulty": "medium",
+      "explanation": "Apagar no remoto exige um push com --delete. O branch -d/-D só mexe em branches locais, e o fetch --prune só limpa referências locais de branches que já sumiram do remoto.",
+      "hint": "O remoto só muda com push.",
+      "reference": "https://git-scm.com/docs/git-push"
+    },
+    {
+      "id": "git-daily-019",
+      "title": "Espiar o remoto sem mexer",
+      "scenario": "Um colega avisou que subiu coisas na main. Você está com mudanças locais e quer só baixar as novidades pra olhar, sem alterar nada no seu trabalho.",
+      "context": "$ git status\nOn branch main\nChanges not staged for commit:\n  modified:   src/home.js",
+      "options": [
+        "git merge origin/main",
+        "git reset --hard origin/main",
+        "git pull",
+        "git fetch origin"
+      ],
+      "answer": "git fetch origin",
+      "difficulty": "easy",
+      "explanation": "O fetch baixa os commits e atualiza o origin/main, sem tocar na sua branch nem na working tree. O pull faz fetch e merge juntos, ou seja, mexe no seu trabalho.",
+      "hint": "Baixar não é integrar.",
+      "reference": "https://git-scm.com/docs/git-fetch"
+    },
+    {
+      "id": "git-daily-020",
+      "title": "Commits em HEAD desanexado",
+      "scenario": "Você fez checkout de um commit antigo pra testar algo e acabou fazendo dois commits ali. Quer manter esse trabalho numa branch de verdade.",
+      "context": "$ git status\nHEAD detached from 5e6f7a8\nnothing to commit, working tree clean\n$ git log --oneline -2\n7a8b9c0 (HEAD) Testa cache\n6f7a8b9 Ajusta TTL",
+      "options": [
+        "git switch -c experimento",
+        "git switch main",
+        "git reset --hard main",
+        "git checkout HEAD~1"
+      ],
+      "answer": "git switch -c experimento",
+      "difficulty": "medium",
+      "explanation": "O switch -c cria uma branch no ponto atual e os commits passam a ter um nome que os protege. Se você voltar pra main antes disso, eles ficam órfãos e só dá pra achar pelo reflog.",
+      "hint": "Dê um nome a esse HEAD.",
+      "reference": "https://git-scm.com/docs/git-switch"
+    },
+    {
+      "id": "git-daily-021",
+      "title": "Ver o que o clean vai apagar",
+      "scenario": "O projeto está cheio de arquivos e pastas não rastreados gerados por scripts. Antes de limpar, você quer ver a lista do que seria removido, sem apagar nada.",
+      "context": "$ git status --short\n?? tmp/\n?? coverage/\n?? notas.txt",
+      "options": [
+        "git clean -nd",
+        "git reset --hard",
+        "git rm -r --cached .",
+        "git clean -fd"
+      ],
+      "answer": "git clean -nd",
+      "difficulty": "medium",
+      "explanation": "O -n faz um dry-run: lista arquivos e pastas (-d) que seriam removidos, sem tocar em nada. O -fd já apagaria tudo de cara, inclusive aquele notas.txt que talvez você queira.",
+      "hint": "Simule antes de executar.",
+      "reference": "https://git-scm.com/docs/git-clean"
+    },
+    {
+      "id": "git-daily-022",
+      "title": "Quem mexeu nessas linhas?",
+      "scenario": "As linhas 40 a 45 do api.js têm uma regra estranha de timeout. Você quer saber em que commit e por quem cada linha foi alterada pela última vez.",
+      "context": "$ sed -n '40,45p' src/api.js\n  const TIMEOUT = 3 * 1000 // ???\n  if (retries > 7) {",
+      "options": [
+        "git blame -L 40,45 src/api.js",
+        "git bisect start",
+        "git show HEAD",
+        "git log src/api.js"
+      ],
+      "answer": "git blame -L 40,45 src/api.js",
+      "difficulty": "easy",
+      "explanation": "O blame com -L mostra commit, autor e data da última alteração de cada linha nesse intervalo. O log do arquivo lista commits, mas não diz qual deles mexeu em cada linha.",
+      "hint": "Culpe as linhas certas.",
+      "reference": "https://git-scm.com/docs/git-blame"
+    },
+    {
+      "id": "git-daily-023",
+      "title": "Hotfix sem largar a branch",
+      "scenario": "Você está com uma refatoração enorme pela metade e um build lento em andamento. Precisa corrigir um bug urgente na main em paralelo, no mesmo repositório, sem stash nem clone novo.",
+      "context": "$ git status --short | wc -l\n      47\n$ git branch\n* refactor/core\n  main",
+      "options": [
+        "git stash -u",
+        "git clone --depth 1 . ../hotfix",
+        "git switch -c hotfix",
+        "git worktree add -b hotfix ../hotfix"
+      ],
+      "answer": "git worktree add -b hotfix ../hotfix",
+      "difficulty": "hard",
+      "explanation": "O worktree cria outro diretório de trabalho ligado ao mesmo repositório, com a branch hotfix criada a partir do HEAD. O stash -u esvaziaria sua working tree no meio do build, que é justamente o que você quer evitar.",
+      "hint": "Uma segunda working tree.",
+      "reference": "https://git-scm.com/docs/git-worktree"
+    },
+    {
+      "id": "git-daily-024",
+      "title": "Marcar a release",
+      "scenario": "A versão 1.2.0 foi aprovada e o commit atual vai pra produção. Você quer marcar esse ponto com uma tag anotada, com mensagem.",
+      "context": "$ git log --oneline -1\n8d9e0f1 (HEAD -> main, origin/main) Bump 1.2.0",
+      "options": [
+        "git tag -d v1.2.0",
+        "git push --tags",
+        "git tag -a v1.2.0 -m \"Release 1.2.0\"",
+        "git branch v1.2.0"
+      ],
+      "answer": "git tag -a v1.2.0 -m \"Release 1.2.0\"",
+      "difficulty": "easy",
+      "explanation": "O -a cria uma tag anotada, que guarda autor, data e mensagem. Uma branch v1.2.0 andaria junto com novos commits, e o push --tags só envia tags que já existem.",
+      "hint": "Anote a versão.",
+      "reference": "https://git-scm.com/docs/git-tag"
+    },
+    {
+      "id": "git-daily-025",
+      "title": "Primeiro push da branch",
+      "scenario": "Você criou a branch feature/busca localmente e quer enviá-la pela primeira vez, já configurando o upstream pros próximos push e pull.",
+      "context": "$ git push\nfatal: The current branch feature/busca has no\nupstream branch.",
+      "options": [
+        "git pull origin feature/busca",
+        "git push -u origin feature/busca",
+        "git push --force",
+        "git fetch --all"
+      ],
+      "answer": "git push -u origin feature/busca",
+      "difficulty": "easy",
+      "explanation": "O -u (--set-upstream) envia a branch e liga ela ao origin/feature/busca, então os próximos push e pull funcionam sem argumentos. O pull falharia, porque a branch ainda não existe no remoto.",
+      "hint": "Envie e lembre o destino.",
+      "reference": "https://git-scm.com/docs/git-push"
+    },
+    {
+      "id": "git-daily-026",
+      "title": "Trabalhar numa branch remota",
+      "scenario": "Uma colega criou a feature/relatorios e pediu sua ajuda. Ela existe só no remoto e você já fez fetch. Quer uma branch local que acompanhe a dela.",
+      "context": "$ git branch -a\n* main\n  remotes/origin/main\n  remotes/origin/feature/relatorios",
+      "options": [
+        "git switch -c feature/relatorios",
+        "git merge origin/feature/relatorios",
+        "git switch feature/relatorios",
+        "git checkout origin/feature/relatorios"
+      ],
+      "answer": "git switch feature/relatorios",
+      "difficulty": "medium",
+      "explanation": "Quando há uma única branch remota com esse nome, o switch cria a branch local já rastreando origin/feature/relatorios. O switch -c criaria uma branch nova a partir da main, e o checkout de origin/... te deixa em HEAD desanexado.",
+      "hint": "O Git adivinha a branch remota pra você.",
+      "reference": "https://git-scm.com/docs/git-switch"
+    },
+    {
+      "id": "git-daily-027",
+      "title": "Pegar arquivo de outra branch",
+      "scenario": "A develop tem uma versão do config.yml que você precisa na sua feature. Quer só esse arquivo, sem trazer nenhum commit da develop.",
+      "context": "$ git branch --show-current\nfeature/deploy\n$ git diff --stat feature/deploy develop -- config.yml\n config.yml | 14 +++++++++-----",
+      "options": [
+        "git checkout develop",
+        "git cherry-pick develop",
+        "git merge develop",
+        "git restore --source develop config.yml"
+      ],
+      "answer": "git restore --source develop config.yml",
+      "difficulty": "medium",
+      "explanation": "O restore --source copia o arquivo como ele está na develop pra sua working tree, sem mexer no histórico. O merge traria todos os commits da develop junto.",
+      "hint": "Restaure de outra origem.",
+      "reference": "https://git-scm.com/docs/git-restore"
+    },
+    {
+      "id": "git-daily-028",
+      "title": "Quando essa função sumiu?",
+      "scenario": "A função calcularFrete não existe mais no código e ninguém lembra quem tirou. Você quer achar os commits que adicionaram ou removeram esse nome.",
+      "context": "$ git grep calcularFrete\n$ echo $?\n1",
+      "options": [
+        "git grep calcularFrete",
+        "git bisect start",
+        "git log -S \"calcularFrete\"",
+        "git blame src/frete.js"
+      ],
+      "answer": "git log -S \"calcularFrete\"",
+      "difficulty": "hard",
+      "explanation": "O log -S (pickaxe) lista os commits em que a quantidade de ocorrências da string mudou, ou seja, onde ela entrou ou saiu. O grep só procura na versão atual, onde a função já não existe.",
+      "hint": "Procure no histórico, não no código atual.",
+      "reference": "https://git-scm.com/docs/git-log"
+    },
+    {
+      "id": "git-daily-029",
+      "title": "Reset --hard apagou commits",
+      "scenario": "Você rodou reset --hard HEAD~2 achando que estava em outra branch e sumiram dois commits que nunca foram enviados. Precisa descobrir os hashes pra recuperá-los.",
+      "context": "$ git reset --hard HEAD~2\nHEAD is now at 1f2e3d4 Ajusta rotas\n$ git log --oneline -1\n1f2e3d4 (HEAD -> feature/api) Ajusta rotas",
+      "options": [
+        "git restore .",
+        "git log --all",
+        "git reflog",
+        "git revert HEAD~2"
+      ],
+      "answer": "git reflog",
+      "difficulty": "hard",
+      "explanation": "O reflog registra cada posição por onde o HEAD passou, inclusive os commits que nenhuma branch alcança mais. O log --all só percorre commits alcançáveis por refs, então os perdidos não aparecem.",
+      "hint": "O Git tem um diário do HEAD.",
+      "reference": "https://git-scm.com/docs/git-reflog"
+    },
+    {
+      "id": "git-daily-030",
+      "title": "Desfazer um merge já enviado",
+      "scenario": "O merge da feature/checkout entrou na main remota e quebrou produção. Você quer desfazer o merge inteiro sem reescrever o histórico compartilhado.",
+      "context": "$ git log --oneline -3\n9a8b7c6 (HEAD -> main, origin/main) Merge branch 'feature/checkout'\n5d4c3b2 Ajusta copy da home\n2e1f0a9 Checkout com PIX",
+      "options": [
+        "git revert -m 1 HEAD",
+        "git revert HEAD",
+        "git reset --hard HEAD~1",
+        "git merge --abort"
+      ],
+      "answer": "git revert -m 1 HEAD",
+      "difficulty": "hard",
+      "explanation": "Commit de merge tem dois pais, então o revert precisa do -m 1 pra saber que a main é a linha principal. Sem o -m, o revert falha nesse caso, e o reset --hard exigiria force push na main.",
+      "hint": "Merges têm mais de um pai.",
+      "reference": "https://git-scm.com/docs/git-revert"
+    },
+    {
+      "id": "git-daily-031",
+      "title": "Desfazer commit e refazer em partes",
+      "scenario": "Seu último commit misturou três assuntos. Você quer desfazê-lo e deixar tudo como mudanças fora do stage, pra escolher com git add o que vai em cada commit novo.",
+      "context": "$ git log --oneline -2\ne7f8a9b (HEAD -> feature/ui) Ajustes gerais\nd6e7f8a (origin/feature/ui) Cria grid",
+      "options": [
+        "git reset --hard HEAD~1",
+        "git reset --mixed HEAD~1",
+        "git revert HEAD",
+        "git reset --soft HEAD~1"
+      ],
+      "answer": "git reset --mixed HEAD~1",
+      "difficulty": "medium",
+      "explanation": "O --mixed (padrão do reset) volta a branch e limpa o index, deixando as mudanças só na working tree. O --soft também preserva o código, mas deixa tudo no stage, que não é o que você quer agora.",
+      "hint": "Desfaça o commit e o stage.",
+      "reference": "https://git-scm.com/docs/git-reset"
+    },
+    {
+      "id": "git-daily-032",
+      "title": "Aplicar um stash específico",
+      "scenario": "Você tem vários stashes e precisa do que mexia nos filtros. Quer aplicá-lo, mas mantê-lo na lista, porque vai precisar dele em outra branch também.",
+      "context": "$ git stash list\nstash@{0}: WIP on main: ajuste header\nstash@{1}: WIP on main: logs debug\nstash@{2}: On feature/busca: filtros novos",
+      "options": [
+        "git stash apply stash@{2}",
+        "git stash show stash@{2}",
+        "git stash drop stash@{2}",
+        "git stash pop"
+      ],
+      "answer": "git stash apply stash@{2}",
+      "difficulty": "hard",
+      "explanation": "O apply aplica o stash indicado e mantém ele na pilha. O pop sem argumento pegaria o stash@{0} e ainda o removeria da lista.",
+      "hint": "Aplique sem tirar da pilha.",
+      "reference": "https://git-scm.com/docs/git-stash"
+    },
+    {
+      "id": "git-daily-033",
+      "title": "Main local divergiu",
+      "scenario": "Você fez um commit na main local e, enquanto isso, entraram dois commits no remoto. Quer integrar sem gerar commit de merge, deixando seu commit por cima.",
+      "context": "$ git status\nOn branch main\nYour branch and 'origin/main' have diverged,\nand have 1 and 2 different commits each, respectively.",
+      "options": [
+        "git pull --rebase",
+        "git push --force",
+        "git merge origin/main",
+        "git reset --hard origin/main"
+      ],
+      "answer": "git pull --rebase",
+      "difficulty": "medium",
+      "explanation": "O pull --rebase baixa os commits remotos e reaplica o seu por cima, deixando o histórico linear. O push --force apagaria os dois commits dos colegas, e o reset --hard jogaria fora o seu.",
+      "hint": "Puxe, mas sem merge.",
+      "reference": "https://git-scm.com/docs/git-pull"
+    },
+    {
+      "id": "git-daily-034",
+      "title": "Rebase virou bagunça",
+      "scenario": "No meio de um rebase com vários commits, os conflitos ficaram confusos e você quer voltar a branch exatamente pro estado de antes do rebase.",
+      "context": "$ git status\ninteractive rebase in progress; onto 3a4b5c6\nLast commands done (4 commands done):\nYou are currently rebasing branch 'feature/x'.\nUnmerged paths:\n  both modified:   src/core.js",
+      "options": [
+        "git rebase --skip",
+        "git merge --abort",
+        "git rebase --abort",
+        "git rebase --continue"
+      ],
+      "answer": "git rebase --abort",
+      "difficulty": "hard",
+      "explanation": "O rebase --abort cancela a operação e devolve a branch ao commit original. O --skip descartaria o commit atual e seguiria em frente, perdendo trabalho em vez de voltar.",
+      "hint": "Volte ao ponto de partida.",
+      "reference": "https://git-scm.com/docs/git-rebase"
+    },
+    {
+      "id": "git-daily-035",
+      "title": "Cadê o que eu guardei?",
+      "scenario": "Você lembra de ter guardado algo com stash semana passada, mas não sabe quantos stashes existem nem de qual branch vieram.",
+      "context": "$ git status\nOn branch main\nnothing to commit, working tree clean",
+      "options": [
+        "git stash pop",
+        "git stash clear",
+        "git stash list",
+        "git reflog"
+      ],
+      "answer": "git stash list",
+      "difficulty": "easy",
+      "explanation": "O stash list mostra todos os stashes com índice, branch e mensagem, sem alterar nada. O pop já aplicaria o mais recente antes de você saber qual era o certo.",
+      "hint": "Primeiro só liste.",
+      "reference": "https://git-scm.com/docs/git-stash"
+    }
+  ]
+}

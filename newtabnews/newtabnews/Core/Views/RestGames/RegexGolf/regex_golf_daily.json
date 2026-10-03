@@ -1,0 +1,815 @@
+{
+  "puzzles": [
+    {
+      "id": "regex-daily-001",
+      "title": "Extensões de imagem",
+      "prompt": "Pegue só arquivos de imagem.",
+      "match": [
+        "logo.png",
+        "foto.jpg",
+        "icone.gif",
+        "banner.png",
+        "avatar.jpg"
+      ],
+      "noMatch": [
+        "script.js",
+        "png_backup.txt",
+        "style.css",
+        "jpg.md",
+        "notas.txt"
+      ],
+      "solution": "(png|jpg|gif)$",
+      "par": 14,
+      "difficulty": "easy",
+      "hint": "Olhe o final dos nomes",
+      "explanation": "A alternância (png|jpg|gif) aceita qualquer uma das três extensões e o $ exige que ela esteja no fim."
+    },
+    {
+      "id": "regex-daily-002",
+      "title": "Só requisições GET",
+      "prompt": "Selecione as requisições que usam o método GET.",
+      "match": [
+        "GET /users",
+        "GET /api/v1",
+        "GET /health",
+        "GET /",
+        "GET /posts?id=2"
+      ],
+      "noMatch": [
+        "POST /users",
+        "FORGET /me",
+        "PUT /GET",
+        "DELETE /api",
+        "get /lower"
+      ],
+      "solution": "^GET",
+      "par": 4,
+      "difficulty": "easy",
+      "hint": "O método vem sempre no começo",
+      "explanation": "O ^ ancora no início da linha, então GET só conta se for a primeira coisa."
+    },
+    {
+      "id": "regex-daily-003",
+      "title": "Logs que doem",
+      "prompt": "Pegue apenas os logs de nível ERROR ou FATAL.",
+      "match": [
+        "[ERROR] db down",
+        "[FATAL] oom",
+        "[ERROR] timeout",
+        "[FATAL] panic"
+      ],
+      "noMatch": [
+        "[INFO] ok",
+        "[WARN] slow",
+        "[DEBUG] x=1",
+        "error handled",
+        "[INFO] no ERROR"
+      ],
+      "solution": "^\\[[EF]",
+      "par": 7,
+      "difficulty": "easy",
+      "hint": "Basta olhar a primeira letra do nível",
+      "explanation": "^\\[ exige o colchete no início e [EF] aceita E ou F logo depois dele."
+    },
+    {
+      "id": "regex-daily-004",
+      "title": "Arquivos de teste",
+      "prompt": "Encontre os arquivos de teste em JavaScript.",
+      "match": [
+        "user.test.js",
+        "api.test.js",
+        "utils.test.js",
+        "app.test.js"
+      ],
+      "noMatch": [
+        "user.js",
+        "test.js",
+        "testes.json",
+        "app.test.ts",
+        "test.js.bak"
+      ],
+      "solution": "\\.test\\.js$",
+      "par": 11,
+      "difficulty": "easy",
+      "hint": "Repare no ponto antes de test",
+      "explanation": "\\.test\\.js$ exige o sufixo literal .test.js no fim; os pontos são escapados para não virarem curinga."
+    },
+    {
+      "id": "regex-daily-005",
+      "title": "Commits de feature",
+      "prompt": "Pegue só os commits que introduzem uma feature.",
+      "match": [
+        "feat: login",
+        "feat: dark mode",
+        "feat: add api",
+        "feat: cache"
+      ],
+      "noMatch": [
+        "fix: login",
+        "chore: deps",
+        "docs: feat list",
+        "feature request",
+        "refeat: x"
+      ],
+      "solution": "^feat:",
+      "par": 6,
+      "difficulty": "easy",
+      "hint": "O prefixo tem dois-pontos",
+      "explanation": "^feat: exige que a mensagem comece exatamente com o prefixo feat seguido de dois-pontos."
+    },
+    {
+      "id": "regex-daily-006",
+      "title": "Tem número aí?",
+      "prompt": "Selecione as linhas que contêm pelo menos um dígito.",
+      "match": [
+        "v2",
+        "item42",
+        "x9y",
+        "port 8080"
+      ],
+      "noMatch": [
+        "vazio",
+        "abc",
+        "sem numero",
+        "dez"
+      ],
+      "solution": "\\d",
+      "par": 2,
+      "difficulty": "easy",
+      "hint": "Existe um atalho para dígitos",
+      "explanation": "\\d casa com qualquer dígito de 0 a 9 em qualquer posição."
+    },
+    {
+      "id": "regex-daily-007",
+      "title": "Só HTTPS",
+      "prompt": "Aceite apenas URLs seguras.",
+      "match": [
+        "https://tabnews.com.br",
+        "https://github.com",
+        "https://x.dev",
+        "https://a.io"
+      ],
+      "noMatch": [
+        "http://tabnews.com.br",
+        "ftp://files.org",
+        "http://https.com",
+        "httpsx://y",
+        "status: ok"
+      ],
+      "solution": "^https:",
+      "par": 7,
+      "difficulty": "easy",
+      "hint": "O protocolo fica no começo",
+      "explanation": "^https: exige o protocolo seguro logo no início, antes das barras."
+    },
+    {
+      "id": "regex-daily-008",
+      "title": "Dotfiles",
+      "prompt": "Pegue os arquivos ocultos do Unix.",
+      "match": [
+        ".env",
+        ".gitignore",
+        ".bashrc",
+        ".prettierrc"
+      ],
+      "noMatch": [
+        "env",
+        "config.env",
+        "README.md",
+        "app.gitignore.bak"
+      ],
+      "solution": "^\\.",
+      "par": 3,
+      "difficulty": "easy",
+      "hint": "Arquivo oculto começa com algo especial",
+      "explanation": "^\\. exige um ponto literal como primeiro caractere."
+    },
+    {
+      "id": "regex-daily-009",
+      "title": "Declarações em JS",
+      "prompt": "Selecione as linhas que declaram uma variável.",
+      "match": [
+        "let x = 1",
+        "const y = 2",
+        "var z = 3",
+        "const API = 'x'"
+      ],
+      "noMatch": [
+        "x = 1",
+        "letter = 'a'",
+        "constant = 3",
+        "variable = 0"
+      ],
+      "solution": "^(let|const|var) ",
+      "par": 17,
+      "difficulty": "easy",
+      "hint": "Cuidado com palavras que só começam igual",
+      "explanation": "A alternância aceita let, const ou var no início e o espaço depois evita casar com letter ou constant."
+    },
+    {
+      "id": "regex-daily-010",
+      "title": "Ponto e vírgula no fim",
+      "prompt": "Pegue as linhas terminadas em ponto e vírgula.",
+      "match": [
+        "return x;",
+        "i++;",
+        "let a = 1;",
+        "break;"
+      ],
+      "noMatch": [
+        "return x",
+        "if (a) {",
+        "// fim;?",
+        "a; b = 2"
+      ],
+      "solution": ";$",
+      "par": 2,
+      "difficulty": "easy",
+      "hint": "Não basta ter, precisa terminar",
+      "explanation": "O $ ancora no fim, então ; só conta se for o último caractere."
+    },
+    {
+      "id": "regex-daily-011",
+      "title": "Componentes React",
+      "prompt": "Selecione os nomes que parecem componentes.",
+      "match": [
+        "Button",
+        "UserCard",
+        "App",
+        "NavBar"
+      ],
+      "noMatch": [
+        "button",
+        "useState",
+        "handleClick",
+        "app",
+        "iPhone"
+      ],
+      "solution": "^[A-Z]",
+      "par": 6,
+      "difficulty": "easy",
+      "hint": "Componentes começam de um jeito específico",
+      "explanation": "^[A-Z] exige que o primeiro caractere seja uma letra maiúscula."
+    },
+    {
+      "id": "regex-daily-012",
+      "title": "TODO e FIXME",
+      "prompt": "Pegue os comentários com pendências.",
+      "match": [
+        "// TODO: refatorar",
+        "// FIXME: bug aqui",
+        "# TODO limpar",
+        "/* FIXME */"
+      ],
+      "noMatch": [
+        "// todo: minusculo",
+        "// feito",
+        "# FIX depois",
+        "Todo list"
+      ],
+      "solution": "TODO|FIXME",
+      "par": 10,
+      "difficulty": "easy",
+      "hint": "Duas palavras, em maiúsculas",
+      "explanation": "A barra | permite casar TODO ou FIXME em qualquer posição; como é case-sensitive, todo minúsculo fica de fora."
+    },
+    {
+      "id": "regex-daily-013",
+      "title": "Versão 2.x",
+      "prompt": "Selecione só as versões com major 2.",
+      "match": [
+        "v2.0.0",
+        "v2.1.3",
+        "v2.10.0",
+        "v2.4.1"
+      ],
+      "noMatch": [
+        "v1.2.0",
+        "v3.0.2",
+        "v1.2.2",
+        "v12.0.0",
+        "v0.2.0"
+      ],
+      "solution": "^v2\\.",
+      "par": 5,
+      "difficulty": "easy",
+      "hint": "O major vem logo depois do v",
+      "explanation": "^v2\\. exige v, depois 2 e um ponto literal bem no começo."
+    },
+    {
+      "id": "regex-daily-014",
+      "title": "Rotas da API",
+      "prompt": "Pegue só as rotas que ficam sob /api/.",
+      "match": [
+        "/api/users",
+        "/api/v1/posts",
+        "/api/health",
+        "/api/"
+      ],
+      "noMatch": [
+        "/users",
+        "/home/api",
+        "/apix/foo",
+        "api/users",
+        "/app/api/x"
+      ],
+      "solution": "^/api/",
+      "par": 6,
+      "difficulty": "easy",
+      "hint": "A rota precisa começar ali",
+      "explanation": "^/api/ exige o prefixo exato com as duas barras desde o início."
+    },
+    {
+      "id": "regex-daily-015",
+      "title": "Cores rgb()",
+      "prompt": "Pegue as cores rgb com exatamente três números.",
+      "match": [
+        "rgb(0,0,0)",
+        "rgb(255,0,10)",
+        "rgb(12,34,56)",
+        "rgb(1,2,3)"
+      ],
+      "noMatch": [
+        "rgba(0,0,0,1)",
+        "rgb(0,0)",
+        "rgb(a,b,c)",
+        "rgb 0,0,0",
+        "rgb(0,0,0,0)"
+      ],
+      "solution": "^rgb\\(\\d+,\\d+,\\d+\\)$",
+      "par": 20,
+      "difficulty": "medium",
+      "hint": "Parênteses precisam de escape",
+      "explanation": "\\( e \\) casam parênteses literais e \\d+ separados por vírgulas exigem três números, com ^ e $ travando a linha toda."
+    },
+    {
+      "id": "regex-daily-016",
+      "title": "Datas ISO",
+      "prompt": "Selecione as datas no formato ano-mês-dia.",
+      "match": [
+        "2024-01-15",
+        "1999-12-31",
+        "2026-10-03",
+        "2000-02-29"
+      ],
+      "noMatch": [
+        "15/01/2024",
+        "2024-1-5",
+        "24-01-15",
+        "2024/01/15",
+        "2024-01-1"
+      ],
+      "solution": "^\\d{4}-\\d\\d-\\d\\d$",
+      "par": 17,
+      "difficulty": "medium",
+      "hint": "Conte os dígitos de cada parte",
+      "explanation": "\\d{4} pega o ano e \\d\\d mês e dia; as âncoras impedem dígitos a menos ou a mais."
+    },
+    {
+      "id": "regex-daily-017",
+      "title": "Variáveis de ambiente",
+      "prompt": "Pegue os nomes em UPPER_SNAKE_CASE.",
+      "match": [
+        "DATABASE_URL",
+        "API_KEY",
+        "NODE_ENV",
+        "PORT",
+        "MAX_RETRY"
+      ],
+      "noMatch": [
+        "databaseUrl",
+        "Api_Key",
+        "node_env",
+        "_PORT",
+        "PORT_"
+      ],
+      "solution": "^[A-Z]+(_[A-Z]+)*$",
+      "par": 18,
+      "difficulty": "medium",
+      "hint": "Underscore só entre blocos de letras",
+      "explanation": "[A-Z]+ é o primeiro bloco e (_[A-Z]+)* permite repetir underscore + letras, sem underscore nas pontas."
+    },
+    {
+      "id": "regex-daily-018",
+      "title": "snake_case",
+      "prompt": "Selecione as variáveis em snake_case.",
+      "match": [
+        "user_id",
+        "created_at",
+        "is_admin",
+        "max_retry_count"
+      ],
+      "noMatch": [
+        "userId",
+        "CreatedAt",
+        "is-admin",
+        "nome",
+        "_private"
+      ],
+      "solution": "^[a-z]+(_[a-z]+)+$",
+      "par": 18,
+      "difficulty": "medium",
+      "hint": "Precisa ter pelo menos um underscore",
+      "explanation": "[a-z]+ seguido de (_[a-z]+)+ exige um ou mais blocos com underscore, tudo minúsculo."
+    },
+    {
+      "id": "regex-daily-019",
+      "title": "camelCase",
+      "prompt": "Pegue os identificadores em camelCase.",
+      "match": [
+        "userId",
+        "createdAt",
+        "isAdmin",
+        "maxRetryCount"
+      ],
+      "noMatch": [
+        "UserId",
+        "user_id",
+        "nome",
+        "URL",
+        "is-admin"
+      ],
+      "solution": "^[a-z]+[A-Z]",
+      "par": 12,
+      "difficulty": "medium",
+      "hint": "Começa minúsculo e depois cresce",
+      "explanation": "^[a-z]+ exige início minúsculo e [A-Z] logo depois marca a corcova do camelo."
+    },
+    {
+      "id": "regex-daily-020",
+      "title": "Branches de trabalho",
+      "prompt": "Selecione as branches feature/ ou fix/ com nome.",
+      "match": [
+        "feature/login",
+        "fix/crash-ios",
+        "feature/dark-mode",
+        "fix/typo"
+      ],
+      "noMatch": [
+        "main",
+        "develop",
+        "hotfix/urgent",
+        "feature-login",
+        "release/1.0",
+        "feature/"
+      ],
+      "solution": "^(feature|fix)/.",
+      "par": 16,
+      "difficulty": "medium",
+      "hint": "hotfix também termina em fix",
+      "explanation": "^(feature|fix)/ exige o prefixo no início e o . obriga ter algum nome depois da barra."
+    },
+    {
+      "id": "regex-daily-021",
+      "title": "IPv4 (versão lite)",
+      "prompt": "Pegue os endereços com quatro blocos de 1 a 3 dígitos.",
+      "match": [
+        "192.168.0.1",
+        "10.0.0.1",
+        "127.0.0.1",
+        "8.8.8.8"
+      ],
+      "noMatch": [
+        "192.168.0",
+        "1.2.3.4.5",
+        "a.b.c.d",
+        "192-168-0-1",
+        "1234.1.1.1"
+      ],
+      "solution": "^(\\d{1,3}\\.){3}\\d{1,3}$",
+      "par": 23,
+      "difficulty": "medium",
+      "hint": "Três blocos com ponto e um sem",
+      "explanation": "(\\d{1,3}\\.){3} repete três vezes um número seguido de ponto e \\d{1,3}$ fecha com o último bloco."
+    },
+    {
+      "id": "regex-daily-022",
+      "title": "Unidades CSS",
+      "prompt": "Selecione os valores com px, em, rem ou %.",
+      "match": [
+        "12px",
+        "1.5rem",
+        "100%",
+        "2em",
+        "0.75rem"
+      ],
+      "noMatch": [
+        "12",
+        "px",
+        "1.5",
+        "em",
+        "10pt"
+      ],
+      "solution": "^[\\d.]+(px|r?em|%)$",
+      "par": 19,
+      "difficulty": "medium",
+      "hint": "rem é em com uma letra a mais",
+      "explanation": "[\\d.]+ pega o número (com ponto opcional) e (px|r?em|%) cobre as unidades, com r? opcional."
+    },
+    {
+      "id": "regex-daily-023",
+      "title": "Sucesso 2xx",
+      "prompt": "Pegue as respostas HTTP de sucesso.",
+      "match": [
+        "200 OK",
+        "201 Created",
+        "204 No Content",
+        "202 Accepted"
+      ],
+      "noMatch": [
+        "404 Not Found",
+        "500 Error",
+        "302 Found",
+        "120 Weird",
+        "2000 ms"
+      ],
+      "solution": "^2\\d\\d ",
+      "par": 7,
+      "difficulty": "medium",
+      "hint": "Três dígitos, começando com 2",
+      "explanation": "^2\\d\\d exige um código de três dígitos iniciado por 2 e o espaço evita números maiores como 2000."
+    },
+    {
+      "id": "regex-daily-024",
+      "title": "E-mails (lite)",
+      "prompt": "Selecione os e-mails com usuário, arroba e domínio com ponto.",
+      "match": [
+        "ana@dev.io",
+        "joao.silva@mail.com",
+        "bot@x.co",
+        "dev@tabnews.com.br"
+      ],
+      "noMatch": [
+        "ana@",
+        "@dev.io",
+        "ana.dev.io",
+        "ana@@dev.io",
+        "ana@dev"
+      ],
+      "solution": "^[\\w.]+@\\w+\\.\\w",
+      "par": 15,
+      "difficulty": "medium",
+      "hint": "Depois do @ precisa de um ponto",
+      "explanation": "[\\w.]+ é o usuário, @\\w+ o domínio e \\.\\w garante pelo menos uma extensão."
+    },
+    {
+      "id": "regex-daily-025",
+      "title": "Host com porta",
+      "prompt": "Pegue os endereços que terminam com uma porta.",
+      "match": [
+        "localhost:3000",
+        "127.0.0.1:8080",
+        "api.dev:443",
+        "db:5432"
+      ],
+      "noMatch": [
+        "localhost",
+        "http://site.com",
+        "host:",
+        "port:abc",
+        "10:30 reuniao"
+      ],
+      "solution": ":\\d+$",
+      "par": 5,
+      "difficulty": "medium",
+      "hint": "A porta é a última coisa",
+      "explanation": ":\\d+$ exige dois-pontos seguido só de dígitos até o fim da linha."
+    },
+    {
+      "id": "regex-daily-026",
+      "title": "Telefone BR",
+      "prompt": "Selecione os telefones no formato (DD) NNNNN-NNNN.",
+      "match": [
+        "(11) 91234-5678",
+        "(21) 99876-5432",
+        "(48) 98765-4321",
+        "(51) 3333-4444"
+      ],
+      "noMatch": [
+        "11912345678",
+        "(11)91234-5678",
+        "(1) 91234-5678",
+        "(11) 91234 5678",
+        "(11) 912-5678"
+      ],
+      "solution": "^\\(\\d\\d\\) \\d{4,5}-\\d{4}$",
+      "par": 24,
+      "difficulty": "medium",
+      "hint": "Fixo tem 4 dígitos antes do hífen, celular tem 5",
+      "explanation": "\\(\\d\\d\\) é o DDD, \\d{4,5} aceita fixo ou celular e -\\d{4} fecha o número."
+    },
+    {
+      "id": "regex-daily-027",
+      "title": "Commits com escopo",
+      "prompt": "Pegue os commits convencionais que têm escopo.",
+      "match": [
+        "feat(auth): login",
+        "fix(ui): botao",
+        "chore(deps): bump",
+        "docs(readme): typo"
+      ],
+      "noMatch": [
+        "feat: login",
+        "fix(): vazio",
+        "update readme",
+        "feat(auth) login",
+        "Fix(ui): x"
+      ],
+      "solution": "^[a-z]+\\(\\w+\\): ",
+      "par": 16,
+      "difficulty": "medium",
+      "hint": "O escopo fica entre parênteses e não pode ser vazio",
+      "explanation": "[a-z]+ é o tipo, \\(\\w+\\) o escopo obrigatório e : com espaço fecha o prefixo."
+    },
+    {
+      "id": "regex-daily-028",
+      "title": "Semver",
+      "prompt": "Selecione as versões no formato major.minor.patch.",
+      "match": [
+        "1.0.0",
+        "2.10.3",
+        "0.0.1",
+        "10.20.30"
+      ],
+      "noMatch": [
+        "1.0",
+        "1.0.0.0",
+        "v1.0.0",
+        "1.a.0",
+        "1..0"
+      ],
+      "solution": "^\\d+\\.\\d+\\.\\d+$",
+      "par": 15,
+      "difficulty": "medium",
+      "hint": "Exatamente três números",
+      "explanation": "Três blocos \\d+ separados por \\. com ^ e $ impedem prefixos e blocos extras."
+    },
+    {
+      "id": "regex-daily-029",
+      "title": "Letras dobradas",
+      "prompt": "Pegue as palavras que têm uma letra repetida em sequência.",
+      "match": [
+        "commit",
+        "bootstrap",
+        "null",
+        "mapper",
+        "assert"
+      ],
+      "noMatch": [
+        "git",
+        "main",
+        "push",
+        "rebase",
+        "merge"
+      ],
+      "solution": "(.)\\1",
+      "par": 5,
+      "difficulty": "hard",
+      "hint": "Grupos podem ser reutilizados",
+      "explanation": "(.) captura um caractere e \\1 exige que o mesmo caractere apareça de novo logo em seguida."
+    },
+    {
+      "id": "regex-daily-030",
+      "title": "Palíndromos de 5",
+      "prompt": "Selecione as palavras de cinco letras que se leem igual de trás pra frente.",
+      "match": [
+        "radar",
+        "level",
+        "refer",
+        "civic",
+        "rotor"
+      ],
+      "noMatch": [
+        "react",
+        "redux",
+        "vuejs",
+        "nodes",
+        "tests"
+      ],
+      "solution": "^(.)(.).\\2\\1$",
+      "par": 13,
+      "difficulty": "hard",
+      "hint": "Capture as duas primeiras letras",
+      "explanation": "(.)(.) captura as duas primeiras, . é o meio e \\2\\1 repete em ordem inversa."
+    },
+    {
+      "id": "regex-daily-031",
+      "title": "Comandos sem vogal",
+      "prompt": "Pegue os comandos que não têm nenhuma vogal.",
+      "match": [
+        "npm",
+        "pwd",
+        "ls",
+        "cd",
+        "nvm",
+        "tsc"
+      ],
+      "noMatch": [
+        "node",
+        "git",
+        "yarn",
+        "echo",
+        "bun"
+      ],
+      "solution": "^[^aeiou]+$",
+      "par": 11,
+      "difficulty": "hard",
+      "hint": "Classes podem ser negadas",
+      "explanation": "[^aeiou] aceita qualquer coisa que não seja vogal e ^...+$ aplica isso à linha inteira."
+    },
+    {
+      "id": "regex-daily-032",
+      "title": "Tags que fecham certo",
+      "prompt": "Selecione o HTML cuja tag de fechamento corresponde à de abertura.",
+      "match": [
+        "<b>oi</b>",
+        "<i>x</i>",
+        "<p>texto</p>",
+        "<em>a</em>"
+      ],
+      "noMatch": [
+        "<b>oi</i>",
+        "<p>texto<p>",
+        "<i>x</b>",
+        "b>oi</b",
+        "<em>a</e>"
+      ],
+      "solution": "^<(\\w+)>.*</\\1>$",
+      "par": 16,
+      "difficulty": "hard",
+      "hint": "Lembre o nome da tag",
+      "explanation": "(\\w+) captura o nome da tag e </\\1> exige que o fechamento use exatamente o mesmo nome."
+    },
+    {
+      "id": "regex-daily-033",
+      "title": "Palavra repetida",
+      "prompt": "Pegue os textos com a mesma palavra duas vezes seguidas.",
+      "match": [
+        "git git push",
+        "npm npm i",
+        "o o bug",
+        "rodar rodar",
+        "ok ok"
+      ],
+      "noMatch": [
+        "git push",
+        "npm i npm",
+        "rodar rodando",
+        "okok",
+        "oo bug"
+      ],
+      "solution": "\\b(\\w+) \\1\\b",
+      "par": 12,
+      "difficulty": "hard",
+      "hint": "Use limites de palavra",
+      "explanation": "\\b(\\w+) captura uma palavra inteira, o espaço separa e \\1\\b exige a mesma palavra completa de novo."
+    },
+    {
+      "id": "regex-daily-034",
+      "title": "Hex de 3 ou 6",
+      "prompt": "Selecione as cores hex minúsculas com 3 ou 6 dígitos.",
+      "match": [
+        "#fff",
+        "#a1b2c3",
+        "#000000",
+        "#c0f"
+      ],
+      "noMatch": [
+        "#ffff",
+        "#12345",
+        "#ggg",
+        "fff",
+        "#a1b2c3d"
+      ],
+      "solution": "^#([\\da-f]{3}){1,2}$",
+      "par": 20,
+      "difficulty": "hard",
+      "hint": "6 é 3 duas vezes",
+      "explanation": "[\\da-f]{3} é um bloco de três dígitos hex e {1,2} permite um ou dois blocos."
+    },
+    {
+      "id": "regex-daily-035",
+      "title": "Mesma ponta",
+      "prompt": "Pegue as palavras que começam e terminam com a mesma letra.",
+      "match": [
+        "test",
+        "stubs",
+        "rollbar",
+        "deployed",
+        "kayak"
+      ],
+      "noMatch": [
+        "tests",
+        "stub",
+        "roll",
+        "deploy",
+        "main"
+      ],
+      "solution": "^(.).*\\1$",
+      "par": 9,
+      "difficulty": "hard",
+      "hint": "Capture a primeira e compare com a última",
+      "explanation": "^(.) captura a primeira letra, .* pula o meio e \\1$ exige a mesma letra no fim."
+    }
+  ]
+}

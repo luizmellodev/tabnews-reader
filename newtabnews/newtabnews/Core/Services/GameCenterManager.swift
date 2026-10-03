@@ -90,6 +90,9 @@ enum RestGameLeaderboard: String, CaseIterable, Identifiable {
     case algoSpot = "tabnews.algospot.best"
     case colorMatch = "tabnews.colormatch.best"
     case soundMatch = "tabnews.soundmatch.best"
+    case httpStatus = "tabnews.httpstatus.best"
+    case gitRescue = "tabnews.gitrescue.best"
+    case regexGolf = "tabnews.regexgolf.best"
 
     var id: String { rawValue }
 
@@ -101,6 +104,9 @@ enum RestGameLeaderboard: String, CaseIterable, Identifiable {
         case .algoSpot: return "AlgoSpot"
         case .colorMatch: return "Color Match"
         case .soundMatch: return "Sound Match"
+        case .httpStatus: return "HTTP Status"
+        case .gitRescue: return "Git Rescue"
+        case .regexGolf: return "Regex Golf"
         }
     }
 
@@ -112,13 +118,16 @@ enum RestGameLeaderboard: String, CaseIterable, Identifiable {
         case .algoSpot: return "puzzlepiece.extension"
         case .colorMatch: return "paintpalette.fill"
         case .soundMatch: return "waveform"
+        case .httpStatus: return "network"
+        case .gitRescue: return "arrow.triangle.branch"
+        case .regexGolf: return "chevron.left.forwardslash.chevron.right"
         }
     }
 
     var preferredTimeScope: GKLeaderboard.TimeScope {
         switch self {
         case .devWordle: return .week
-        case .devSpot, .bigO, .algoSpot, .colorMatch, .soundMatch: return .allTime
+        case .devSpot, .bigO, .algoSpot, .colorMatch, .soundMatch, .httpStatus, .gitRescue, .regexGolf: return .allTime
         }
     }
 }

@@ -52,12 +52,23 @@ struct PublicUser: Codable, Identifiable {
     }
 
     var memberSince: String? {
-        guard let createdAt else { return nil }
-        let parser = ISO8601DateFormatter()
-        parser.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        guard let date = parser.date(from: createdAt) else { return nil }
-        return date.formatted(.dateTime.month(.wide).year().locale(Locale(identifier: "pt_BR")))
+        formatMemberSince(createdAt)
     }
+}
+
+extension User {
+    var memberSince: String? {
+        formatMemberSince(createdAt)
+    }
+}
+
+/// "março de 2022" a partir do created_at da API
+private func formatMemberSince(_ createdAt: String?) -> String? {
+    guard let createdAt else { return nil }
+    let parser = ISO8601DateFormatter()
+    parser.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    guard let date = parser.date(from: createdAt) else { return nil }
+    return date.formatted(.dateTime.month(.wide).year().locale(Locale(identifier: "pt_BR")))
 }
 
 // MARK: - Auth Requests

@@ -1,93 +1,108 @@
 import SwiftUI
 
-struct RestGamesHubBanner: View {
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("JOGOS DEV")
-                        .font(.system(size: 18, weight: .black, design: .rounded))
-                        .tracking(2)
-                        .foregroundStyle(.white)
-
-                    Text("Wordle · Leet · Big O · AlgoSpot · Spot · Descanso")
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(.white.opacity(0.5))
-                }
-
-                Spacer(minLength: 0)
-
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.white.opacity(0.45))
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 14)
-            .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
-            .background {
-                ArcadeBlackBannerBackground()
-            }
-            .compositingGroup()
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(.white.opacity(0.1), lineWidth: 1)
-            }
-        }
-        .buttonStyle(.plain)
+/// Quantos desafios diários o usuário já jogou hoje
+enum RestGamesDailyProgress {
+    @MainActor
+    static func current() -> (done: Int, total: Int) {
+        let played = [
+            DevWordleViewModel.todaySummary().played,
+            BigOViewModel.todaySummary().played,
+            AlgoSpotViewModel.todaySummary().played,
+            ScenarioQuizViewModel.todaySummary(for: .httpStatus).played,
+            ScenarioQuizViewModel.todaySummary(for: .gitRescue).played,
+            RegexGolfViewModel.todaySummary().played
+        ]
+        return (played.filter { $0 }.count, played.count)
     }
 }
 
-struct RestGamesRankingsBanner: View {
-    let onTap: () -> Void
+/// Card do Perfil: entrada dos Jogos Dev com progresso do dia e atalho para os rankings
+struct RestGamesProfileCard: View {
+    let onPlay: () -> Void
+    let onRankings: () -> Void
+
+    @State private var progress = (done: 0, total: 6)
+
+    private var isDayComplete: Bool {
+        progress.done >= progress.total
+    }
 
     var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [Color.orange.opacity(0.9), Color.yellow.opacity(0.85)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 34, height: 34)
+        VStack(alignment: .leading, spacing: 14) {
+            Button(action: onPlay) {
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("JOGOS DEV")
+                            .font(.system(size: 18, weight: .black, design: .rounded))
+                            .tracking(2)
+                            .foregroundStyle(.white)
 
-                    Image(systemName: "trophy.fill")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
+                        Text("Regex Golf · HTTP · Git · Wordle · Big O · e mais")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.5))
+                            .lineLimit(1)
+                    }
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Rankings")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
-                    Text("Game Center · 4 leaderboards")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white.opacity(0.45))
                 }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            HStack(spacing: 10) {
+                dailyProgress
 
                 Spacer(minLength: 0)
 
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 11)
-            .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
-            .background(Color("CardColor"))
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+                Button(action: onRankings) {
+                    HStack(spacing: 5) {
+                        Image(systemName: "trophy.fill")
+                        Text("Rankings")
+                    }
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.85))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(.white.opacity(0.1), in: Capsule())
+                }
+                .buttonStyle(.plain)
             }
         }
-        .buttonStyle(.plain)
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            ArcadeBlackBannerBackground()
+        }
+        .compositingGroup()
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(.white.opacity(0.1), lineWidth: 1)
+        }
+        .onAppear {
+            progress = RestGamesDailyProgress.current()
+        }
+    }
+
+    private var dailyProgress: some View {
+        HStack(spacing: 8) {
+            HStack(spacing: 3) {
+                ForEach(0..<progress.total, id: \.self) { index in
+                    Capsule()
+                        .fill(index < progress.done ? Color.green : Color.white.opacity(0.18))
+                        .frame(width: 10, height: 4)
+                }
+            }
+
+            Text(isDayComplete ? "Diários completos" : "\(progress.done)/\(progress.total) diários hoje")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(isDayComplete ? .green : .white.opacity(0.6))
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 

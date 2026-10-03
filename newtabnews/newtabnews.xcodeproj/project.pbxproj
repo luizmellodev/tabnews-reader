@@ -205,6 +205,20 @@
 		ED505630C6584CBEA4276195 /* dev_words.json in Resources */ = {isa = PBXBuildFile; fileRef = 56398CBA6EC948BF8027A624 /* dev_words.json */; };
 		EF99794497654680863D2FBD /* RestGameTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAB388B57CD4A79AA767CB7 /* RestGameTheme.swift */; };
 		F1AD9D04C2204BE58A554E67 /* DevSpotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D183E25BBA7467DB659C974 /* DevSpotViewModel.swift */; };
+		06BAD6E66F5DE57585863CF2 /* ScenarioQuizEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7353FB1699F499996041099D /* ScenarioQuizEngine.swift */; };
+		1EA27466A63483E06E1F68D4 /* ScenarioQuizViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2107599A16128E2DB7E73C /* ScenarioQuizViewModel.swift */; };
+		47C047E951AE83F881306253 /* ScenarioQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A07CE37A1FFAAFD28F442C /* ScenarioQuizView.swift */; };
+		5D86E59A1CF93A42E5AA8B79 /* HttpStatusGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = D592EEA58F6464A26EC5D3C6 /* HttpStatusGame.swift */; };
+		571993F192F0BAF784BF1B87 /* GitRescueGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022BC3A98CB5BD9E4A4F4120 /* GitRescueGame.swift */; };
+		3D6A114927D682EE3A55C5D3 /* RegexGolfEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35225F5C28B402F560206535 /* RegexGolfEngine.swift */; };
+		4437E8073E65D6A3E32D0C77 /* RegexGolfViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA7ACC97CDE604AFC9F96F6 /* RegexGolfViewModel.swift */; };
+		FEF827BB63211266ADE20790 /* RegexGolfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */; };
+		4D18DC27055B09691088DE9D /* regex_golf_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = 8B00D89532958B32A0189EB5 /* regex_golf_daily.json */; };
+		D3E8FA4892864E557F38B9E4 /* regex_golf_free.json in Resources */ = {isa = PBXBuildFile; fileRef = FE4B26D5F3981F5D61FD8829 /* regex_golf_free.json */; };
+		5510150F5C93958E78FA925C /* git_rescue_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = 14F3D8CAE7A2DFED85AD34B9 /* git_rescue_daily.json */; };
+		9FCAB5ADE787EE8C9CAE3FE4 /* git_rescue_free.json in Resources */ = {isa = PBXBuildFile; fileRef = 4C1FD96A780758D405915CA4 /* git_rescue_free.json */; };
+		F60F282683B6AEBF9B35AAFC /* http_status_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = C1E9B8085AD6A08B6BCCB825 /* http_status_daily.json */; };
+		B56D3A56087518A60356328F /* http_status_free.json in Resources */ = {isa = PBXBuildFile; fileRef = 4059FD99D3F93806BC39EF3D /* http_status_free.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -427,6 +441,20 @@
 		E5B200082F9000010068804D /* algo_spot_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = algo_spot_free.json; sourceTree = "<group>"; };
 		F5728D8AF8F2408296178E2D /* DevWordleBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleBoardView.swift; sourceTree = "<group>"; };
 		FBB2CD64BBD04D07906D36E4 /* RestGameScoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameScoring.swift; sourceTree = "<group>"; };
+		7353FB1699F499996041099D /* ScenarioQuizEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioQuizEngine.swift; sourceTree = "<group>"; };
+		8A2107599A16128E2DB7E73C /* ScenarioQuizViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioQuizViewModel.swift; sourceTree = "<group>"; };
+		52A07CE37A1FFAAFD28F442C /* ScenarioQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioQuizView.swift; sourceTree = "<group>"; };
+		D592EEA58F6464A26EC5D3C6 /* HttpStatusGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpStatusGame.swift; sourceTree = "<group>"; };
+		022BC3A98CB5BD9E4A4F4120 /* GitRescueGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitRescueGame.swift; sourceTree = "<group>"; };
+		35225F5C28B402F560206535 /* RegexGolfEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexGolfEngine.swift; sourceTree = "<group>"; };
+		0AA7ACC97CDE604AFC9F96F6 /* RegexGolfViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexGolfViewModel.swift; sourceTree = "<group>"; };
+		69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexGolfView.swift; sourceTree = "<group>"; };
+		8B00D89532958B32A0189EB5 /* regex_golf_daily.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = regex_golf_daily.json; sourceTree = "<group>"; };
+		FE4B26D5F3981F5D61FD8829 /* regex_golf_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = regex_golf_free.json; sourceTree = "<group>"; };
+		14F3D8CAE7A2DFED85AD34B9 /* git_rescue_daily.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = git_rescue_daily.json; sourceTree = "<group>"; };
+		4C1FD96A780758D405915CA4 /* git_rescue_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = git_rescue_free.json; sourceTree = "<group>"; };
+		C1E9B8085AD6A08B6BCCB825 /* http_status_daily.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_status_daily.json; sourceTree = "<group>"; };
+		4059FD99D3F93806BC39EF3D /* http_status_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_status_free.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -491,6 +519,10 @@
 		3C7D1AE364B2414B8F232BCA /* RestGames */ = {
 			isa = PBXGroup;
 			children = (
+				1AB7DBF9CB3E544246545821 /* RegexGolf */,
+				BB8785017BDE06C49B0D6E20 /* GitRescue */,
+				05D378E3FE36C55B824AED1E /* HttpStatus */,
+				2A03C647FBA02F9682612A57 /* ScenarioQuiz */,
 				CA69EED4C427447E9102CB8B /* RestGamesHubView.swift */,
 				DCFB20E6443F44E1AA0A1BE4 /* RestGamePlayView.swift */,
 				643122B8B84043FD96DC45C4 /* DevWordle */,
@@ -979,6 +1011,48 @@
 			path = AlgoSpot;
 			sourceTree = "<group>";
 		};
+		2A03C647FBA02F9682612A57 /* ScenarioQuiz */ = {
+			isa = PBXGroup;
+			children = (
+				52A07CE37A1FFAAFD28F442C /* ScenarioQuizView.swift */,
+				8A2107599A16128E2DB7E73C /* ScenarioQuizViewModel.swift */,
+				7353FB1699F499996041099D /* ScenarioQuizEngine.swift */,
+			);
+			path = ScenarioQuiz;
+			sourceTree = "<group>";
+		};
+		05D378E3FE36C55B824AED1E /* HttpStatus */ = {
+			isa = PBXGroup;
+			children = (
+				4059FD99D3F93806BC39EF3D /* http_status_free.json */,
+				C1E9B8085AD6A08B6BCCB825 /* http_status_daily.json */,
+				D592EEA58F6464A26EC5D3C6 /* HttpStatusGame.swift */,
+			);
+			path = HttpStatus;
+			sourceTree = "<group>";
+		};
+		BB8785017BDE06C49B0D6E20 /* GitRescue */ = {
+			isa = PBXGroup;
+			children = (
+				4C1FD96A780758D405915CA4 /* git_rescue_free.json */,
+				14F3D8CAE7A2DFED85AD34B9 /* git_rescue_daily.json */,
+				022BC3A98CB5BD9E4A4F4120 /* GitRescueGame.swift */,
+			);
+			path = GitRescue;
+			sourceTree = "<group>";
+		};
+		1AB7DBF9CB3E544246545821 /* RegexGolf */ = {
+			isa = PBXGroup;
+			children = (
+				FE4B26D5F3981F5D61FD8829 /* regex_golf_free.json */,
+				8B00D89532958B32A0189EB5 /* regex_golf_daily.json */,
+				69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */,
+				0AA7ACC97CDE604AFC9F96F6 /* RegexGolfViewModel.swift */,
+				35225F5C28B402F560206535 /* RegexGolfEngine.swift */,
+			);
+			path = RegexGolf;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1123,6 +1197,12 @@
 				D4E5F6052F8000010068804C /* dev_leet_problems.json in Resources */,
 				449AA869DB8647A7AA74E861 /* dev_spot_words.json in Resources */,
 				E5B100B12F9000010068804D /* big_o_daily.json in Resources */,
+				B56D3A56087518A60356328F /* http_status_free.json in Resources */,
+				F60F282683B6AEBF9B35AAFC /* http_status_daily.json in Resources */,
+				9FCAB5ADE787EE8C9CAE3FE4 /* git_rescue_free.json in Resources */,
+				5510150F5C93958E78FA925C /* git_rescue_daily.json in Resources */,
+				D3E8FA4892864E557F38B9E4 /* regex_golf_free.json in Resources */,
+				4D18DC27055B09691088DE9D /* regex_golf_daily.json in Resources */,
 				E5B100B22F9000010068804D /* big_o_free.json in Resources */,
 				E5B200B12F9000010068804D /* algo_spot_daily.json in Resources */,
 				E5B200B22F9000010068804D /* algo_spot_free.json in Resources */,
@@ -1311,6 +1391,14 @@
 				F1AD9D04C2204BE58A554E67 /* DevSpotViewModel.swift in Sources */,
 				C75A5F815869469288FE91B7 /* DevSpotEngine.swift in Sources */,
 				E5B100A12F9000010068804D /* BigOEngine.swift in Sources */,
+				FEF827BB63211266ADE20790 /* RegexGolfView.swift in Sources */,
+				4437E8073E65D6A3E32D0C77 /* RegexGolfViewModel.swift in Sources */,
+				3D6A114927D682EE3A55C5D3 /* RegexGolfEngine.swift in Sources */,
+				571993F192F0BAF784BF1B87 /* GitRescueGame.swift in Sources */,
+				5D86E59A1CF93A42E5AA8B79 /* HttpStatusGame.swift in Sources */,
+				47C047E951AE83F881306253 /* ScenarioQuizView.swift in Sources */,
+				1EA27466A63483E06E1F68D4 /* ScenarioQuizViewModel.swift in Sources */,
+				06BAD6E66F5DE57585863CF2 /* ScenarioQuizEngine.swift in Sources */,
 				E5B100A22F9000010068804D /* BigOViewModel.swift in Sources */,
 				E5B100A32F9000010068804D /* BigOView.swift in Sources */,
 				E5B100A42F9000010068804D /* BigOCodeCardView.swift in Sources */,
