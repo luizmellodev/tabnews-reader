@@ -94,22 +94,17 @@ extension MainViewModel {
     
     @MainActor
     func fetchPost() async {
-        for index in content.indices {
-            guard content[index].body?.isEmpty != false else { continue }
+        let filled = await fetchBodies(for: content)
+        let filledByKey = Dictionary(filled.map { ($0.stableKey, $0) }, uniquingKeysWith: { first, _ in first })
 
-            do {
-                let response = try await service.getPost(
-                    user: content[index].ownerUsername ?? "erro",
-                    slug: content[index].slug ?? "erro"
-                )
-                content[index] = response
-            } catch {
-                #if DEBUG
-                print("Erro ao buscar post [\(content[index].slug ?? "unknown")]: \(error)")
-                #endif
-            }
+        // Aplica por chave (não por índice): o feed pode ter mudado durante os awaits (refresh, troca de estratégia)
+        content = content.map { post in
+            guard post.body?.isEmpty != false,
+                  let full = filledByKey[post.stableKey],
+                  full.body?.isEmpty == false else { return post }
+            return full
         }
-        
+
         saveCachedContent(page: currentPage)
         
         // Sincronizar com widgets
@@ -123,8 +118,36 @@ extension MainViewModel {
         NotificationCenter.default.post(name: .postsLoaded, object: nil)
     }
     
+    /// Busca o corpo completo dos posts em paralelo, mantendo a ordem. Posts que falharem voltam como vieram.
+    private func fetchBodies(for posts: [PostRequest]) async -> [PostRequest] {
+        let service = self.service
+
+        return await withTaskGroup(of: (Int, PostRequest?).self) { group in
+            for (index, post) in posts.enumerated() where post.body?.isEmpty != false {
+                guard let user = post.ownerUsername, let slug = post.slug else { continue }
+
+                group.addTask {
+                    do {
+                        return (index, try await service.getPost(user: user, slug: slug))
+                    } catch {
+                        #if DEBUG
+                        print("Erro ao buscar post [\(slug)]: \(error)")
+                        #endif
+                        return (index, nil)
+                    }
+                }
+            }
+
+            var result = posts
+            for await (index, full) in group {
+                if let full { result[index] = full }
+            }
+            return result
+        }
+    }
+
     private func mergePostsPreservingBodies(_ newPosts: [PostRequest], existing: [PostRequest]) -> [PostRequest] {
-        let existingByKey = Dictionary(uniqueKeysWithValues: existing.map { ($0.stableKey, $0) })
+        let existingByKey = Dictionary(existing.map { ($0.stableKey, $0) }, uniquingKeysWith: { first, _ in first })
         
         return newPosts.map { newPost in
             guard let existingPost = existingByKey[newPost.stableKey],
@@ -178,33 +201,31 @@ extension MainViewModel {
         
         isLoadingMore = true
         currentPage += 1
-        
+        let strategy = currentStrategy
+
         do {
             let newPosts = try await service.getContent(
                 page: "\(currentPage)",
                 perPage: "\(postsPerPage)",
-                strategy: currentStrategy.rawValue
+                strategy: strategy.rawValue
             )
-            
+
             if newPosts.isEmpty || newPosts.count < postsPerPage {
                 hasMorePages = false
             }
-            
-            for index in newPosts.indices {
-                var post = newPosts[index]
-                do {
-                    let response = try await service.getPost(
-                        user: post.ownerUsername ?? "erro",
-                        slug: post.slug ?? "erro"
-                    )
-                    self.content.append(response)
-                } catch {
-                    #if DEBUG
-                    print("Error fetching post details: \(error)")
-                    #endif
-                }
+
+            let filled = await fetchBodies(for: newPosts)
+
+            // Usuário trocou de estratégia enquanto carregava: descarta essa página
+            guard strategy == currentStrategy else {
+                isLoadingMore = false
+                return
             }
-            
+
+            // Ordenação "relevantes" muda entre páginas; evita posts duplicados (IDs repetidos no ForEach)
+            let existingKeys = Set(content.map(\.stableKey))
+            content.append(contentsOf: filled.filter { !existingKeys.contains($0.stableKey) })
+
             saveCachedContent(page: currentPage)
             isLoadingMore = false
         } catch {

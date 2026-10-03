@@ -64,7 +64,14 @@ class NetworkManager: NetworkManagerProtocol {
         }
         
         var lastError: Error = NetworkError.badServerResponse
-        
+
+        // 429 garante que o servidor não processou, então é seguro repetir qualquer método.
+        // Já 503/timeout podem acontecer depois do servidor aceitar: só repete GET para não duplicar POSTs.
+        let isIdempotent = method.uppercased() == "GET"
+        func shouldRetry(statusCode: Int) -> Bool {
+            statusCode == 429 || (isIdempotent && retryableStatusCodes.contains(statusCode))
+        }
+
         for attempt in 0..<maxRetries {
             await RequestThrottler.shared.waitIfNeeded()
             
@@ -93,7 +100,7 @@ class NetworkManager: NetworkManagerProtocol {
                     Logger.error("⚠️ Error: Bad server response (status code: \(httpResponse.statusCode))")
                     Logger.error("Error body: \(errorBody)")
                     
-                    if retryableStatusCodes.contains(httpResponse.statusCode), attempt < maxRetries - 1 {
+                    if shouldRetry(statusCode: httpResponse.statusCode), attempt < maxRetries - 1 {
                         if let errorResponse = try? JSONDecoder().decode(APIError.self, from: data) {
                             lastError = NetworkError.apiError(errorResponse)
                         } else {
@@ -118,13 +125,13 @@ class NetworkManager: NetworkManagerProtocol {
                 }
             } catch let error as NetworkError {
                 lastError = error
-                if case .apiError(let apiError) = error, retryableStatusCodes.contains(apiError.statusCode), attempt < maxRetries - 1 {
+                if case .apiError(let apiError) = error, shouldRetry(statusCode: apiError.statusCode), attempt < maxRetries - 1 {
                     continue
                 }
                 throw error
             } catch {
                 lastError = error
-                if attempt < maxRetries - 1 {
+                if isIdempotent, attempt < maxRetries - 1 {
                     continue
                 }
                 throw error

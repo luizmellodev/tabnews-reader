@@ -9,7 +9,10 @@ import SwiftUI
 
 struct UserPublicationsView: View {
     let username: String
+    /// true quando aberto a partir do @ de alguém: mostra cabeçalho com bio e tabcoins da pessoa
+    var showsProfileHeader: Bool = false
     
+    @State private var profile: PublicUser?
     @State private var publications: [PostRequest] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -65,9 +68,12 @@ struct UserPublicationsView: View {
                     Image(systemName: "doc.text")
                         .font(.system(size: 48))
                         .foregroundStyle(.secondary)
+                    if showsProfileHeader {
+                        profileHeader
+                    }
                     Text("Nenhuma publicação")
                         .font(.headline)
-                    Text("Você ainda não publicou nada no TabNews")
+                    Text(showsProfileHeader ? "@\(username) ainda não publicou nada no TabNews" : "Você ainda não publicou nada no TabNews")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -77,6 +83,10 @@ struct UserPublicationsView: View {
             } else {
                 ScrollView {
                     LazyVStack(spacing: 12) {
+                        if showsProfileHeader {
+                            profileHeader
+                        }
+                        
                         ForEach(publications) { post in
                             Button {
                                 Task {
@@ -114,7 +124,7 @@ struct UserPublicationsView: View {
                 }
             }
         }
-        .navigationTitle("Minhas Publicações")
+        .navigationTitle(showsProfileHeader ? "@\(username)" : "Minhas Publicações")
         .navigationBarTitleDisplayMode(.inline)
         .background {
             ZStack {
@@ -157,6 +167,77 @@ struct UserPublicationsView: View {
         }
         .task {
             await loadPublications()
+        }
+        .task {
+            guard showsProfileHeader else { return }
+            profile = try? await authService.getPublicUser(username: username)
+        }
+    }
+    
+    // MARK: - Profile Header
+    
+    @ViewBuilder
+    private var profileHeader: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                Circle()
+                    .fill(Color.primary.opacity(0.1))
+                    .frame(width: 52, height: 52)
+                    .overlay(
+                        Text(String(username.prefix(1)).uppercased())
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                    )
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("@\(username)")
+                        .font(.headline)
+                    if let memberSince = profile?.memberSince {
+                        Text("No TabNews desde \(memberSince)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                
+                Spacer()
+            }
+            
+            if let profile {
+                HStack(spacing: 20) {
+                    profileStat(value: profile.tabcoins, label: "TabCoins", icon: "star.fill", color: .orange)
+                    profileStat(value: profile.tabcash, label: "TabCash", icon: "dollarsign.circle.fill", color: .green)
+                    Spacer()
+                }
+                
+                if let description = profile.description, !description.isEmpty {
+                    CommentBodyView(markdown: description)
+                        .font(.subheadline)
+                }
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+        .padding(.bottom, 8)
+    }
+    
+    private func profileStat(value: Int?, label: String, icon: String, color: Color) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.caption)
+                .foregroundStyle(color)
+            VStack(alignment: .leading, spacing: 0) {
+                Text("\(value ?? 0)")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Text(label)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
     
@@ -353,3 +434,29 @@ struct PublicationCard: View {
     }
 }
 
+
+// MARK: - Profile Sheet
+
+/// Perfil de outro usuário, aberto ao tocar no @ em posts e comentários.
+/// Sheet com NavigationStack própria para funcionar em qualquer tela que mostra um post.
+struct UserProfileSheet: View {
+    let username: String
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationStack {
+            UserPublicationsView(username: username, showsProfileHeader: true)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Fechar") { dismiss() }
+                    }
+                }
+        }
+    }
+}
+
+/// Wrapper Identifiable para `.sheet(item:)`
+struct ProfileTarget: Identifiable {
+    let username: String
+    var id: String { username }
+}

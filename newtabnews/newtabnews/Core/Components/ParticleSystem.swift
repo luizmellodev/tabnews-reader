@@ -256,8 +256,15 @@ public struct ParticleSystemView: View {
     }
     
     private func startAnimation() {
+        timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1/60, repeats: true) { _ in
             updateParticles(deltaTime: 1/60)
+
+            // Todas as partículas morreram: para o timer em vez de rodar a 60fps até o onDisappear
+            if particles.isEmpty {
+                timer?.invalidate()
+                timer = nil
+            }
         }
     }
     
@@ -323,7 +330,6 @@ public struct ParticleEmitterModifier: ViewModifier {
             )
             .onPreferenceChange(ButtonPositionPreferenceKey.self) { position in
                 emitterOrigin = position
-                print("🎯 [ParticleEmitter] Origin atualizado: \(position)")
             }
             .overlay(
                 Group {
@@ -333,15 +339,9 @@ public struct ParticleEmitterModifier: ViewModifier {
                             origin: emitterOrigin
                         )
                         .allowsHitTesting(false)
-                        .onAppear {
-                            print("✨ [ParticleEmitter] Confete APARECEU!")
-                        }
                     }
                 }
             )
-            .onChange(of: isEmitting) { oldValue, newValue in
-                print("🔄 [ParticleEmitter] isEmitting mudou: \(oldValue) -> \(newValue)")
-            }
     }
 }
 

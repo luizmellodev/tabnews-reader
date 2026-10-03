@@ -27,7 +27,9 @@ struct PostHeader: View {
     @State private var showConfetti: Bool = false
     @State private var showLoginRequiredAlert: Bool = false
     @State private var showAuthSheet: Bool = false
-    
+    @State private var voteErrorMessage: String?
+    @State private var profileTarget: ProfileTarget?
+
     private let authService = AuthService.shared
     private let voteManager = VoteManager.shared
     
@@ -98,9 +100,18 @@ struct PostHeader: View {
                                 .foregroundStyle(.secondary)
                         }
                     } else {
-                        Text(post.ownerUsername ?? "")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                        Button {
+                            if let owner = post.ownerUsername, !owner.isEmpty {
+                                profileTarget = ProfileTarget(username: owner)
+                            }
+                        } label: {
+                            Text(post.ownerUsername ?? "")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .underline(color: .secondary.opacity(0.4))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityHint("Abre o perfil do autor")
                         
                         Text("•")
                             .font(.caption)
@@ -252,8 +263,22 @@ struct PostHeader: View {
         } message: {
             Text("Entre para acessar seu perfil, seus posts e seus votos.")
         }
+        .alert(
+            "Não foi possível votar",
+            isPresented: Binding(
+                get: { voteErrorMessage != nil },
+                set: { if !$0 { voteErrorMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(voteErrorMessage ?? "")
+        }
         .sheet(isPresented: $showAuthSheet) {
             NativeLoginView()
+        }
+        .sheet(item: $profileTarget) { target in
+            UserProfileSheet(username: target.username)
         }
     }
     
@@ -305,6 +330,12 @@ struct PostHeader: View {
                 await MainActor.run {
                     isVoting = false
                     localTabcoins = post.tabcoins
+
+                    if case AuthError.sessionExpired = error {
+                        showLoginRequiredAlert = true
+                    } else {
+                        voteErrorMessage = error.localizedDescription
+                    }
                 }
             }
         }

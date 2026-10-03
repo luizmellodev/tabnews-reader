@@ -23,6 +23,8 @@ struct SettingsView: View {
     @State private var showingClearLibrary = false
     @State private var showLoginSheet = false
     @State private var showLogoutAlert = false
+    @State private var showDeleteAccountAlert = false
+    @State private var deletedAccount: DeletedAccountInfo?
     @State private var showingGames = false
     @State private var showingRankings = false
     @StateObject private var authService = AuthService.shared
@@ -149,6 +151,23 @@ struct SettingsView: View {
                 }
             } message: {
                 Text("Tem certeza que deseja sair da sua conta?")
+            }
+            .alert("Excluir Conta", isPresented: $showDeleteAccountAlert) {
+                Button("Cancelar", role: .cancel) { }
+                Button("Continuar", role: .destructive) {
+                    // Captura os dados antes do logout para pré-preencher o email de exclusão
+                    let user = authService.currentUser
+                    authService.logout()
+                    deletedAccount = DeletedAccountInfo(
+                        username: user?.username ?? "",
+                        email: user?.email ?? ""
+                    )
+                }
+            } message: {
+                Text("Sua conta será desconectada deste app. A exclusão permanente é feita pelo suporte do TabNews, e no próximo passo você pode enviar o pedido por email.")
+            }
+            .sheet(item: $deletedAccount) { account in
+                DeleteAccountContactView(username: account.username, email: account.email)
             }
             .task {
                 if authService.isAuthenticated, let username = authService.currentUser?.username {
@@ -712,6 +731,23 @@ struct SettingsView: View {
                         .cornerRadius(8)
                     }
                     .buttonStyle(.borderless)
+
+                    // Exigido pela App Store (guideline 5.1.1(v)) para apps com criação de conta
+                    Button {
+                        showDeleteAccountAlert = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "person.crop.circle.badge.xmark")
+                                .font(.subheadline)
+                            Text("Excluir conta")
+                                .font(.subheadline)
+                            Spacer()
+                        }
+                        .foregroundStyle(.secondary)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 16)
+                    }
+                    .buttonStyle(.borderless)
                 }
             } else {
                 VStack(spacing: 10) {
@@ -900,6 +936,12 @@ struct SettingsView: View {
 }
 
 #if DEBUG
+private struct DeletedAccountInfo: Identifiable {
+    let username: String
+    let email: String
+    var id: String { username + email }
+}
+
 private struct PushTokenDebugSheet: View {
     let info: FirebasePushNotificationService.DebugInfo
     @Environment(\.dismiss) private var dismiss

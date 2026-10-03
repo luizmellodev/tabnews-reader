@@ -18,6 +18,7 @@ struct CommentRow: View {
     @State private var hasVoted: Bool = false
     @State private var localTabcoins: Int? = nil
     @State private var showConfetti: Bool = false
+    @State private var profileTarget: ProfileTarget?
 
     private let maxDepth = 5
     private let guideWidth: CGFloat = 14
@@ -59,6 +60,9 @@ struct CommentRow: View {
             if showConfetti {
                 confettiOverlay
             }
+        }
+        .sheet(item: $profileTarget) { target in
+            UserProfileSheet(username: target.username)
         }
     }
 
@@ -116,9 +120,17 @@ struct CommentRow: View {
 
     private var metadataLine: some View {
         HStack(spacing: 6) {
-            Text("@\(comment.ownerUsername ?? "Anônimo")")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            Button {
+                if let owner = comment.ownerUsername, !owner.isEmpty {
+                    profileTarget = ProfileTarget(username: owner)
+                }
+            } label: {
+                Text("@\(comment.ownerUsername ?? "Anônimo")")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("Abre o perfil de quem comentou")
 
             Text("•")
                 .font(.caption)

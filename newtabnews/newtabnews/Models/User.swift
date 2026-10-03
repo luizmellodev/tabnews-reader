@@ -31,6 +31,35 @@ struct User: Codable, Identifiable {
     }
 }
 
+// MARK: - Public User
+
+/// Perfil público retornado por GET /users/{username} (sem email, ao contrário de `User`)
+struct PublicUser: Codable, Identifiable {
+    let id: String
+    let username: String
+    let description: String?
+    let tabcoins: Int?
+    let tabcash: Int?
+    let createdAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case username
+        case description
+        case tabcoins
+        case tabcash
+        case createdAt = "created_at"
+    }
+
+    var memberSince: String? {
+        guard let createdAt else { return nil }
+        let parser = ISO8601DateFormatter()
+        parser.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard let date = parser.date(from: createdAt) else { return nil }
+        return date.formatted(.dateTime.month(.wide).year().locale(Locale(identifier: "pt_BR")))
+    }
+}
+
 // MARK: - Auth Requests
 
 struct LoginRequest: Codable {

@@ -162,6 +162,7 @@ struct ContentView: View {
             if newPhase == .active {
                 clearBadge()
                 syncToWatch()
+                AuthService.shared.validateSession()
                 AppReviewManager.shared.handleAppBecameActive()
             } else if newPhase == .background {
                 AppReviewManager.shared.handleAppEnteredBackground()

@@ -31,6 +31,7 @@ enum AuthError: LocalizedError {
     case serverError
     case encodingError
     case unauthorized
+    case sessionExpired
     case unknown
     
     var errorDescription: String? {
@@ -55,6 +56,8 @@ enum AuthError: LocalizedError {
             return "Erro ao processar dados"
         case .unauthorized:
             return "Não autorizado. Faça login novamente"
+        case .sessionExpired:
+            return "Sua sessão expirou. Entre novamente para continuar."
         case .unknown:
             return "Erro desconhecido. Tente novamente"
         }
@@ -285,7 +288,51 @@ class AuthService: ObservableObject {
         
         try await fetchCurrentUser(token: token)
     }
-    
+
+    private var lastSessionValidation: Date = .distantPast
+
+    /// Valida a sessão salva no Keychain. O GET /user também renova a sessão no TabNews
+    /// (ela expira após alguns dias sem uso), então chamar isso ao abrir o app evita que
+    /// votos e comentários falhem com 401 enquanto a UI ainda mostra o usuário logado.
+    func validateSession() {
+        guard let token = keychainManager.getSessionToken(),
+              Date().timeIntervalSince(lastSessionValidation) > 30 * 60 else { return }
+
+        lastSessionValidation = Date()
+
+        Task {
+            do {
+                try await fetchCurrentUser(token: token)
+            } catch {
+                // Só desloga quando a API confirma que a sessão é inválida; erro de rede mantém o estado
+                if Self.isSessionExpired(error) {
+                    #if DEBUG
+                    print("⚠️ [AuthService] Sessão expirada, deslogando")
+                    #endif
+                    logout()
+                }
+            }
+        }
+    }
+
+    private static func isSessionExpired(_ error: Error) -> Bool {
+        if case NetworkError.apiError(let apiError) = error {
+            return apiError.statusCode == 401
+        }
+        return false
+    }
+
+    func getPublicUser(username: String) async throws -> PublicUser {
+        try await networkManager.sendRequest(
+            "/users/\(username)",
+            method: "GET",
+            parameters: nil,
+            authentication: nil,
+            token: nil,
+            body: nil
+        )
+    }
+
     func getUserPublications(username: String, page: Int = 1, perPage: Int = 30) async throws -> [PostRequest] {
         let posts: [PostRequest] = try await networkManager.sendRequest(
             "/contents/\(username)",
@@ -342,14 +389,26 @@ class AuthService: ObservableObject {
             throw AuthError.encodingError
         }
         
-        let _: Comment = try await networkManager.sendRequest(
-            "/contents/\(username)/\(slug)/tabcoins",
-            method: "POST",
-            parameters: nil,
-            authentication: "Cookie",
-            token: "session_id=\(token)",
-            body: requestBody
-        )
+        do {
+            let _: Comment = try await networkManager.sendRequest(
+                "/contents/\(username)/\(slug)/tabcoins",
+                method: "POST",
+                parameters: nil,
+                authentication: "Cookie",
+                token: "session_id=\(token)",
+                body: requestBody
+            )
+        } catch {
+            if Self.isSessionExpired(error) {
+                logout()
+                throw AuthError.sessionExpired
+            }
+            // Preserva a mensagem da API (ex.: TabCash insuficiente, voto no próprio conteúdo)
+            if case NetworkError.apiError(let apiError) = error {
+                throw ValidationError(message: apiError.message)
+            }
+            throw AuthError.from(error)
+        }
     }
 }
 

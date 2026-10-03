@@ -16,6 +16,7 @@ struct CommentsView: View {
     @State private var isExpanded: Bool = false
     @State private var replyingToComment: Comment?
     @State private var showAuthSheet = false
+    @State private var voteErrorMessage: String?
     @StateObject private var authService = AuthService.shared
     
     private let previewCount = 2
@@ -205,8 +206,19 @@ struct CommentsView: View {
         .sheet(isPresented: $showAuthSheet) {
             NativeLoginView()
         }
+        .alert(
+            "Não foi possível votar",
+            isPresented: Binding(
+                get: { voteErrorMessage != nil },
+                set: { if !$0 { voteErrorMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(voteErrorMessage ?? "")
+        }
     }
-    
+
     /// Linha fina entre comentários de primeiro nível — separa blocos sem o peso visual de um Divider padrão.
     private var commentSeparator: some View {
         Rectangle()
@@ -317,6 +329,12 @@ struct CommentsView: View {
                 // Notificar falha
                 await MainActor.run {
                     completion(false)
+
+                    if case AuthError.sessionExpired = error {
+                        showAuthSheet = true
+                    } else {
+                        voteErrorMessage = error.localizedDescription
+                    }
                 }
             }
         }

@@ -39,7 +39,7 @@ struct PostCTAView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 
-                Link(destination: URL(string: tabNewsURL)!) {
+                Link(destination: tabNewsURL) {
                     HStack(spacing: 4) {
                         Text("Dê upvote no TabNews")
                             .font(.subheadline)
@@ -122,10 +122,12 @@ struct PostCTAView: View {
         }
     }
     
-    private var tabNewsURL: String {
+    private var tabNewsURL: URL {
         let username = post.ownerUsername ?? "NewsletterOficial"
         let slug = post.slug ?? ""
-        return "https://www.tabnews.com.br/\(username)/\(slug)"
+        let base = URL(string: "https://www.tabnews.com.br")!
+        // appending(path:) faz o percent-encoding, então um slug com caracteres especiais não crasha
+        return base.appending(path: username).appending(path: slug)
     }
 }
 
