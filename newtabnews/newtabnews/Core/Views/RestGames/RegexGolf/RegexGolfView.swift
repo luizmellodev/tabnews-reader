@@ -7,6 +7,15 @@ enum RegexGolfTheme {
     static let fail = Color(red: 1.0, green: 0.42, blue: 0.42)
 }
 
+private struct RegexGolfResultSnapshot: Identifiable {
+    let puzzle: RegexGolfPuzzle
+    let pattern: String
+    let solved: Bool
+    let score: Int
+
+    var id: RegexGolfPuzzle.ID { puzzle.id }
+}
+
 struct RegexGolfView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -18,7 +27,7 @@ struct RegexGolfView: View {
     @State private var hasStartedFree = false
     @State private var showOnboarding = !RestGameOnboarding.hasSeen(.regexGolf)
     @State private var showIntro = false
-    @State private var showResult = false
+    @State private var result: RegexGolfResultSnapshot?
     @State private var showGiveUpConfirm = false
     @State private var showFreeModeLockedHint = false
 
@@ -67,24 +76,26 @@ struct RegexGolfView: View {
         .sheet(isPresented: $showIntro) {
             RegexGolfIntroSheet { openURL($0) }
         }
-        .sheet(isPresented: $showResult, onDismiss: {
+        .sheet(item: $result, onDismiss: {
             activeViewModel.advanceAfterReveal()
-        }) {
-            if let puzzle = activeViewModel.puzzle {
-                RegexGolfResultSheet(
+        }) { result in
+            RegexGolfResultSheet(
+                puzzle: result.puzzle,
+                pattern: result.pattern,
+                solved: result.solved,
+                score: result.score
+            )
+        }
+        .onChange(of: activeViewModel.phase) { _, phase in
+            guard phase == .revealing else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                guard activeViewModel.phase == .revealing, let puzzle = activeViewModel.puzzle else { return }
+                result = RegexGolfResultSnapshot(
                     puzzle: puzzle,
                     pattern: activeViewModel.pattern,
                     solved: activeViewModel.lastRoundSolved,
                     score: activeViewModel.lastRoundScore
                 )
-            }
-        }
-        .onChange(of: activeViewModel.phase) { _, phase in
-            guard phase == .revealing else { return }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                if activeViewModel.phase == .revealing {
-                    showResult = true
-                }
             }
         }
         .alert("Desistir deste puzzle?", isPresented: $showGiveUpConfirm) {

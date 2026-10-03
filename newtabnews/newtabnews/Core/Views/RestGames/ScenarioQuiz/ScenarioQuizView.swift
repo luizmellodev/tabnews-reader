@@ -1,8 +1,10 @@
 import SwiftUI
 
-private struct ScenarioQuizRevealSnapshot: Equatable {
+private struct ScenarioQuizRevealSnapshot: Equatable, Identifiable {
     let challenge: ScenarioQuizChallenge
     let wasCorrect: Bool
+
+    var id: ScenarioQuizChallenge.ID { challenge.id }
 }
 
 struct ScenarioQuizView: View {
@@ -18,7 +20,6 @@ struct ScenarioQuizView: View {
     @State private var hasStartedFree = false
     @State private var showOnboarding: Bool
     @State private var showIntroLearn = false
-    @State private var showRevealLearn = false
     @State private var revealSnapshot: ScenarioQuizRevealSnapshot?
     @State private var showFreeModeLockedHint = false
 
@@ -71,28 +72,28 @@ struct ScenarioQuizView: View {
         .sheet(isPresented: $showIntroLearn) {
             ScenarioQuizIntroSheet(config: config) { openURL($0) }
         }
-        .sheet(isPresented: $showRevealLearn, onDismiss: handleRevealSheetDismissed) {
-            if let snapshot = revealSnapshot {
-                ScenarioQuizLearnSheet(
-                    config: config,
-                    challenge: snapshot.challenge,
-                    wasCorrect: snapshot.wasCorrect
-                ) { openURL($0) }
-            }
+        .sheet(item: $revealSnapshot, onDismiss: handleRevealSheetDismissed) { snapshot in
+            ScenarioQuizLearnSheet(
+                config: config,
+                challenge: snapshot.challenge,
+                wasCorrect: snapshot.wasCorrect
+            ) { openURL($0) }
         }
         .onChange(of: activeViewModel.phase) { _, phase in
-            guard phase == .revealing, let round = activeViewModel.currentRoundData else { return }
-            revealSnapshot = ScenarioQuizRevealSnapshot(
-                challenge: round.challenge,
-                wasCorrect: activeViewModel.wasCorrect
-            )
+            guard phase == .revealing else { return }
             // Pequena pausa para o jogador ver qual opção estava certa antes do sheet subir
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-                if activeViewModel.phase == .revealing {
-                    showRevealLearn = true
-                }
+                presentRevealLearn()
             }
         }
+    }
+
+    private func presentRevealLearn() {
+        guard activeViewModel.phase == .revealing, let round = activeViewModel.currentRoundData else { return }
+        revealSnapshot = ScenarioQuizRevealSnapshot(
+            challenge: round.challenge,
+            wasCorrect: activeViewModel.wasCorrect
+        )
     }
 
     private func handleRevealSheetDismissed() {
@@ -140,7 +141,6 @@ struct ScenarioQuizView: View {
             return
         }
         showFreeModeLockedHint = false
-        showRevealLearn = false
         revealSnapshot = nil
         if mode == .free, !hasStartedFree {
             hasStartedFree = true
@@ -230,7 +230,7 @@ struct ScenarioQuizView: View {
 
                 if viewModel.phase == .revealing {
                     Button {
-                        showRevealLearn = true
+                        presentRevealLearn()
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "lightbulb.fill")

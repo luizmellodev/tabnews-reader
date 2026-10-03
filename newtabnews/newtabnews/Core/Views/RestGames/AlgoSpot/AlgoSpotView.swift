@@ -1,8 +1,10 @@
 import SwiftUI
 
-private struct AlgoSpotRevealSnapshot: Equatable {
+private struct AlgoSpotRevealSnapshot: Equatable, Identifiable {
     let challenge: AlgoSpotChallenge
     let wasCorrect: Bool
+
+    var id: AlgoSpotChallenge.ID { challenge.id }
 }
 
 struct AlgoSpotView: View {
@@ -16,7 +18,6 @@ struct AlgoSpotView: View {
     @State private var hasStartedFree = false
     @State private var showOnboarding = !RestGameOnboarding.hasSeen(.algoSpot)
     @State private var showIntroLearn = false
-    @State private var showRevealLearn = false
     @State private var revealSnapshot: AlgoSpotRevealSnapshot?
     @State private var showFreeModeLockedHint = false
 
@@ -65,24 +66,26 @@ struct AlgoSpotView: View {
                 openURL(url)
             }
         }
-        .sheet(isPresented: $showRevealLearn, onDismiss: handleRevealSheetDismissed) {
-            if let snapshot = revealSnapshot {
-                AlgoSpotLearnSheet(
-                    challenge: snapshot.challenge,
-                    wasCorrect: snapshot.wasCorrect
-                ) { url in
-                    openURL(url)
-                }
+        .sheet(item: $revealSnapshot, onDismiss: handleRevealSheetDismissed) { snapshot in
+            AlgoSpotLearnSheet(
+                challenge: snapshot.challenge,
+                wasCorrect: snapshot.wasCorrect
+            ) { url in
+                openURL(url)
             }
         }
         .onChange(of: activeViewModel.phase) { _, phase in
-            guard phase == .revealing, let round = activeViewModel.currentRoundData else { return }
-            revealSnapshot = AlgoSpotRevealSnapshot(
-                challenge: round.challenge,
-                wasCorrect: activeViewModel.wasCorrect
-            )
-            showRevealLearn = true
+            guard phase == .revealing else { return }
+            presentRevealLearn()
         }
+    }
+
+    private func presentRevealLearn() {
+        guard activeViewModel.phase == .revealing, let round = activeViewModel.currentRoundData else { return }
+        revealSnapshot = AlgoSpotRevealSnapshot(
+            challenge: round.challenge,
+            wasCorrect: activeViewModel.wasCorrect
+        )
     }
 
     private func handleRevealSheetDismissed() {
@@ -130,7 +133,6 @@ struct AlgoSpotView: View {
             return
         }
         showFreeModeLockedHint = false
-        showRevealLearn = false
         revealSnapshot = nil
         if mode == .free, !hasStartedFree {
             hasStartedFree = true
@@ -222,7 +224,7 @@ struct AlgoSpotView: View {
 
             if viewModel.phase == .revealing {
                 Button {
-                    showRevealLearn = true
+                    presentRevealLearn()
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "lightbulb.fill")
