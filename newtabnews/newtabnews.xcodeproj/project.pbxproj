@@ -7,10 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		06BAD6E66F5DE57585863CF2 /* ScenarioQuizEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7353FB1699F499996041099D /* ScenarioQuizEngine.swift */; };
 		1B199B9550F2418CAD3B492F /* DevWordleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC86A73A42F548C99F4ECBE8 /* DevWordleEngine.swift */; };
+		1EA27466A63483E06E1F68D4 /* ScenarioQuizViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2107599A16128E2DB7E73C /* ScenarioQuizViewModel.swift */; };
 		36D4339C76BA4B97A6769717 /* DevWordleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2688CAC2769D44D3BC9C39FA /* DevWordleView.swift */; };
+		3D6A114927D682EE3A55C5D3 /* RegexGolfEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35225F5C28B402F560206535 /* RegexGolfEngine.swift */; };
+		4437E8073E65D6A3E32D0C77 /* RegexGolfViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA7ACC97CDE604AFC9F96F6 /* RegexGolfViewModel.swift */; };
 		449AA869DB8647A7AA74E861 /* dev_spot_words.json in Resources */ = {isa = PBXBuildFile; fileRef = 6FA87B49DE4E4C3D8D1D30FC /* dev_spot_words.json */; };
+		47C047E951AE83F881306253 /* ScenarioQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A07CE37A1FFAAFD28F442C /* ScenarioQuizView.swift */; };
+		4D18DC27055B09691088DE9D /* regex_golf_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = 8B00D89532958B32A0189EB5 /* regex_golf_daily.json */; };
+		5510150F5C93958E78FA925C /* git_rescue_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = 14F3D8CAE7A2DFED85AD34B9 /* git_rescue_daily.json */; };
 		55A05722FF634FA291B6F9D1 /* RestGameScoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CD64BBD04D07906D36E4 /* RestGameScoring.swift */; };
+		571993F192F0BAF784BF1B87 /* GitRescueGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022BC3A98CB5BD9E4A4F4120 /* GitRescueGame.swift */; };
+		5D86E59A1CF93A42E5AA8B79 /* HttpStatusGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = D592EEA58F6464A26EC5D3C6 /* HttpStatusGame.swift */; };
 		790887282F0F16AD0068804C /* UserPublicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790887272F0F16AD0068804C /* UserPublicationsView.swift */; };
 		790AB0C12ECEAE9500E443E6 /* TextToSpeechManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790AB0C02ECEAE9500E443E6 /* TextToSpeechManager.swift */; };
 		790AB0C42ECEAEB100E443E6 /* AddFolderSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790AB0C32ECEAEB100E443E6 /* AddFolderSheet.swift */; };
@@ -166,6 +175,7 @@
 		8F73A988A8534556869B0CF5 /* RestFeedbackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3577F4A1EE7F48E5AC0735F4 /* RestFeedbackManager.swift */; };
 		985849525534425EACEA4E07 /* ToneGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87F7915FE654FB8BE6560FB /* ToneGenerator.swift */; };
 		9D3BE5498AD542A3A27AEE06 /* RestGameFreeModePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00BF01A61E64E60BBEA8B85 /* RestGameFreeModePolicy.swift */; };
+		9FCAB5ADE787EE8C9CAE3FE4 /* git_rescue_free.json in Resources */ = {isa = PBXBuildFile; fileRef = 4C1FD96A780758D405915CA4 /* git_rescue_free.json */; };
 		A07F0161F91641B082A29BC9 /* DevWordleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3609D848BF2A48FEA008D3AD /* DevWordleViewModel.swift */; };
 		A1B2C0022F7000010068804C /* GameCenterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C0012F7000010068804C /* GameCenterManager.swift */; };
 		A1B2C0042F7000010068804C /* GameCenterLeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C0032F7000010068804C /* GameCenterLeaderboardView.swift */; };
@@ -177,11 +187,13 @@
 		B0D5183425C046A28A393097 /* RestGamePickers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1576AB50B8D5426AB20781DC /* RestGamePickers.swift */; };
 		B1C2D3E52F8000020068804C /* RestGameProgrammingSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E42F8000020068804C /* RestGameProgrammingSearch.swift */; };
 		B2D9826FE8EB4E6AB635C19F /* RestGamePlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB20E6443F44E1AA0A1BE4 /* RestGamePlayView.swift */; };
+		B56D3A56087518A60356328F /* http_status_free.json in Resources */ = {isa = PBXBuildFile; fileRef = 4059FD99D3F93806BC39EF3D /* http_status_free.json */; };
 		BA4055F3DBCE4BE48E4403C1 /* DevSpotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD40B937DA164E089409B358 /* DevSpotView.swift */; };
 		C691DAF262AB406AA207296E /* DevWordleBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5728D8AF8F2408296178E2D /* DevWordleBoardView.swift */; };
 		C6EF614F898847D08AB8DB86 /* RestGamesHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA69EED4C427447E9102CB8B /* RestGamesHubView.swift */; };
 		C75A5F815869469288FE91B7 /* DevSpotEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C0EBF0FC18475F962933FF /* DevSpotEngine.swift */; };
 		C8EA0D7D9F4B44E2AC710283 /* RestGameEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B2ED2A42984CDF98E2D6FE /* RestGameEngine.swift */; };
+		D3E8FA4892864E557F38B9E4 /* regex_golf_free.json in Resources */ = {isa = PBXBuildFile; fileRef = FE4B26D5F3981F5D61FD8829 /* regex_golf_free.json */; };
 		D4E5F6012F8000010068804C /* DevLeetEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6022F8000010068804C /* DevLeetEngine.swift */; };
 		D4E5F6032F8000010068804C /* DevLeetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6042F8000010068804C /* DevLeetView.swift */; };
 		D4E5F6052F8000010068804C /* dev_leet_problems.json in Resources */ = {isa = PBXBuildFile; fileRef = D4E5F6062F8000010068804C /* dev_leet_problems.json */; };
@@ -205,20 +217,8 @@
 		ED505630C6584CBEA4276195 /* dev_words.json in Resources */ = {isa = PBXBuildFile; fileRef = 56398CBA6EC948BF8027A624 /* dev_words.json */; };
 		EF99794497654680863D2FBD /* RestGameTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAB388B57CD4A79AA767CB7 /* RestGameTheme.swift */; };
 		F1AD9D04C2204BE58A554E67 /* DevSpotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D183E25BBA7467DB659C974 /* DevSpotViewModel.swift */; };
-		06BAD6E66F5DE57585863CF2 /* ScenarioQuizEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7353FB1699F499996041099D /* ScenarioQuizEngine.swift */; };
-		1EA27466A63483E06E1F68D4 /* ScenarioQuizViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2107599A16128E2DB7E73C /* ScenarioQuizViewModel.swift */; };
-		47C047E951AE83F881306253 /* ScenarioQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A07CE37A1FFAAFD28F442C /* ScenarioQuizView.swift */; };
-		5D86E59A1CF93A42E5AA8B79 /* HttpStatusGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = D592EEA58F6464A26EC5D3C6 /* HttpStatusGame.swift */; };
-		571993F192F0BAF784BF1B87 /* GitRescueGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022BC3A98CB5BD9E4A4F4120 /* GitRescueGame.swift */; };
-		3D6A114927D682EE3A55C5D3 /* RegexGolfEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35225F5C28B402F560206535 /* RegexGolfEngine.swift */; };
-		4437E8073E65D6A3E32D0C77 /* RegexGolfViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA7ACC97CDE604AFC9F96F6 /* RegexGolfViewModel.swift */; };
-		FEF827BB63211266ADE20790 /* RegexGolfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */; };
-		4D18DC27055B09691088DE9D /* regex_golf_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = 8B00D89532958B32A0189EB5 /* regex_golf_daily.json */; };
-		D3E8FA4892864E557F38B9E4 /* regex_golf_free.json in Resources */ = {isa = PBXBuildFile; fileRef = FE4B26D5F3981F5D61FD8829 /* regex_golf_free.json */; };
-		5510150F5C93958E78FA925C /* git_rescue_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = 14F3D8CAE7A2DFED85AD34B9 /* git_rescue_daily.json */; };
-		9FCAB5ADE787EE8C9CAE3FE4 /* git_rescue_free.json in Resources */ = {isa = PBXBuildFile; fileRef = 4C1FD96A780758D405915CA4 /* git_rescue_free.json */; };
 		F60F282683B6AEBF9B35AAFC /* http_status_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = C1E9B8085AD6A08B6BCCB825 /* http_status_daily.json */; };
-		B56D3A56087518A60356328F /* http_status_free.json in Resources */ = {isa = PBXBuildFile; fileRef = 4059FD99D3F93806BC39EF3D /* http_status_free.json */; };
+		FEF827BB63211266ADE20790 /* RegexGolfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -271,15 +271,24 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		022BC3A98CB5BD9E4A4F4120 /* GitRescueGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitRescueGame.swift; sourceTree = "<group>"; };
 		0578C34654A4634FDF1FABC9 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		0AA7ACC97CDE604AFC9F96F6 /* RegexGolfViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexGolfViewModel.swift; sourceTree = "<group>"; };
+		14F3D8CAE7A2DFED85AD34B9 /* git_rescue_daily.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = git_rescue_daily.json; sourceTree = "<group>"; };
 		1576AB50B8D5426AB20781DC /* RestGamePickers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGamePickers.swift; sourceTree = "<group>"; };
 		24C0EBF0FC18475F962933FF /* DevSpotEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevSpotEngine.swift; sourceTree = "<group>"; };
 		2688CAC2769D44D3BC9C39FA /* DevWordleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleView.swift; sourceTree = "<group>"; };
+		35225F5C28B402F560206535 /* RegexGolfEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexGolfEngine.swift; sourceTree = "<group>"; };
 		3577F4A1EE7F48E5AC0735F4 /* RestFeedbackManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestFeedbackManager.swift; sourceTree = "<group>"; };
 		3609D848BF2A48FEA008D3AD /* DevWordleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleViewModel.swift; sourceTree = "<group>"; };
+		4059FD99D3F93806BC39EF3D /* http_status_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_status_free.json; sourceTree = "<group>"; };
+		4C1FD96A780758D405915CA4 /* git_rescue_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = git_rescue_free.json; sourceTree = "<group>"; };
+		52A07CE37A1FFAAFD28F442C /* ScenarioQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioQuizView.swift; sourceTree = "<group>"; };
 		56398CBA6EC948BF8027A624 /* dev_words.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dev_words.json; sourceTree = "<group>"; };
+		69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexGolfView.swift; sourceTree = "<group>"; };
 		6B5CCF96574748ECBF41FC31 /* DevWordleKeyboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleKeyboardView.swift; sourceTree = "<group>"; };
 		6FA87B49DE4E4C3D8D1D30FC /* dev_spot_words.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dev_spot_words.json; sourceTree = "<group>"; };
+		7353FB1699F499996041099D /* ScenarioQuizEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioQuizEngine.swift; sourceTree = "<group>"; };
 		790887272F0F16AD0068804C /* UserPublicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPublicationsView.swift; sourceTree = "<group>"; };
 		790AB0C02ECEAE9500E443E6 /* TextToSpeechManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextToSpeechManager.swift; sourceTree = "<group>"; };
 		790AB0C32ECEAEB100E443E6 /* AddFolderSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFolderSheet.swift; sourceTree = "<group>"; };
@@ -404,6 +413,8 @@
 		79F200172F6000170068804C /* ExternalWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalWebView.swift; sourceTree = "<group>"; };
 		7D183E25BBA7467DB659C974 /* DevSpotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevSpotViewModel.swift; sourceTree = "<group>"; };
 		835881F7443246A385749456 /* RestGameSharedViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameSharedViews.swift; sourceTree = "<group>"; };
+		8A2107599A16128E2DB7E73C /* ScenarioQuizViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioQuizViewModel.swift; sourceTree = "<group>"; };
+		8B00D89532958B32A0189EB5 /* regex_golf_daily.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = regex_golf_daily.json; sourceTree = "<group>"; };
 		A1B2C0012F7000010068804C /* GameCenterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterManager.swift; sourceTree = "<group>"; };
 		A1B2C0032F7000010068804C /* GameCenterLeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterLeaderboardView.swift; sourceTree = "<group>"; };
 		A1B2C0052F7000010068804C /* RestGamesBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGamesBanner.swift; sourceTree = "<group>"; };
@@ -415,12 +426,14 @@
 		B2B2ED2A42984CDF98E2D6FE /* RestGameEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameEngine.swift; sourceTree = "<group>"; };
 		BC86A73A42F548C99F4ECBE8 /* DevWordleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleEngine.swift; sourceTree = "<group>"; };
 		BD40B937DA164E089409B358 /* DevSpotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevSpotView.swift; sourceTree = "<group>"; };
+		C1E9B8085AD6A08B6BCCB825 /* http_status_daily.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_status_daily.json; sourceTree = "<group>"; };
 		CA69EED4C427447E9102CB8B /* RestGamesHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGamesHubView.swift; sourceTree = "<group>"; };
 		CEAB388B57CD4A79AA767CB7 /* RestGameTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameTheme.swift; sourceTree = "<group>"; };
 		D00BF01A61E64E60BBEA8B85 /* RestGameFreeModePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameFreeModePolicy.swift; sourceTree = "<group>"; };
 		D4E5F6022F8000010068804C /* DevLeetEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevLeetEngine.swift; sourceTree = "<group>"; };
 		D4E5F6042F8000010068804C /* DevLeetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevLeetView.swift; sourceTree = "<group>"; };
 		D4E5F6062F8000010068804C /* dev_leet_problems.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dev_leet_problems.json; sourceTree = "<group>"; };
+		D592EEA58F6464A26EC5D3C6 /* HttpStatusGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpStatusGame.swift; sourceTree = "<group>"; };
 		D87F7915FE654FB8BE6560FB /* ToneGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToneGenerator.swift; sourceTree = "<group>"; };
 		DCFB20E6443F44E1AA0A1BE4 /* RestGamePlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGamePlayView.swift; sourceTree = "<group>"; };
 		E5B100012F9000010068804D /* BigOEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigOEngine.swift; sourceTree = "<group>"; };
@@ -441,20 +454,7 @@
 		E5B200082F9000010068804D /* algo_spot_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = algo_spot_free.json; sourceTree = "<group>"; };
 		F5728D8AF8F2408296178E2D /* DevWordleBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleBoardView.swift; sourceTree = "<group>"; };
 		FBB2CD64BBD04D07906D36E4 /* RestGameScoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameScoring.swift; sourceTree = "<group>"; };
-		7353FB1699F499996041099D /* ScenarioQuizEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioQuizEngine.swift; sourceTree = "<group>"; };
-		8A2107599A16128E2DB7E73C /* ScenarioQuizViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioQuizViewModel.swift; sourceTree = "<group>"; };
-		52A07CE37A1FFAAFD28F442C /* ScenarioQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioQuizView.swift; sourceTree = "<group>"; };
-		D592EEA58F6464A26EC5D3C6 /* HttpStatusGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpStatusGame.swift; sourceTree = "<group>"; };
-		022BC3A98CB5BD9E4A4F4120 /* GitRescueGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitRescueGame.swift; sourceTree = "<group>"; };
-		35225F5C28B402F560206535 /* RegexGolfEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexGolfEngine.swift; sourceTree = "<group>"; };
-		0AA7ACC97CDE604AFC9F96F6 /* RegexGolfViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexGolfViewModel.swift; sourceTree = "<group>"; };
-		69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexGolfView.swift; sourceTree = "<group>"; };
-		8B00D89532958B32A0189EB5 /* regex_golf_daily.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = regex_golf_daily.json; sourceTree = "<group>"; };
 		FE4B26D5F3981F5D61FD8829 /* regex_golf_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = regex_golf_free.json; sourceTree = "<group>"; };
-		14F3D8CAE7A2DFED85AD34B9 /* git_rescue_daily.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = git_rescue_daily.json; sourceTree = "<group>"; };
-		4C1FD96A780758D405915CA4 /* git_rescue_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = git_rescue_free.json; sourceTree = "<group>"; };
-		C1E9B8085AD6A08B6BCCB825 /* http_status_daily.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_status_daily.json; sourceTree = "<group>"; };
-		4059FD99D3F93806BC39EF3D /* http_status_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_status_free.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -516,6 +516,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		05D378E3FE36C55B824AED1E /* HttpStatus */ = {
+			isa = PBXGroup;
+			children = (
+				4059FD99D3F93806BC39EF3D /* http_status_free.json */,
+				C1E9B8085AD6A08B6BCCB825 /* http_status_daily.json */,
+				D592EEA58F6464A26EC5D3C6 /* HttpStatusGame.swift */,
+			);
+			path = HttpStatus;
+			sourceTree = "<group>";
+		};
+		1AB7DBF9CB3E544246545821 /* RegexGolf */ = {
+			isa = PBXGroup;
+			children = (
+				FE4B26D5F3981F5D61FD8829 /* regex_golf_free.json */,
+				8B00D89532958B32A0189EB5 /* regex_golf_daily.json */,
+				69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */,
+				0AA7ACC97CDE604AFC9F96F6 /* RegexGolfViewModel.swift */,
+				35225F5C28B402F560206535 /* RegexGolfEngine.swift */,
+			);
+			path = RegexGolf;
+			sourceTree = "<group>";
+		};
+		2A03C647FBA02F9682612A57 /* ScenarioQuiz */ = {
+			isa = PBXGroup;
+			children = (
+				52A07CE37A1FFAAFD28F442C /* ScenarioQuizView.swift */,
+				8A2107599A16128E2DB7E73C /* ScenarioQuizViewModel.swift */,
+				7353FB1699F499996041099D /* ScenarioQuizEngine.swift */,
+			);
+			path = ScenarioQuiz;
+			sourceTree = "<group>";
+		};
 		3C7D1AE364B2414B8F232BCA /* RestGames */ = {
 			isa = PBXGroup;
 			children = (
@@ -971,6 +1003,16 @@
 			path = DevSpot;
 			sourceTree = "<group>";
 		};
+		BB8785017BDE06C49B0D6E20 /* GitRescue */ = {
+			isa = PBXGroup;
+			children = (
+				4C1FD96A780758D405915CA4 /* git_rescue_free.json */,
+				14F3D8CAE7A2DFED85AD34B9 /* git_rescue_daily.json */,
+				022BC3A98CB5BD9E4A4F4120 /* GitRescueGame.swift */,
+			);
+			path = GitRescue;
+			sourceTree = "<group>";
+		};
 		D4E5F6072F8000010068804C /* DevLeet */ = {
 			isa = PBXGroup;
 			children = (
@@ -1009,48 +1051,6 @@
 				E5B200082F9000010068804D /* algo_spot_free.json */,
 			);
 			path = AlgoSpot;
-			sourceTree = "<group>";
-		};
-		2A03C647FBA02F9682612A57 /* ScenarioQuiz */ = {
-			isa = PBXGroup;
-			children = (
-				52A07CE37A1FFAAFD28F442C /* ScenarioQuizView.swift */,
-				8A2107599A16128E2DB7E73C /* ScenarioQuizViewModel.swift */,
-				7353FB1699F499996041099D /* ScenarioQuizEngine.swift */,
-			);
-			path = ScenarioQuiz;
-			sourceTree = "<group>";
-		};
-		05D378E3FE36C55B824AED1E /* HttpStatus */ = {
-			isa = PBXGroup;
-			children = (
-				4059FD99D3F93806BC39EF3D /* http_status_free.json */,
-				C1E9B8085AD6A08B6BCCB825 /* http_status_daily.json */,
-				D592EEA58F6464A26EC5D3C6 /* HttpStatusGame.swift */,
-			);
-			path = HttpStatus;
-			sourceTree = "<group>";
-		};
-		BB8785017BDE06C49B0D6E20 /* GitRescue */ = {
-			isa = PBXGroup;
-			children = (
-				4C1FD96A780758D405915CA4 /* git_rescue_free.json */,
-				14F3D8CAE7A2DFED85AD34B9 /* git_rescue_daily.json */,
-				022BC3A98CB5BD9E4A4F4120 /* GitRescueGame.swift */,
-			);
-			path = GitRescue;
-			sourceTree = "<group>";
-		};
-		1AB7DBF9CB3E544246545821 /* RegexGolf */ = {
-			isa = PBXGroup;
-			children = (
-				FE4B26D5F3981F5D61FD8829 /* regex_golf_free.json */,
-				8B00D89532958B32A0189EB5 /* regex_golf_daily.json */,
-				69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */,
-				0AA7ACC97CDE604AFC9F96F6 /* RegexGolfViewModel.swift */,
-				35225F5C28B402F560206535 /* RegexGolfEngine.swift */,
-			);
-			path = RegexGolf;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1669,7 +1669,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.2.1;
+				MARKETING_VERSION = 4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.luizmello.newtabnews;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -1712,7 +1712,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.2.1;
+				MARKETING_VERSION = 4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.luizmello.newtabnews;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;

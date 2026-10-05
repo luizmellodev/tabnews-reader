@@ -856,13 +856,13 @@ struct SettingsView: View {
     }
 }
 
-#if DEBUG
 private struct DeletedAccountInfo: Identifiable {
     let username: String
     let email: String
     var id: String { username + email }
 }
 
+#if DEBUG
 private struct PushTokenDebugSheet: View {
     let info: FirebasePushNotificationService.DebugInfo
     @Environment(\.dismiss) private var dismiss
