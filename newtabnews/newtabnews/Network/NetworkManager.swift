@@ -4,19 +4,19 @@ import Foundation
 private actor RequestThrottler {
     static let shared = RequestThrottler()
 
-    private var lastRequestTime: Date = .distantPast
+    private var nextSlot: Date = .distantPast
     private let minimumInterval: TimeInterval = 0.35
 
     func waitIfNeeded() async {
-        let elapsed = Date().timeIntervalSince(lastRequestTime)
-        guard elapsed < minimumInterval else {
-            lastRequestTime = Date()
-            return
-        }
+        // Reserva o horário antes de dormir: o actor é reentrante durante o sleep, então
+        // calcular depois deixava várias chamadas paralelas acordarem e saírem juntas
+        let now = Date()
+        let slot = max(now, nextSlot)
+        nextSlot = slot.addingTimeInterval(minimumInterval)
 
-        let waitTime = minimumInterval - elapsed
+        let waitTime = slot.timeIntervalSince(now)
+        guard waitTime > 0 else { return }
         try? await Task.sleep(nanoseconds: UInt64(waitTime * 1_000_000_000))
-        lastRequestTime = Date()
     }
 }
 
@@ -131,6 +131,10 @@ class NetworkManager: NetworkManagerProtocol {
                 throw error
             } catch {
                 lastError = error
+                // Cancelada por quem chamou: repetir só gastaria tempo e a resposta seria descartada
+                if error is CancellationError || (error as? URLError)?.code == .cancelled {
+                    throw error
+                }
                 if isIdempotent, attempt < maxRetries - 1 {
                     continue
                 }

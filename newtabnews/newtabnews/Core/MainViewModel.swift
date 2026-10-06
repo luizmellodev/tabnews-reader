@@ -58,6 +58,9 @@ extension MainViewModel {
         } catch {
             if content.isEmpty {
                 self.state = .requestFailed
+            } else if state == .loading {
+                // Falhou com conteúdo antigo na tela: volta a mostrá-lo em vez de ficar no skeleton
+                self.state = .requestSucceeded
             }
             #if DEBUG
             print(error)
@@ -237,6 +240,13 @@ extension MainViewModel {
         }
     }
     
+    /// Pull to refresh: mantém a lista atual na tela (sem skeleton) e troca quando a resposta chega
+    @MainActor
+    func refresh() async {
+        await fetchContent(showLoading: false)
+        await fetchPost()
+    }
+
     @MainActor
     func resetPagination() async {
         currentPage = 1

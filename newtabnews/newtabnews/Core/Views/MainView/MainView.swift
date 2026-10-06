@@ -214,7 +214,9 @@ struct MainView: View {
     }
 
     private func refreshContent() async {
-        await viewModel.resetPagination()
+        // Task não estruturada: o SwiftUI cancela a task do .refreshable quando o gesto termina,
+        // o que abortava as requisições no meio e caía na tela de erro
+        await Task { await viewModel.refresh() }.value
     }
 
     private func refreshNewPuzzleBanner() {
