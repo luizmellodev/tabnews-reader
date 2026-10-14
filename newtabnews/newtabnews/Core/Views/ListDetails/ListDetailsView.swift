@@ -254,6 +254,8 @@ struct ListDetailView: View {
                 let response = try await contentService.getPost(user: username, slug: slug)
                 if let body = response.body, !body.isEmpty {
                     post = response
+                    // Devolve o texto pro card do feed, que pode estar no skeleton
+                    viewModel.applyLoadedBody(response)
                     isLoadingBody = false
                     bodyLoadFailed = false
                     return
