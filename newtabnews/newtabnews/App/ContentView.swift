@@ -159,6 +159,9 @@ struct ContentView: View {
                 syncToWatch()
                 AuthService.shared.validateSession()
                 AppReviewManager.shared.handleAppBecameActive()
+                if alreadyLoaded {
+                    Task { await viewModel.resumeIfNeeded() }
+                }
             } else if newPhase == .background {
                 AppReviewManager.shared.handleAppEnteredBackground()
             }
@@ -237,8 +240,14 @@ struct ContentView: View {
             Task {
                 // Busca conteúdo fresco (com skeleton se não tiver cache)
                 await viewModel.fetchContent(showLoading: viewModel.content.isEmpty)
+                // Só depois da lista do feed: as requisições são espaçadas uma a uma e o badge atrasava a Home
+                Task { await newsletterVM.refreshUnreadBadge() }
                 await viewModel.fetchPost()
                 alreadyLoaded = true
+                // O app pode ter ido pro background no meio do primeiro load; o .active já passou
+                if scenePhase == .active {
+                    await viewModel.resumeIfNeeded()
+                }
             }
         }
         

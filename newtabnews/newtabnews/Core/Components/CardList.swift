@@ -9,7 +9,9 @@ import SwiftUI
 
 struct CardList: View {
     var post: PostRequest
-    
+    // Opcional: o card também aparece fora do feed, onde o MainViewModel não está no ambiente
+    @Environment(MainViewModel.self) private var viewModel: MainViewModel?
+
     private var isFeatured: Bool {
         (post.tabcoins ?? 0) >= 10
     }
@@ -65,6 +67,11 @@ struct CardList: View {
                         .truncationMode(.tail)
                         .multilineTextAlignment(.leading)
                         .foregroundStyle(.primary)
+                } else if viewModel?.failedBodyKeys.contains(post.stableKey) == true {
+                    Text("Não deu para carregar a prévia agora. Toque em Ler mais ou puxe para atualizar.")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                        .foregroundStyle(.secondary)
                 } else {
                     CardBodySkeleton()
                 }

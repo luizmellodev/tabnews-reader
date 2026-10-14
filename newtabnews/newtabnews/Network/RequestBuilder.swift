@@ -21,7 +21,9 @@ struct RequestBuilder {
         
         var request = URLRequest(url: apiUrl)
         request.httpMethod = httpMethod
-        
+        // O padrão de 60s (x3 tentativas) deixava o feed preso no skeleton por minutos em rede ruim
+        request.timeoutInterval = 20
+
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         if let token = token {
