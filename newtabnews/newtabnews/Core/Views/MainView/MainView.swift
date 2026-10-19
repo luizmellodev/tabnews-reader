@@ -15,6 +15,7 @@ struct MainView: View {
     @Binding var isViewInApp: Bool
     @State private var isLoadingStrategy = false
     @AppStorage(PitchFilter.storageKey) private var hidePitchPosts = false
+    @AppStorage("pitchFilterTipDismissed") private var pitchFilterTipDismissed = false
     @AppStorage("debugShowDigestBanner") private var debugShowDigestBanner = false
     @AppStorage("debugShowDailyDigestBanner") private var debugShowDailyDigestBanner = false
     @State private var showDigestSheet = false
@@ -53,6 +54,13 @@ struct MainView: View {
         guard !isWeekend else { return false }
 
         return dailyDigestManager.shouldShowBanner()
+    }
+
+    /// Dica mostrada uma vez, só quando o feed carregado tem Pitch.
+    private var shouldShowPitchFilterTip: Bool {
+        !pitchFilterTipDismissed
+            && viewModel.state == .requestSucceeded
+            && viewModel.content.contains { PitchFilter.isPitch(title: $0.title) }
     }
 
     /// Avisa que o feed está sem Pitches, para o usuário não achar que faltam posts.
@@ -100,6 +108,22 @@ struct MainView: View {
                         pitchFilterNotice
                             .padding(.horizontal)
                             .transition(.opacity)
+                    } else if shouldShowPitchFilterTip {
+                        PitchFilterTip(
+                            onEnable: {
+                                withAnimation(.easeOut(duration: 0.2)) {
+                                    pitchFilterTipDismissed = true
+                                    hidePitchPosts = true
+                                }
+                            },
+                            onDismiss: {
+                                withAnimation(.easeOut(duration: 0.2)) {
+                                    pitchFilterTipDismissed = true
+                                }
+                            }
+                        )
+                        .padding(.horizontal)
+                        .transition(.move(edge: .top).combined(with: .opacity))
                     }
 
                     if let banner = newPuzzleBanner {
@@ -147,6 +171,7 @@ struct MainView: View {
             .animation(.easeOut(duration: 0.25), value: newPuzzleBanner)
             .animation(.spring(), value: shouldShowDigestBanner)
             .animation(.spring(), value: shouldShowDailyDigestBanner)
+            .animation(.easeOut(duration: 0.25), value: hidePitchPosts)
             .navigationTitle("Tab News")
             .navigationBarTitleDisplayMode(.large)
             .onChange(of: hidePitchPosts) { _, _ in
@@ -255,5 +280,62 @@ struct MainView: View {
 
     private func refreshNewPuzzleBanner() {
         newPuzzleBanner = RestGamesNewPuzzlePrompt.current()
+    }
+}
+
+private struct PitchFilterTip: View {
+    let onEnable: () -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "eye.slash")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Muitos posts de Pitch?")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+
+                    Text("Você pode tirar as divulgações de projetos do feed. Dá para mudar depois no Perfil.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
+                        .padding(6)
+                        .contentShape(Rectangle())
+                }
+                .accessibilityLabel("Dispensar dica")
+            }
+
+            Button(action: onEnable) {
+                Text("Ocultar Pitch")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 36)
+                    .background(
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(.black)
+                    )
+            }
+        }
+        .buttonStyle(.plain)
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .fill(Color("CardColor"))
+        )
     }
 }
