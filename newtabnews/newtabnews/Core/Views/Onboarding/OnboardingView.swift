@@ -123,8 +123,6 @@ struct OnboardingPageView: View {
     @State private var showContent = false
     @State private var showIcon = false
     @State private var showSecondaryImage = false
-    @State private var iconBounce = 0
-    @State private var secondaryWiggle = 0
     @State private var entranceTask: Task<Void, Never>?
     
     private var isActive: Bool { currentPage == pageIndex }
@@ -135,25 +133,22 @@ struct OnboardingPageView: View {
             
             // Animated icons
             ZStack {
-                // Secundário fica atrás e "sai" de trás do principal até o canto
-                Image(systemName: page.secondaryImageName)
-                    .font(.system(size: 35, weight: .light))
-                    .foregroundStyle(.primary.opacity(0.7))
-                    .symbolEffect(.wiggle, value: secondaryWiggle)
-                    .rotationEffect(.degrees(showSecondaryImage ? 15 : -20))
-                    .scaleEffect(showSecondaryImage ? 1 : 0.4)
-                    .offset(x: showSecondaryImage ? 38 : 0, y: showSecondaryImage ? -38 : 0)
-                    .opacity(showSecondaryImage ? 1 : 0)
-                
-                // Principal sobe saindo do desfoque e dá um bounce ao assentar
+                // Principal entra girando com zoom
                 Image(systemName: page.imageName)
                     .font(.system(size: 65, weight: .light))
                     .foregroundStyle(.primary)
-                    .symbolEffect(.bounce.up, value: iconBounce)
-                    .scaleEffect(showIcon ? 1 : 0.6)
-                    .offset(y: showIcon ? 0 : 24)
-                    .blur(radius: showIcon ? 0 : 12)
+                    .rotationEffect(.degrees(showIcon ? 360 : 0))
                     .opacity(showIcon ? 1 : 0)
+                    .scaleEffect(showIcon ? 1 : 0.5)
+                
+                // Secundário sai do centro e assenta inclinado no canto
+                Image(systemName: page.secondaryImageName)
+                    .font(.system(size: 35, weight: .light))
+                    .foregroundStyle(.primary.opacity(0.7))
+                    .offset(x: showSecondaryImage ? 30 : 0, y: showSecondaryImage ? -30 : 0)
+                    .rotationEffect(.degrees(showSecondaryImage ? 15 : 0))
+                    .opacity(showSecondaryImage ? 1 : 0)
+                    .scaleEffect(showSecondaryImage ? 1 : 0.5)
             }
             .frame(height: screenSize.height * 0.2)
             
@@ -250,29 +245,17 @@ struct OnboardingPageView: View {
             try? await Task.sleep(nanoseconds: 50_000_000)
             guard !Task.isCancelled, isActive else { return }
 
-            withAnimation(.spring(response: 0.55, dampingFraction: 0.72)) {
-                showIcon = true
-            }
-
-            try? await Task.sleep(nanoseconds: 150_000_000)
-            guard !Task.isCancelled, isActive else { return }
-
             withAnimation(.spring(duration: 0.7)) {
+                showIcon = true
                 showContent = true
             }
 
-            try? await Task.sleep(nanoseconds: 250_000_000)
+            try? await Task.sleep(nanoseconds: 300_000_000)
             guard !Task.isCancelled, isActive else { return }
 
-            iconBounce += 1
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
+            withAnimation(.spring(duration: 0.7)) {
                 showSecondaryImage = true
             }
-
-            try? await Task.sleep(nanoseconds: 450_000_000)
-            guard !Task.isCancelled, isActive else { return }
-
-            secondaryWiggle += 1
         }
     }
 }
