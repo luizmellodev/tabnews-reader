@@ -61,7 +61,7 @@
 		7915848D2EFC903C00C69745 /* SavedPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7915848C2EFC903C00C69745 /* SavedPost.swift */; };
 		7915848E2EFC903C00C69745 /* SavedPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7915848C2EFC903C00C69745 /* SavedPost.swift */; };
 		791584902EFC929C00C69745 /* PostCTAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7915848F2EFC929C00C69745 /* PostCTAView.swift */; };
-		791584982EFC97F900C69745 /* OnboardingTipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791584972EFC97F900C69745 /* OnboardingTipsView.swift */; };
+		791584982EFC97F900C69745 /* InlineTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791584972EFC97F900C69745 /* InlineTip.swift */; };
 		791B1EB92ED4CC7E00B9143D /* SkeletonCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791B1EB82ED4CC7E00B9143D /* SkeletonCard.swift */; };
 		791B1EBB2ED4CC9400B9143D /* SkeletonListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791B1EBA2ED4CC9400B9143D /* SkeletonListView.swift */; };
 		791B1F172ED4D10400B9143D /* HybridMarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791B1F162ED4D10400B9143D /* HybridMarkdownView.swift */; };
@@ -316,7 +316,7 @@
 		791584852EFC89F200C69745 /* UserFolderRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserFolderRow.swift; sourceTree = "<group>"; };
 		7915848C2EFC903C00C69745 /* SavedPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPost.swift; sourceTree = "<group>"; };
 		7915848F2EFC929C00C69745 /* PostCTAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCTAView.swift; sourceTree = "<group>"; };
-		791584972EFC97F900C69745 /* OnboardingTipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTipsView.swift; sourceTree = "<group>"; };
+		791584972EFC97F900C69745 /* InlineTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineTip.swift; sourceTree = "<group>"; };
 		791B1EB82ED4CC7E00B9143D /* SkeletonCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonCard.swift; sourceTree = "<group>"; };
 		791B1EBA2ED4CC9400B9143D /* SkeletonListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonListView.swift; sourceTree = "<group>"; };
 		791B1F162ED4D10400B9143D /* HybridMarkdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HybridMarkdownView.swift; sourceTree = "<group>"; };
@@ -973,7 +973,7 @@
 			children = (
 				79C7064A2D9AFCE5005C26A7 /* OnboardingView.swift */,
 				A1B2C0072F7000010068804C /* RestGamesAnnouncementSheet.swift */,
-				791584972EFC97F900C69745 /* OnboardingTipsView.swift */,
+				791584972EFC97F900C69745 /* InlineTip.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -1297,7 +1297,7 @@
 				796D05DB2F0AC5610064A2BC /* WidgetSyncManager.swift in Sources */,
 				79904A062A731F6F0050240C /* WebContentView.swift in Sources */,
 				790AB0CD2ECEAF1300E443E6 /* Highlight.swift in Sources */,
-				791584982EFC97F900C69745 /* OnboardingTipsView.swift in Sources */,
+				791584982EFC97F900C69745 /* InlineTip.swift in Sources */,
 				7915848D2EFC903C00C69745 /* SavedPost.swift in Sources */,
 				790AB0D12ECEB21C00E443E6 /* PostWithHighlightsView.swift in Sources */,
 				79904A0E2A732FC90050240C /* SettingsView.swift in Sources */,

@@ -15,7 +15,6 @@ struct ContentView: View {
         
     @AppStorage("current_theme") var currentTheme: Theme = .system
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
-    @AppStorage("hasSeenTipsOnboarding") var hasSeenTipsOnboarding: Bool = false
     @AppStorage(RestGamesAnnouncement.seenVersionKey) private var restGamesAnnouncementSeenVersion: String = ""
     
     @Environment(\.scenePhase) private var scenePhase
@@ -32,7 +31,6 @@ struct ContentView: View {
     @State var selectedTab: AppTab = .home
     @State var postToOpen: PostRequest? = nil
     @State var isLoadingPost: Bool = false
-    @State var showTipsOnboarding: Bool = false
 	@State var showDigestSheet: Bool = false
     @State private var showRestGamesAnnouncement = false
     @State private var showRestGamesHub = false
@@ -57,11 +55,6 @@ struct ContentView: View {
                     OnboardingView(showOnboarding: $hasSeenOnboarding)
                 } else {
                     mainContent
-
-                    if showTipsOnboarding {
-                        OnboardingTipsView(showOnboarding: $showTipsOnboarding)
-                        .transition(.opacity)
-                    }
                 }
             }
             .allowsHitTesting(!showSplash)
@@ -142,16 +135,7 @@ struct ContentView: View {
         .onAppear {
             setupObservers()
             RestGamesAnnouncement.prepareForLaunchIfNeeded()
-
-            if !hasSeenTipsOnboarding && hasSeenOnboarding {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    withAnimation {
-                        showTipsOnboarding = true
-                    }
-                }
-            } else {
-                evaluateRestGamesAnnouncement()
-            }
+            evaluateRestGamesAnnouncement()
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             if newPhase == .active {
@@ -163,25 +147,14 @@ struct ContentView: View {
                 AppReviewManager.shared.handleAppEnteredBackground()
             }
         }
-        .onChange(of: showTipsOnboarding) { _, newValue in
-            if !newValue {
-                hasSeenTipsOnboarding = true
-                evaluateRestGamesAnnouncement()
-            }
-        }
         .onChange(of: showSplash) { _, isShowing in
             if !isShowing {
                 evaluateRestGamesAnnouncement()
             }
         }
         .onChange(of: hasSeenOnboarding) { _, newValue in
-            // Quando terminar o onboarding inicial, mostrar tips automaticamente
-            if newValue && !hasSeenTipsOnboarding {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    withAnimation {
-                        showTipsOnboarding = true
-                    }
-                }
+            if newValue {
+                evaluateRestGamesAnnouncement()
             }
         }
         .onOpenURL { url in
@@ -215,14 +188,12 @@ struct ContentView: View {
 
     private func evaluateRestGamesAnnouncement() {
         guard hasSeenOnboarding,
-              hasSeenTipsOnboarding,
               shouldShowRestGamesAnnouncement,
               !showSplash,
-              !showTipsOnboarding,
               !showRestGamesAnnouncement else { return }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-            guard shouldShowRestGamesAnnouncement, !showTipsOnboarding, !showSplash else { return }
+            guard shouldShowRestGamesAnnouncement, !showSplash else { return }
             showRestGamesAnnouncement = true
         }
     }
@@ -312,20 +283,6 @@ struct ContentView: View {
             handleWatchLikedPosts(notification)
         }
         
-        NotificationCenter.default.addObserver(
-            forName: .showTipsOnboarding,
-            object: nil,
-            queue: .main
-        ) { [self] _ in
-            selectedTab = .home
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation {
-                    showTipsOnboarding = true
-                }
-            }
-        }
-
         NotificationCenter.default.addObserver(
             forName: .showRestGamesAnnouncement,
             object: nil,

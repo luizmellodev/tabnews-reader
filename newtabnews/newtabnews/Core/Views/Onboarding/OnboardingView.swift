@@ -14,7 +14,7 @@ struct OnboardingView: View {
     private let pages: [OnboardingPage] = [
         OnboardingPage(
             title: "TabNews",
-            subtitle: "O app não oficial da sua plataforma favorita de conteúdo de tecnologia",
+            subtitle: "O app não oficial da sua plataforma favorita de conteúdo de tecnologia. Projeto independente e open source, sem vínculo com o TabNews.",
             imageName: "square.text.square.fill",
             secondaryImageName: "square.text.square"
         ),
@@ -67,8 +67,6 @@ struct OnboardingView: View {
                                 withAnimation {
                                     showOnboarding = false
                                     UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
-                                    // Garantir que os tips vão aparecer após o onboarding inicial
-                                    UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
                                 }
                             }
                         )
@@ -94,19 +92,11 @@ struct OnboardingView: View {
     }
 }
 
-/// Também usado pelas dicas (OnboardingTipsView), para as duas telas terem o mesmo visual
 struct OnboardingPage {
     let title: String
     let subtitle: String
     let imageName: String
     let secondaryImageName: String
-    var illustration: OnboardingIllustration = .none
-}
-
-enum OnboardingIllustration {
-    case none
-    /// Réplica em preto e branco do menu de toque longo dos posts
-    case postMenu
 }
 
 struct OnboardingPageView: View {
@@ -166,12 +156,6 @@ struct OnboardingPageView: View {
                     .padding(.horizontal, 32)
                     .opacity(showContent ? 1 : 0)
                     .offset(y: showContent ? 0 : 20)
-
-                if page.illustration == .postMenu {
-                    OnboardingPostMenuIllustration()
-                        .opacity(showContent ? 1 : 0)
-                        .offset(y: showContent ? 0 : 20)
-                }
             }
             
             Spacer()
@@ -257,42 +241,5 @@ struct OnboardingPageView: View {
                 showSecondaryImage = true
             }
         }
-    }
-}
-
-/// Mesmos itens e ordem do contextMenu de PostRow, em preto e branco
-private struct OnboardingPostMenuIllustration: View {
-    private let items: [(title: String, icon: String)] = [
-        ("Curtir", "heart"),
-        ("Ler Depois", "bookmark"),
-        ("Ouvir Post", "speaker.wave.2"),
-        ("Salvar em Pasta", "folder.badge.plus")
-    ]
-
-    var body: some View {
-        VStack(spacing: 0) {
-            ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                HStack {
-                    Text(item.title)
-                    Spacer()
-                    Image(systemName: item.icon)
-                }
-                .font(.subheadline)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 11)
-
-                if index < items.count - 1 {
-                    Divider()
-                }
-            }
-        }
-        .foregroundStyle(.primary)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(Color.primary.opacity(0.1), lineWidth: 1)
-        }
-        .frame(maxWidth: 240)
-        .accessibilityElement(children: .combine)
     }
 }

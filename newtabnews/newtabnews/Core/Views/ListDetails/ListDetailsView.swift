@@ -28,6 +28,8 @@ struct ListDetailView: View {
     @State private var showAudioControls = false
     @State private var isLoadingBody = false
     @State private var bodyLoadFailed = false
+    @AppStorage(AppTip.highlight.storageKey) private var highlightTipDismissed = false
+    @AppStorage(AppTip.author.storageKey) private var authorTipDismissed = false
     @Query private var highlights: [Highlight]
     
     @AppStorage("showReadOnTabNewsButton") private var showReadOnTabNewsButton = false
@@ -71,6 +73,8 @@ struct ListDetailView: View {
                     Divider()
                         .padding(.vertical, 8)
                     
+                    postTip
+                    
                     if isHighlightMode {
                         HighlightModeIndicator()
                     }
@@ -110,6 +114,40 @@ struct ListDetailView: View {
     }
     
     // MARK: - View Builders
+
+    /// Uma dica por vez: primeiro Destacar/Anotar, depois o perfil do autor
+    @ViewBuilder
+    private var postTip: some View {
+        if !isNewsletter {
+            if !highlightTipDismissed {
+                InlineTip(
+                    icon: "highlighter",
+                    title: "Destaque e anote",
+                    message: "Toque no lápis e selecione um trecho para destacar. No ícone de nota, escreva suas ideias sobre o post.",
+                    onDismiss: {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            highlightTipDismissed = true
+                        }
+                    }
+                )
+                .padding(.bottom, 12)
+                .transition(.opacity)
+            } else if !authorTipDismissed {
+                InlineTip(
+                    icon: "person.crop.circle",
+                    title: "Conheça quem escreve",
+                    message: "Toque no @ do autor de um post ou comentário para ver o perfil, os TabCoins e as publicações.",
+                    onDismiss: {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            authorTipDismissed = true
+                        }
+                    }
+                )
+                .padding(.bottom, 12)
+                .transition(.opacity)
+            }
+        }
+    }
     
     private var postContent: some View {
         VStack(alignment: .leading, spacing: 0) {

@@ -303,8 +303,8 @@ struct SettingsView: View {
             }
 
             Button {
-                UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
-                NotificationCenter.default.post(name: .showTipsOnboarding, object: nil)
+                AppTip.resetAll()
+                ToastManager.shared.show(text: "As dicas vão aparecer de novo", icon: "lightbulb.fill")
             } label: {
                 Label("Ver Dicas Novamente", systemImage: "lightbulb.fill")
             }
@@ -346,7 +346,7 @@ struct SettingsView: View {
 
             Button {
                 UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
-                UserDefaults.standard.set(false, forKey: "hasSeenTipsOnboarding")
+                AppTip.resetAll()
                 exit(0)
             } label: {
                 Label("Resetar Onboarding Completo", systemImage: "arrow.counterclockwise.circle")
