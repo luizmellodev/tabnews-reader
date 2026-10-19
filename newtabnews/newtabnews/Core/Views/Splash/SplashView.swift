@@ -11,16 +11,15 @@ struct SplashView: View {
 
     private let title = "TabNews"
     private static let logoSize = CGSize(width: 84, height: 67)
-    /// Escala final do zoom: grande o bastante para o furo da pasta cobrir a tela toda.
-    private static let revealScale: CGFloat = 40
+    /// Escala final da saída: o logo "avança" em direção à tela enquanto some.
+    private static let exitScale: CGFloat = 6
 
     @State private var outlineProgress: CGFloat = 0
     @State private var fillOpacity: Double = 0
     @State private var logoScale: CGFloat = 1
     @State private var lettersShown = 0
     @State private var titleOpacity: Double = 1
-    /// A partir daqui o furo da pasta fica transparente e mostra o app por baixo.
-    @State private var isRevealing = false
+    @State private var logoOpacity: Double = 1
     @State private var splashOpacity: Double = 1
 
     var body: some View {
@@ -35,15 +34,11 @@ struct SplashView: View {
             logo
                 .frame(width: Self.logoSize.width, height: Self.logoSize.height)
                 .scaleEffect(logoScale)
+                .opacity(logoOpacity)
 
             animatedTitle
                 .opacity(titleOpacity)
                 .offset(y: Self.logoSize.height / 2 + 40)
-        }
-        .compositingGroup()
-        .mask {
-            SplashRevealMask(logoSize: Self.logoSize, scale: logoScale, isRevealing: isRevealing)
-                .fill(style: FillStyle(eoFill: true))
         }
         .opacity(splashOpacity)
         .ignoresSafeArea()
@@ -121,15 +116,18 @@ struct SplashView: View {
             }
             try? await Task.sleep(nanoseconds: 380_000_000)
 
-            // 4. Saída: a pasta do logo vira uma janela e cresce até revelar o app
-            isRevealing = true
+            // 4. Saída: o logo avança em direção à tela e se dissolve junto com a splash
             withAnimation(.easeOut(duration: 0.15)) {
                 titleOpacity = 0
             }
-            withAnimation(.timingCurve(0.7, 0, 0.84, 0, duration: 0.6)) {
-                logoScale = Self.revealScale
+            withAnimation(.easeIn(duration: 0.45)) {
+                logoScale = Self.exitScale
+                logoOpacity = 0
             }
-            try? await Task.sleep(nanoseconds: 600_000_000)
+            withAnimation(.easeIn(duration: 0.4).delay(0.1)) {
+                splashOpacity = 0
+            }
+            try? await Task.sleep(nanoseconds: 500_000_000)
 
             showSplash = false
         }
@@ -151,34 +149,6 @@ struct SplashView: View {
 
             showSplash = false
         }
-    }
-}
-
-/// Máscara da splash: a tela inteira, menos o furo da pasta do logo durante a revelação.
-/// Acompanha a mesma escala do logo, centralizada na tela.
-private struct SplashRevealMask: Shape {
-    let logoSize: CGSize
-    var scale: CGFloat
-    let isRevealing: Bool
-
-    var animatableData: CGFloat {
-        get { scale }
-        set { scale = newValue }
-    }
-
-    func path(in rect: CGRect) -> Path {
-        var path = Path(rect)
-        guard isRevealing else { return path }
-
-        let size = CGSize(width: logoSize.width * scale, height: logoSize.height * scale)
-        let logoRect = CGRect(
-            x: rect.midX - size.width / 2,
-            y: rect.midY - size.height / 2,
-            width: size.width,
-            height: size.height
-        )
-        path.addPath(TabNewsLogoGeometry.hole(in: logoRect))
-        return path
     }
 }
 
