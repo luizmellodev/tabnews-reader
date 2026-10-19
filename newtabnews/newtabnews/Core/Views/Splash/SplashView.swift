@@ -10,51 +10,50 @@ struct SplashView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let title = "TabNews"
+    private static let logoSize = CGSize(width: 84, height: 67)
+    /// Escala final do zoom: grande o bastante para o furo da pasta cobrir a tela toda.
+    private static let revealScale: CGFloat = 40
 
     @State private var outlineProgress: CGFloat = 0
     @State private var fillOpacity: Double = 0
     @State private var logoScale: CGFloat = 1
-    @State private var logoOffsetY: CGFloat = 0
-    @State private var logoOpacity: Double = 1
-    @State private var typedCount = 0
-    @State private var showCursor = false
-    @State private var cursorVisible = true
+    @State private var lettersShown = 0
     @State private var titleOpacity: Double = 1
+    /// A partir daqui o furo da pasta fica transparente e mostra o app por baixo.
+    @State private var isRevealing = false
     @State private var splashOpacity: Double = 1
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                Color("Background")
-                    .ignoresSafeArea()
+        ZStack {
+            Color("Background")
 
-                Image("ruido")
-                    .resizable()
-                    .scaledToFill()
-                    .blendMode(.overlay)
-                    .ignoresSafeArea()
+            Image("ruido")
+                .resizable()
+                .scaledToFill()
+                .blendMode(.overlay)
 
-                VStack(spacing: 22) {
-                    logo
-                        .frame(width: 84, height: 67)
-                        .scaleEffect(logoScale)
-                        .opacity(logoOpacity)
-                        .offset(y: logoOffsetY)
+            logo
+                .frame(width: Self.logoSize.width, height: Self.logoSize.height)
+                .scaleEffect(logoScale)
 
-                    typedTitle
-                        .opacity(titleOpacity)
-                }
-            }
-            .opacity(splashOpacity)
-            .onAppear {
-                if reduceMotion {
-                    runReducedMotionSequence()
-                } else {
-                    runAnimationSequence(in: geometry.size)
-                }
+            animatedTitle
+                .opacity(titleOpacity)
+                .offset(y: Self.logoSize.height / 2 + 40)
+        }
+        .compositingGroup()
+        .mask {
+            SplashRevealMask(logoSize: Self.logoSize, scale: logoScale, isRevealing: isRevealing)
+                .fill(style: FillStyle(eoFill: true))
+        }
+        .opacity(splashOpacity)
+        .ignoresSafeArea()
+        .onAppear {
+            if reduceMotion {
+                runReducedMotionSequence()
+            } else {
+                runAnimationSequence()
             }
         }
-        .ignoresSafeArea()
     }
 
     // MARK: - Subviews
@@ -65,6 +64,7 @@ struct SplashView: View {
             TabNewsLogoOutline()
                 .trim(from: 0, to: outlineProgress)
                 .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                .opacity(1 - fillOpacity)
 
             // Preenchimento final, igual ao asset TabnewsLogo
             TabNewsLogoShape()
@@ -73,18 +73,13 @@ struct SplashView: View {
         }
     }
 
-    private var typedTitle: some View {
-        // Texto completo invisível reserva a largura final, evitando que o título "ande" enquanto digita
-        ZStack(alignment: .leading) {
-            Text(title).opacity(0)
-
-            // Cursor acompanha as letras já digitadas
-            HStack(spacing: 1) {
-                Text(String(title.prefix(typedCount)))
-
-                Rectangle()
-                    .frame(width: 3, height: 28)
-                    .opacity(showCursor && cursorVisible ? 1 : 0)
+    private var animatedTitle: some View {
+        HStack(spacing: 0) {
+            ForEach(Array(title.enumerated()), id: \.offset) { index, letter in
+                Text(String(letter))
+                    .opacity(index < lettersShown ? 1 : 0)
+                    .offset(y: index < lettersShown ? 0 : 10)
+                    .blur(radius: index < lettersShown ? 0 : 4)
             }
         }
         .font(.title.weight(.semibold))
@@ -96,52 +91,45 @@ struct SplashView: View {
     // MARK: - Sequences
 
     @MainActor
-    private func runAnimationSequence(in size: CGSize) {
+    private func runAnimationSequence() {
         Task { @MainActor in
             // 1. Desenha o contorno
-            withAnimation(.easeInOut(duration: 0.7)) {
+            withAnimation(.easeInOut(duration: 0.55)) {
                 outlineProgress = 1
             }
-            try? await Task.sleep(nanoseconds: 650_000_000)
+            try? await Task.sleep(nanoseconds: 500_000_000)
 
             // 2. Preenche com um "pop"
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            withAnimation(.easeOut(duration: 0.25)) {
+            withAnimation(.easeOut(duration: 0.2)) {
                 fillOpacity = 1
             }
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.5)) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
                 logoScale = 1.12
             }
-            try? await Task.sleep(nanoseconds: 150_000_000)
+            try? await Task.sleep(nanoseconds: 120_000_000)
             withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                 logoScale = 1
             }
 
-            // 3. Digita o título com cursor piscando
-            showCursor = true
+            // 3. Título entra letra a letra
             for index in 1...title.count {
-                try? await Task.sleep(nanoseconds: 55_000_000)
-                typedCount = index
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                    lettersShown = index
+                }
+                try? await Task.sleep(nanoseconds: 35_000_000)
             }
-            for _ in 0..<3 {
-                try? await Task.sleep(nanoseconds: 180_000_000)
-                cursorVisible.toggle()
-            }
-            showCursor = false
+            try? await Task.sleep(nanoseconds: 380_000_000)
 
-            // 4. Saída: logo cresce e sobe enquanto tudo some
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                logoScale = 2.2
-                logoOffsetY = -size.height * 0.25
-                logoOpacity = 0
+            // 4. Saída: a pasta do logo vira uma janela e cresce até revelar o app
+            isRevealing = true
+            withAnimation(.easeOut(duration: 0.15)) {
                 titleOpacity = 0
             }
-            try? await Task.sleep(nanoseconds: 400_000_000)
-
-            withAnimation(.easeOut(duration: 0.3)) {
-                splashOpacity = 0
+            withAnimation(.timingCurve(0.7, 0, 0.84, 0, duration: 0.6)) {
+                logoScale = Self.revealScale
             }
-            try? await Task.sleep(nanoseconds: 300_000_000)
+            try? await Task.sleep(nanoseconds: 600_000_000)
 
             showSplash = false
         }
@@ -151,7 +139,7 @@ struct SplashView: View {
     private func runReducedMotionSequence() {
         outlineProgress = 1
         fillOpacity = 1
-        typedCount = title.count
+        lettersShown = title.count
 
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 300_000_000)
@@ -163,6 +151,34 @@ struct SplashView: View {
 
             showSplash = false
         }
+    }
+}
+
+/// Máscara da splash: a tela inteira, menos o furo da pasta do logo durante a revelação.
+/// Acompanha a mesma escala do logo, centralizada na tela.
+private struct SplashRevealMask: Shape {
+    let logoSize: CGSize
+    var scale: CGFloat
+    let isRevealing: Bool
+
+    var animatableData: CGFloat {
+        get { scale }
+        set { scale = newValue }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path(rect)
+        guard isRevealing else { return path }
+
+        let size = CGSize(width: logoSize.width * scale, height: logoSize.height * scale)
+        let logoRect = CGRect(
+            x: rect.midX - size.width / 2,
+            y: rect.midY - size.height / 2,
+            width: size.width,
+            height: size.height
+        )
+        path.addPath(TabNewsLogoGeometry.hole(in: logoRect))
+        return path
     }
 }
 
