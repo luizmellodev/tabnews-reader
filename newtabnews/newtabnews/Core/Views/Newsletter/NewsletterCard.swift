@@ -11,13 +11,12 @@ struct NewsletterCard: View {
     @Environment(MainViewModel.self) private var viewModel
     
     let newsletter: PostRequest
-    let isNew: Bool
+    let isUnseen: Bool
     
     @Binding var isViewInApp: Bool
     @Binding var currentTheme: Theme
     var zoomNamespace: Namespace.ID
-    
-    @State private var isPressed = false
+    var onOpen: () -> Void = {}
     
     var body: some View {
         NavigationLink {
@@ -28,41 +27,62 @@ struct NewsletterCard: View {
             )
             .environment(viewModel)
             .postZoomDestination(id: newsletter.zoomTransitionID, namespace: zoomNamespace)
+            .onAppear(perform: onOpen)
         } label: {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 0) {
+                if isUnseen {
+                    // Mesmo estilo do selo "Em destaque" da Home.
+                    Text("Novo")
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                        .textCase(.uppercase)
+                        .tracking(0.6)
+                        .foregroundStyle(.tertiary)
+                        .padding(.bottom, 6)
+                }
+                
+                Text(newsletter.title ?? "Sem título")
+                    .multilineTextAlignment(.leading)
+                    .font(.body)
+                    .lineSpacing(2)
+                    .lineLimit(3)
+                    .foregroundStyle(.primary)
+                    .padding(.bottom, 6)
+                
                 HStack {
-                    Text(newsletter.title ?? "Sem título")
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                        .lineLimit(2)
+                    if let sourceHost {
+                        Text(sourceHost)
+                            .lineLimit(1)
+                    }
                     
                     Spacer()
                     
-                    if isNew {
-                        Text("NOVO")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.background)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(
-                                Capsule()
-                                    .fill(.primary)
-                            )
+                    if let time {
+                        Text(time)
+                            .italic()
                     }
                 }
-                
-                Text(getFormattedDate(value: newsletter.createdAt ?? ""))
-                        .font(.caption)
-                        .foregroundStyle(.gray)
+                .font(.footnote)
+                .foregroundStyle(.gray)
             }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color("CardColor"))
-            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 14)
+            .contentShape(Rectangle())
+            .accessibilityElement(children: .combine)
+            .accessibilityValue(isUnseen ? "Novo" : "")
         }
         .postZoomSource(id: newsletter.zoomTransitionID, namespace: zoomNamespace)
         .buttonStyle(PlainButtonStyle())
+    }
+    
+    private var sourceHost: String? {
+        guard let source = newsletter.sourceUrl,
+              let host = URL(string: source)?.host(), !host.isEmpty else { return nil }
+        return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
+    }
+    
+    private var time: String? {
+        NewsletterViewModel.parseDate(newsletter.createdAt)?
+            .formatted(Date.FormatStyle(date: .omitted, time: .shortened).locale(Locale(identifier: "pt_BR")))
     }
 }

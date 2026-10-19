@@ -10,22 +10,14 @@ import Foundation
 
 struct NewsletterView: View {
     
-    @EnvironmentObject var viewModel: NewsletterViewModel
+    @Environment(NewsletterViewModel.self) private var viewModel
     @Binding var isViewInApp: Bool
     @Binding var currentTheme: Theme
     @Namespace private var zoomNamespace
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color("Background")
-                    .ignoresSafeArea()
-                Image("ruido")
-                    .resizable()
-                    .scaledToFill()
-                    .blendMode(.overlay)
-                    .ignoresSafeArea()
-                
+            Group {
                 switch viewModel.state {
                 case .loading:
                     ProgressView()
@@ -33,26 +25,19 @@ struct NewsletterView: View {
                     
                 case .requestSucceeded:
                     ScrollView {
-                        LazyVStack(spacing: 16) {
-                            headerView
-                            
-                            ForEach(viewModel.newsletter) { newsletter in
-                                NewsletterCard(
-                                    newsletter: newsletter,
-                                    isNew: NewsletterViewModel.isCreatedToday(createdAt: newsletter.createdAt),
-                                    isViewInApp: $isViewInApp,
-                                    currentTheme: $currentTheme,
-                                    zoomNamespace: zoomNamespace
-                                )
+                        LazyVStack(alignment: .leading, spacing: 28) {
+                            ForEach(viewModel.sections) { section in
+                                sectionView(section)
                             }
                         }
-                        .padding()
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                        .padding(.bottom)
                     }
                     .refreshable {
-                        await viewModel.fetchNewsletterContent()
+                        await viewModel.fetchNewsletterContent(showLoading: false)
                         viewModel.markNewslettersAsSeen()
                     }
-                    .padding(.top, 60)
                     
                 case .requestFailed:
                     FailureView(currentTheme: .constant(.dark)) {
@@ -65,9 +50,24 @@ struct NewsletterView: View {
                     Color.clear
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .navigationTitle("Newsletter")
+            .navigationBarTitleDisplayMode(.large)
+            .background {
+                ZStack {
+                    Color("Background")
+                        .ignoresSafeArea()
+                    Image("ruido")
+                        .resizable()
+                        .scaledToFill()
+                        .blendMode(.overlay)
+                        .ignoresSafeArea()
+                }
+            }
             .task {
                 if !viewModel.alreadyLoaded {
                     await viewModel.fetchNewsletterContent()
+                    viewModel.markNewslettersAsSeen()
                 }
                 
                 AppReviewManager.shared.recordNewsletterVisit()
@@ -75,19 +75,37 @@ struct NewsletterView: View {
             .onAppear {
                 viewModel.markNewslettersAsSeen()
             }
+            .onDisappear {
+                viewModel.clearUnseenHighlights()
+            }
         }
     }
     
-    private var headerView: some View {
-        VStack(spacing: 8) {
-            Text("Newsletter")
-                .font(.largeTitle)
-                .fontWeight(.bold)
+    private func sectionView(_ section: NewsletterSection) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(section.title)
+                .font(.caption)
+                .fontWeight(.medium)
+                .textCase(.uppercase)
+                .tracking(0.6)
+                .foregroundStyle(.secondary)
+                .padding(.bottom, 2)
+                .accessibilityAddTraits(.isHeader)
             
-            Text("Fique por dentro das novidades")
-                .font(.subheadline)
-                .foregroundStyle(.gray)
+            ForEach(Array(section.items.enumerated()), id: \.element.id) { index, newsletter in
+                if index > 0 {
+                    Divider()
+                }
+                
+                NewsletterCard(
+                    newsletter: newsletter,
+                    isUnseen: newsletter.id.map { viewModel.unseenIds.contains($0) } ?? false,
+                    isViewInApp: $isViewInApp,
+                    currentTheme: $currentTheme,
+                    zoomNamespace: zoomNamespace,
+                    onOpen: { viewModel.markAsRead(newsletter) }
+                )
+            }
         }
-        .padding(.vertical)
     }
 }
