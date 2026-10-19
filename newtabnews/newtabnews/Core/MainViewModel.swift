@@ -21,7 +21,13 @@ class MainViewModel {
     var currentPage: Int = 1
     var isLoadingMore: Bool = false
     var hasMorePages: Bool = true
+    /// Quantos Pitches o filtro tirou do feed carregado (mostrado na Home).
+    var hiddenPitchCount: Int = 0
     private let postsPerPage: Int = 10
+    /// Com o filtro de Pitch, uma página pode voltar quase vazia. Busca as seguintes
+    /// até ter pelo menos isso de posts novos (ou até `maxExtraPages`).
+    private let minimumVisiblePerFetch: Int = 5
+    private let maxExtraPages: Int = 3
     private let maxCachedPages: Int = 5
     
     let defaults = UserDefaults.standard
@@ -45,15 +51,10 @@ extension MainViewModel {
         self.hasMorePages = true
         
         do {
-            let newPosts = try await service.getContent(
-                page: "\(currentPage)",
-                perPage: "\(postsPerPage)",
-                strategy: currentStrategy.rawValue
-            )
+            let newPosts = try await fetchVisiblePosts(strategy: currentStrategy, excluding: [], resetHiddenCount: true)
             
             let previousContent = self.content
             self.content = mergePostsPreservingBodies(newPosts, existing: previousContent)
-            self.hasMorePages = newPosts.count == postsPerPage
             self.state = .requestSucceeded
         } catch {
             if content.isEmpty {
@@ -149,6 +150,50 @@ extension MainViewModel {
         }
     }
 
+    /// Busca `currentPage` já sem os Pitches (antes de baixar o texto dos posts) e, se sobrar pouco,
+    /// avança para as próximas páginas. Atualiza `currentPage` e `hasMorePages`.
+    /// Só a primeira página propaga erro; falha numa página extra só encerra a busca.
+    @MainActor
+    private func fetchVisiblePosts(
+        strategy: ContentStrategy,
+        excluding existingKeys: Set<String>,
+        resetHiddenCount: Bool = false
+    ) async throws -> [PostRequest] {
+        var seenKeys = existingKeys
+        var visible: [PostRequest] = []
+        var hidden = 0
+        var extraPages = 0
+
+        func load(page: Int) async throws {
+            let raw = try await service.getContent(
+                page: "\(page)",
+                perPage: "\(postsPerPage)",
+                strategy: strategy.rawValue
+            )
+            hasMorePages = raw.count == postsPerPage
+            let kept = PitchFilter.apply(to: raw)
+            hidden += raw.count - kept.count
+            for post in kept where seenKeys.insert(post.stableKey).inserted {
+                visible.append(post)
+            }
+        }
+
+        try await load(page: currentPage)
+        defer { hiddenPitchCount = (resetHiddenCount ? 0 : hiddenPitchCount) + hidden }
+
+        while visible.count < minimumVisiblePerFetch, hasMorePages, extraPages < maxExtraPages, strategy == currentStrategy {
+            extraPages += 1
+            do {
+                try await load(page: currentPage + 1)
+                currentPage += 1
+            } catch {
+                break
+            }
+        }
+
+        return visible
+    }
+
     private func mergePostsPreservingBodies(_ newPosts: [PostRequest], existing: [PostRequest]) -> [PostRequest] {
         let existingByKey = Dictionary(existing.map { ($0.stableKey, $0) }, uniquingKeysWith: { first, _ in first })
         
@@ -207,15 +252,10 @@ extension MainViewModel {
         let strategy = currentStrategy
 
         do {
-            let newPosts = try await service.getContent(
-                page: "\(currentPage)",
-                perPage: "\(postsPerPage)",
-                strategy: strategy.rawValue
+            let newPosts = try await fetchVisiblePosts(
+                strategy: strategy,
+                excluding: Set(content.map(\.stableKey))
             )
-
-            if newPosts.isEmpty || newPosts.count < postsPerPage {
-                hasMorePages = false
-            }
 
             let filled = await fetchBodies(for: newPosts)
 
@@ -247,6 +287,22 @@ extension MainViewModel {
         await fetchPost()
     }
 
+    /// Chamado quando a opção de ocultar Pitch muda no Perfil.
+    @MainActor
+    func pitchFilterChanged() async {
+        if PitchFilter.isEnabled {
+            let kept = PitchFilter.apply(to: content)
+            hiddenPitchCount = content.count - kept.count
+            content = kept
+            saveCachedContent(page: 1)
+        } else {
+            // Os Pitches nunca foram baixados: recarrega a partir da primeira página.
+            hiddenPitchCount = 0
+            clearOldCache()
+            await refresh()
+        }
+    }
+
     @MainActor
     func resetPagination() async {
         currentPage = 1
@@ -274,7 +330,8 @@ extension MainViewModel {
         if let cachedData = defaults.object(forKey: cacheKey) as? Data {
             let decoder = JSONDecoder()
             if let cachedPosts = try? decoder.decode([PostRequest].self, from: cachedData) {
-                self.content = cachedPosts
+                self.content = PitchFilter.apply(to: cachedPosts)
+                self.hiddenPitchCount = cachedPosts.count - self.content.count
                 self.state = .requestSucceeded
                 self.currentPage = 1
                 self.hasMorePages = true

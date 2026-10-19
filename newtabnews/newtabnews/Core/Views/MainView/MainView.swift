@@ -14,6 +14,7 @@ struct MainView: View {
 
     @Binding var isViewInApp: Bool
     @State private var isLoadingStrategy = false
+    @AppStorage(PitchFilter.storageKey) private var hidePitchPosts = false
     @AppStorage("debugShowDigestBanner") private var debugShowDigestBanner = false
     @AppStorage("debugShowDailyDigestBanner") private var debugShowDailyDigestBanner = false
     @State private var showDigestSheet = false
@@ -54,6 +55,29 @@ struct MainView: View {
         return dailyDigestManager.shouldShowBanner()
     }
 
+    /// Avisa que o feed está sem Pitches, para o usuário não achar que faltam posts.
+    private var pitchFilterNotice: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "eye.slash")
+            Text(viewModel.hiddenPitchCount == 1
+                 ? "1 post de Pitch oculto"
+                 : "\(viewModel.hiddenPitchCount) posts de Pitch ocultos")
+                .contentTransition(.numericText())
+            Spacer()
+            Button("Mostrar") {
+                withAnimation(.easeOut(duration: 0.2)) {
+                    hidePitchPosts = false
+                }
+            }
+            .fontWeight(.medium)
+            .foregroundStyle(.primary)
+        }
+        .font(.footnote)
+        .foregroundStyle(.secondary)
+        .animation(.default, value: viewModel.hiddenPitchCount)
+        .accessibilityElement(children: .contain)
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -71,6 +95,12 @@ struct MainView: View {
                     .padding(.horizontal)
                     .padding(.top, 4)
                     .padding(.bottom, 2)
+
+                    if hidePitchPosts {
+                        pitchFilterNotice
+                            .padding(.horizontal)
+                            .transition(.opacity)
+                    }
 
                     if let banner = newPuzzleBanner {
                         RestGamesNewPuzzleBanner(
@@ -119,6 +149,10 @@ struct MainView: View {
             .animation(.spring(), value: shouldShowDailyDigestBanner)
             .navigationTitle("Tab News")
             .navigationBarTitleDisplayMode(.large)
+            .onChange(of: hidePitchPosts) { _, _ in
+                // Também dispara quando a opção muda no Perfil.
+                Task { await viewModel.pitchFilterChanged() }
+            }
             .background {
                 ZStack {
                     Color("Background")

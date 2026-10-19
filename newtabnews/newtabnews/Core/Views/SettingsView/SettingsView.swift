@@ -32,6 +32,7 @@ struct SettingsView: View {
     @StateObject private var authService = AuthService.shared
     @AppStorage("showReadOnTabNewsButton") private var showReadOnTabNewsButton = false
     @AppStorage("isBetaTester") private var isBetaTester = false
+    @AppStorage(PitchFilter.storageKey) private var hidePitchPosts = false
     @State private var isRefreshing = false
     @State private var userPublicationsCount: Int?
     #if DEBUG
@@ -255,6 +256,8 @@ struct SettingsView: View {
             Toggle("Visualizar no App", isOn: $isViewInApp)
 
             Toggle("Botão 'Ler no TabNews'", isOn: $showReadOnTabNewsButton)
+
+            Toggle("Ocultar posts de Pitch", isOn: $hidePitchPosts)
 
             HStack {
                 Label("Notificações", systemImage: "bell.badge")

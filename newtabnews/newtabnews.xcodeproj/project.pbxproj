@@ -161,6 +161,7 @@
 		79F100042F5000020068804C /* ContentStrategyPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F100032F5000020068804C /* ContentStrategyPicker.swift */; };
 		79F100062F5000030068804C /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F100052F5000030068804C /* SearchView.swift */; };
 		79F200022F6000020068804C /* PostRequest+Discover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200012F6000010068804C /* PostRequest+Discover.swift */; };
+		F49D167256724012AE0FF720 /* PostRequest+Pitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = D282D37EFCC342B6B1A2557B /* PostRequest+Pitch.swift */; };
 		79F200062F6000060068804C /* DiscoverService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200052F6000050068804C /* DiscoverService.swift */; };
 		79F200082F6000080068804C /* DiscoverViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200072F6000070068804C /* DiscoverViewModel.swift */; };
 		79F2000A2F60000A0068804C /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200092F6000090068804C /* SearchViewModel.swift */; };
@@ -401,6 +402,7 @@
 		79F100032F5000020068804C /* ContentStrategyPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentStrategyPicker.swift; sourceTree = "<group>"; };
 		79F100052F5000030068804C /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		79F200012F6000010068804C /* PostRequest+Discover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PostRequest+Discover.swift"; sourceTree = "<group>"; };
+		D282D37EFCC342B6B1A2557B /* PostRequest+Pitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PostRequest+Pitch.swift"; sourceTree = "<group>"; };
 		79F200052F6000050068804C /* DiscoverService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverService.swift; sourceTree = "<group>"; };
 		79F200072F6000070068804C /* DiscoverViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewModel.swift; sourceTree = "<group>"; };
 		79F200092F6000090068804C /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
@@ -959,6 +961,7 @@
 				790AB0CA2ECEAF0500E443E6 /* Folder.swift */,
 				79C706392D95E766005C26A7 /* PostRequest.swift */,
 				79F200012F6000010068804C /* PostRequest+Discover.swift */,
+				D282D37EFCC342B6B1A2557B /* PostRequest+Pitch.swift */,
 				7915848C2EFC903C00C69745 /* SavedPost.swift */,
 				796D064A2F0AE61C0064A2BC /* User.swift */,
 			);
@@ -1332,6 +1335,7 @@
 				79F100042F5000020068804C /* ContentStrategyPicker.swift in Sources */,
 				79F100062F5000030068804C /* SearchView.swift in Sources */,
 				79F200022F6000020068804C /* PostRequest+Discover.swift in Sources */,
+				F49D167256724012AE0FF720 /* PostRequest+Pitch.swift in Sources */,
 				79F200062F6000060068804C /* DiscoverService.swift in Sources */,
 				79F200082F6000080068804C /* DiscoverViewModel.swift in Sources */,
 				79F2000A2F60000A0068804C /* SearchViewModel.swift in Sources */,
