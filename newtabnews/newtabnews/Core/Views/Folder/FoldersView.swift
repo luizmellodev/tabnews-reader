@@ -26,7 +26,6 @@ struct FoldersView: View {
     
     @State private var expandedFolders: Set<String> = [] // String ao invés de UUID
     @State private var showingAddFolder = false
-    @AppStorage(AppTip.library.storageKey) private var libraryTipDismissed = false
     @State private var selectedPost: PostRequest?
     @State private var selectedHighlights: [Highlight] = []
     @State private var isEditMode = false
@@ -53,9 +52,6 @@ struct FoldersView: View {
                 emptyState
             } else {
                     List {
-                        if !libraryTipDismissed {
-                            libraryTipSection
-                        }
                         if shouldShowDigestBanner {
                             digestSection
                         }
@@ -133,23 +129,6 @@ struct FoldersView: View {
     }
     
     // MARK: - View Builders
-
-    private var libraryTipSection: some View {
-        Section {
-            InlineTip(
-                icon: "books.vertical",
-                title: "Sua Biblioteca",
-                message: "Curtidos, Ler Depois, destaques e anotações ficam aqui. Toque na pasta com + no topo para criar uma pasta.",
-                onDismiss: {
-                    withAnimation(.easeOut(duration: 0.2)) {
-                        libraryTipDismissed = true
-                    }
-                }
-            )
-            .listRowInsets(EdgeInsets())
-            .listRowBackground(Color.clear)
-        }
-    }
     
     @ViewBuilder
     private var digestSection: some View {

@@ -11,7 +11,6 @@ enum AppTip: String, CaseIterable {
     case pitchFilter
     case highlight
     case author
-    case library
 
     var storageKey: String { "tip.\(rawValue).dismissed" }
 
