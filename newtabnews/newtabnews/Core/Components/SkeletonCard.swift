@@ -8,7 +8,10 @@
 import SwiftUI
 
 enum CardLayout {
-    static let bodyLineLimit = 6
+    /// Máximo de linhas da prévia: em card com título longo, o layout mostra menos
+    static let bodyLineLimit = 8
+    /// As barras do skeleton têm altura fixa e não encolhem, então ficam em 6 para caber com título longo
+    static let skeletonLineCount = 6
     static let cardHeight: CGFloat = 350
     static let bodyPreviewMinHeight: CGFloat = 108
 }
@@ -47,7 +50,7 @@ struct SkeletonShimmer: View {
 }
 
 struct CardBodySkeleton: View {
-    var lineCount: Int = CardLayout.bodyLineLimit
+    var lineCount: Int = CardLayout.skeletonLineCount
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {

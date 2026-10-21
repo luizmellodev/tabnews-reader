@@ -139,7 +139,7 @@ extension String {
         return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
-    func feedPreview(maxLength: Int = 200) -> String {
+    func feedPreview(maxLength: Int = 600) -> String {
         let flowingText = plainTextFromMarkdown
             .components(separatedBy: .whitespacesAndNewlines)
             .filter { !$0.isEmpty }

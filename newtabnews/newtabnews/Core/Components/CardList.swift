@@ -28,6 +28,8 @@ struct CardList: View {
                 .lineSpacing(2)
                 .foregroundColor(.primary)
                 .padding(.bottom, 8)
+                // O título ganha o espaço primeiro; a prévia usa o que sobrar
+                .layoutPriority(1)
                 .padding(.top, isFeatured ? 0 : 20)
             
             HStack {
