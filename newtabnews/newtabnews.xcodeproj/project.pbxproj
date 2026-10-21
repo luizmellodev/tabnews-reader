@@ -220,6 +220,9 @@
 		F1AD9D04C2204BE58A554E67 /* DevSpotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D183E25BBA7467DB659C974 /* DevSpotViewModel.swift */; };
 		F60F282683B6AEBF9B35AAFC /* http_status_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = C1E9B8085AD6A08B6BCCB825 /* http_status_daily.json */; };
 		FEF827BB63211266ADE20790 /* RegexGolfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */; };
+		4E19B940E08E4DA68EF1FB10 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 7A4450EF7E3A4A7C8F2AA342 /* Markdown */; };
+		22EBCC31A8D7448B918EC461 /* MarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E670A684CA94BAE987F0555 /* MarkdownRenderer.swift */; };
+		2208920A2C8B47EB8E280E5E /* MarkdownBlockViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA9D38AB8C741509951B785 /* MarkdownBlockViews.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -457,6 +460,8 @@
 		F5728D8AF8F2408296178E2D /* DevWordleBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleBoardView.swift; sourceTree = "<group>"; };
 		FBB2CD64BBD04D07906D36E4 /* RestGameScoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameScoring.swift; sourceTree = "<group>"; };
 		FE4B26D5F3981F5D61FD8829 /* regex_golf_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = regex_golf_free.json; sourceTree = "<group>"; };
+		4E670A684CA94BAE987F0555 /* MarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderer.swift; sourceTree = "<group>"; };
+		8BA9D38AB8C741509951B785 /* MarkdownBlockViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownBlockViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -503,6 +508,7 @@
 			files = (
 				79259D2B2EFB7D0F004BC057 /* FirebaseMessaging in Frameworks */,
 				79259D292EFB7D0F004BC057 /* FirebaseFirestore in Frameworks */,
+				4E19B940E08E4DA68EF1FB10 /* Markdown in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -789,6 +795,8 @@
 			isa = PBXGroup;
 			children = (
 				791B1F162ED4D10400B9143D /* HybridMarkdownView.swift */,
+				8BA9D38AB8C741509951B785 /* MarkdownBlockViews.swift */,
+				4E670A684CA94BAE987F0555 /* MarkdownRenderer.swift */,
 				791B1EBA2ED4CC9400B9143D /* SkeletonListView.swift */,
 				791B1EB82ED4CC7E00B9143D /* SkeletonCard.swift */,
 				790AB0D22ECEB9BE00E443E6 /* HighlightableTextView.swift */,
@@ -1102,6 +1110,9 @@
 				79C706412D9ADF07005C26A7 /* Notifications */,
 			);
 			name = newtabnews;
+			packageProductDependencies = (
+				7A4450EF7E3A4A7C8F2AA342 /* Markdown */,
+			);
 			productName = newtabnews;
 			productReference = 791E87D42A4FD99B00C2F0B4 /* newtabnews.app */;
 			productType = "com.apple.product-type.application";
@@ -1168,6 +1179,7 @@
 			mainGroup = 791E87CB2A4FD99B00C2F0B4;
 			packageReferences = (
 				79259D272EFB7D0F004BC057 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				8162DE44F8E042BB9FE5821B /* XCRemoteSwiftPackageReference "swift-markdown" */,
 			);
 			productRefGroup = 791E87D52A4FD99B00C2F0B4 /* Products */;
 			projectDirPath = "";
@@ -1262,6 +1274,8 @@
 			files = (
 				791E87DA2A4FD99B00C2F0B4 /* ContentView.swift in Sources */,
 				791B1F172ED4D10400B9143D /* HybridMarkdownView.swift in Sources */,
+				2208920A2C8B47EB8E280E5E /* MarkdownBlockViews.swift in Sources */,
+				22EBCC31A8D7448B918EC461 /* MarkdownRenderer.swift in Sources */,
 				79C7062A2D95E534005C26A7 /* NetworkError.swift in Sources */,
 				791039F22F32E674001AA78E /* NativeLoginView.swift in Sources */,
 				790AB0D32ECEB9BE00E443E6 /* HighlightableTextView.swift in Sources */,
@@ -1863,6 +1877,14 @@
 				minimumVersion = 12.7.0;
 			};
 		};
+		8162DE44F8E042BB9FE5821B /* XCRemoteSwiftPackageReference "swift-markdown" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/swiftlang/swift-markdown";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1875,6 +1897,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 79259D272EFB7D0F004BC057 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
+		};
+		7A4450EF7E3A4A7C8F2AA342 /* Markdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8162DE44F8E042BB9FE5821B /* XCRemoteSwiftPackageReference "swift-markdown" */;
+			productName = Markdown;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

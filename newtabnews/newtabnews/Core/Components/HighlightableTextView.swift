@@ -10,10 +10,10 @@ import SwiftData
 import UIKit
 
 struct HighlightableTextView: UIViewRepresentable {
-    let text: String
-    let postId: String
-    let highlights: [Highlight]
+    let attributedText: NSAttributedString
+    let highlights: [ResolvedHighlight]
     let isHighlightMode: Bool
+    var allowsTextSelection = false
     let onHighlight: (String, NSRange) -> Void
     let onRemoveHighlight: (Highlight) -> Void
     
@@ -26,6 +26,7 @@ struct HighlightableTextView: UIViewRepresentable {
         textView.textContainer.lineFragmentPadding = 0
         textView.textContainer.lineBreakMode = .byWordWrapping
         textView.delegate = context.coordinator
+        textView.adjustsFontForContentSizeCategory = true
         
         // Permitir seleção de texto
         textView.isSelectable = true
@@ -47,320 +48,24 @@ struct HighlightableTextView: UIViewRepresentable {
         // Sempre permitir seleção para que links funcionem
         textView.isSelectable = true
         
-        // Controlar se o texto pode ser selecionado pelo usuário
         // No modo normal, os links funcionam mas o usuário não pode selecionar texto
-        if !isHighlightMode {
+        if !isHighlightMode && !allowsTextSelection {
             textView.selectedTextRange = nil
         }
         
-        // Criar attributed string com markdown básico
-        let attributedString = processMarkdown(text)
-        
-        // Aplicar highlights existentes
-        for highlight in highlights {
-            if highlight.rangeStart >= 0 && highlight.rangeStart + highlight.rangeLength <= attributedString.length {
-                let range = NSRange(location: highlight.rangeStart, length: highlight.rangeLength)
-                attributedString.addAttribute(
-                    .backgroundColor,
-                    value: UIColor(Color(hex: highlight.colorHex)).withAlphaComponent(0.4),
-                    range: range
-                )
-            }
+        let rendered = NSMutableAttributedString(attributedString: attributedText)
+        for resolved in highlights where NSMaxRange(resolved.range) <= rendered.length {
+            rendered.addAttribute(
+                .backgroundColor,
+                value: UIColor(Color(hex: resolved.highlight.colorHex)).withAlphaComponent(0.4),
+                range: resolved.range
+            )
         }
         
-        textView.attributedText = attributedString
-        
-        // Invalidar layout para recalcular altura
-        textView.invalidateIntrinsicContentSize()
-    }
-    
-    private func processMarkdown(_ markdown: String) -> NSMutableAttributedString {
-        var processedText = markdown
-        let attributedString = NSMutableAttributedString()
-        
-        // Processar linha por linha para manter a estrutura
-        let lines = processedText.components(separatedBy: "\n")
-        var inCodeBlock = false
-        
-        for (index, line) in lines.enumerated() {
-            var lineAttributedString = NSMutableAttributedString()
-            var currentLine = line
-            
-            // Estilo base
-            let baseParagraphStyle = NSMutableParagraphStyle()
-            baseParagraphStyle.lineSpacing = 6
-            baseParagraphStyle.alignment = .justified
-            baseParagraphStyle.lineBreakMode = .byWordWrapping
-            
-            // Headers (# ## ### etc)
-            if let headerMatch = line.range(of: "^(#{1,6})\\s+(.+)$", options: .regularExpression) {
-                let headerLevel = line[headerMatch].prefix(while: { $0 == "#" }).count
-                let headerText = String(line.dropFirst(headerLevel).trimmingCharacters(in: .whitespaces))
-                let fontSize: CGFloat = max(18, 26 - CGFloat(headerLevel * 2))
-                let fontWeight: UIFont.Weight = headerLevel <= 2 ? .semibold : .medium
-                
-                lineAttributedString = NSMutableAttributedString(string: headerText)
-                let headerParagraph = NSMutableParagraphStyle()
-                headerParagraph.lineSpacing = 4
-                headerParagraph.alignment = .left
-                
-                lineAttributedString.addAttributes([
-                    .font: UIFont.systemFont(ofSize: fontSize, weight: fontWeight),
-                    .foregroundColor: UIColor.label,
-                    .paragraphStyle: headerParagraph
-                ], range: NSRange(location: 0, length: lineAttributedString.length))
-            }
-            // Divider (--- ou ***)
-            else if line.trimmingCharacters(in: .whitespaces).range(of: "^(---|\\*\\*\\*)$", options: .regularExpression) != nil {
-                lineAttributedString = NSMutableAttributedString(string: "―――――――――――――――――――")
-                lineAttributedString.addAttributes([
-                    .font: UIFont.systemFont(ofSize: 12),
-                    .foregroundColor: UIColor.separator
-                ], range: NSRange(location: 0, length: lineAttributedString.length))
-            }
-            // Lista (- item) - apenas hífen+espaço como no MDText
-            else if line.trimmingCharacters(in: .whitespaces).hasPrefix("- ") {
-                let pattern = "^-\\s+(.+)"
-                if let regex = try? NSRegularExpression(pattern: pattern, options: .anchorsMatchLines),
-                   let match = regex.firstMatch(in: line, range: NSRange(location: 0, length: line.count)) {
-                    let itemRange = match.range(at: 1)
-                    let itemText = (line as NSString).substring(with: itemRange)
-                    
-                    lineAttributedString = NSMutableAttributedString(string: "• \(itemText)")
-                let listParagraph = NSMutableParagraphStyle()
-                    listParagraph.firstLineHeadIndent = 0
-                    listParagraph.headIndent = 20
-                    listParagraph.lineSpacing = 6
-                    listParagraph.alignment = .left
-                listParagraph.lineBreakMode = .byWordWrapping
-                    
-                    lineAttributedString.addAttributes([
-                        .font: UIFont.systemFont(ofSize: 17, weight: .light),
-                        .foregroundColor: UIColor.label,
-                        .paragraphStyle: listParagraph
-                    ], range: NSRange(location: 0, length: lineAttributedString.length))
-                } else {
-                    // Fallback
-                    let itemText = String(line.dropFirst(2))
-                    lineAttributedString = NSMutableAttributedString(string: "• \(itemText)")
-                    lineAttributedString.addAttributes([
-                        .font: UIFont.systemFont(ofSize: 17, weight: .light),
-                        .foregroundColor: UIColor.label
-                    ], range: NSRange(location: 0, length: lineAttributedString.length))
-                }
-            }
-            // Bloco de código (```...```)
-            else if line.trimmingCharacters(in: .whitespaces).hasPrefix("```") {
-                inCodeBlock.toggle()
-                // Linha do marcador ``` não é mostrada
-                continue
-            }
-            // Linha dentro de bloco de código
-            else if inCodeBlock {
-                lineAttributedString = NSMutableAttributedString(string: currentLine)
-                lineAttributedString.addAttributes([
-                    .font: UIFont.monospacedSystemFont(ofSize: 14, weight: .regular),
-                    .backgroundColor: UIColor.systemGray6,
-                    .foregroundColor: UIColor.label
-                ], range: NSRange(location: 0, length: lineAttributedString.length))
-            }
-            // Quote (> texto)
-            else if line.trimmingCharacters(in: .whitespaces).hasPrefix(">") {
-                let quoteText = String(line.dropFirst().trimmingCharacters(in: .whitespaces))
-                lineAttributedString = NSMutableAttributedString(string: "│ \(quoteText)")
-                let quoteParagraph = NSMutableParagraphStyle()
-                quoteParagraph.lineSpacing = 6
-                quoteParagraph.alignment = .left
-                quoteParagraph.lineBreakMode = .byWordWrapping
-                
-                lineAttributedString.addAttributes([
-                    .font: UIFont.systemFont(ofSize: 17, weight: .light),
-                    .foregroundColor: UIColor.secondaryLabel,
-                    .paragraphStyle: quoteParagraph
-                ], range: NSRange(location: 0, length: lineAttributedString.length))
-            }
-            // Linha normal
-            else {
-                lineAttributedString = NSMutableAttributedString(string: currentLine)
-                lineAttributedString.addAttributes([
-                    .font: UIFont.systemFont(ofSize: 17, weight: .light),
-                    .foregroundColor: UIColor.label,
-                    .paragraphStyle: baseParagraphStyle
-                ], range: NSRange(location: 0, length: lineAttributedString.length))
-            }
-            
-            // Aplicar formatação inline (bold, italic, code, links) na linha
-            applyInlineFormatting(to: lineAttributedString)
-            
-            attributedString.append(lineAttributedString)
-            
-            // Adicionar quebra de linha (exceto na última linha)
-            if index < lines.count - 1 {
-                attributedString.append(NSAttributedString(string: "\n"))
-            }
-        }
-        
-        return attributedString
-    }
-    
-    private func applyInlineFormatting(to attributedString: NSMutableAttributedString) {
-        let text = attributedString.string
-        let fullRange = NSRange(location: 0, length: attributedString.length)
-        
-        // Bold (**texto** ou __texto__)
-        let boldPattern = "(\\*\\*|__)(.+?)\\1"
-        if let boldRegex = try? NSRegularExpression(pattern: boldPattern) {
-            let matches = boldRegex.matches(in: text, range: fullRange).reversed()
-            for match in matches {
-                let fullMatch = match.range
-                let contentRange = match.range(at: 2)
-                let content = (text as NSString).substring(with: contentRange)
-                
-                let boldText = NSAttributedString(string: content, attributes: [
-                    .font: UIFont.systemFont(ofSize: 17, weight: .semibold),
-                    .foregroundColor: UIColor.label
-                ])
-                attributedString.replaceCharacters(in: fullMatch, with: boldText)
-            }
-        }
-        
-        // Italic (*texto* ou _texto_)
-        let italicPattern = "(?<!\\*)\\*(?!\\*)([^*]+)\\*(?!\\*)|(?<!_)_(?!_)([^_]+)_(?!_)"
-        if let italicRegex = try? NSRegularExpression(pattern: italicPattern) {
-            let matches = italicRegex.matches(in: attributedString.string, range: NSRange(location: 0, length: attributedString.length)).reversed()
-            for match in matches {
-                let fullMatch = match.range
-                let contentRange = match.range(at: 1).location != NSNotFound ? match.range(at: 1) : match.range(at: 2)
-                let content = (attributedString.string as NSString).substring(with: contentRange)
-                
-                // Criar fonte italic light manualmente
-                let baseFont = UIFont.systemFont(ofSize: 17, weight: .light)
-                let italicDescriptor = baseFont.fontDescriptor.withSymbolicTraits(.traitItalic)
-                let italicFont = italicDescriptor.flatMap { UIFont(descriptor: $0, size: 17) } ?? UIFont.italicSystemFont(ofSize: 17)
-                
-                let italicText = NSAttributedString(string: content, attributes: [
-                    .font: italicFont,
-                    .foregroundColor: UIColor.label
-                ])
-                attributedString.replaceCharacters(in: fullMatch, with: italicText)
-            }
-        }
-        
-        // Code inline (`code`)
-        let codePattern = "`([^`]+)`"
-        if let codeRegex = try? NSRegularExpression(pattern: codePattern) {
-            let matches = codeRegex.matches(in: attributedString.string, range: NSRange(location: 0, length: attributedString.length)).reversed()
-            for match in matches {
-                let fullMatch = match.range
-                let contentRange = match.range(at: 1)
-                let content = (attributedString.string as NSString).substring(with: contentRange)
-                
-                let codeText = NSAttributedString(string: content, attributes: [
-                    .font: UIFont.monospacedSystemFont(ofSize: 16, weight: .regular),
-                    .backgroundColor: UIColor.systemGray5,
-                    .foregroundColor: UIColor.systemPink
-                ])
-                attributedString.replaceCharacters(in: fullMatch, with: codeText)
-            }
-        }
-        
-        // Hyperlinks <url> - processar PRIMEIRO
-        let hyperlinkPattern = "<((?i)https?://(?:www\\.)?\\S+(?:/|\\b))>"
-        if let hyperlinkRegex = try? NSRegularExpression(pattern: hyperlinkPattern) {
-            let matches = hyperlinkRegex.matches(in: attributedString.string, range: NSRange(location: 0, length: attributedString.length)).reversed()
-            for match in matches {
-                let fullMatch = match.range
-                let urlRange = match.range(at: 1)
-                let urlString = (attributedString.string as NSString).substring(with: urlRange)
-                
-                if let url = URL(string: urlString) {
-                    let linkedText = NSAttributedString(string: urlString, attributes: [
-                        .font: UIFont.systemFont(ofSize: 17, weight: .light),
-                        .link: url,
-                        .foregroundColor: UIColor.systemBlue,
-                        .underlineStyle: NSUnderlineStyle.single.rawValue
-                    ])
-                    attributedString.replaceCharacters(in: fullMatch, with: linkedText)
-                }
-            }
-        }
-        
-        // Autolinks (URLs soltas) - processar DEPOIS dos hyperlinks
-        let autolinkPattern = "(?<!\\]\\()https?://[^\\s<>]+\\.[^\\s<>]+"
-        if let autolinkRegex = try? NSRegularExpression(pattern: autolinkPattern) {
-            let matches = autolinkRegex.matches(in: attributedString.string, range: NSRange(location: 0, length: attributedString.length)).reversed()
-            for match in matches {
-                let fullMatch = match.range
-                let urlString = (attributedString.string as NSString).substring(with: fullMatch)
-                
-                if let url = URL(string: urlString) {
-                    let linkedText = NSAttributedString(string: urlString, attributes: [
-                        .font: UIFont.systemFont(ofSize: 17, weight: .light),
-                        .link: url,
-                        .foregroundColor: UIColor.systemBlue,
-                        .underlineStyle: NSUnderlineStyle.single.rawValue
-                    ])
-                    attributedString.replaceCharacters(in: fullMatch, with: linkedText)
-                }
-            }
-        }
-        
-        // Imagens ![alt](url) - processar ANTES dos links markdown
-        let imagePattern = "!\\[([^\\]]*)\\]\\(([^\\)]+)\\)"
-        if let imageRegex = try? NSRegularExpression(pattern: imagePattern) {
-            let matches = imageRegex.matches(in: attributedString.string, range: NSRange(location: 0, length: attributedString.length)).reversed()
-            for match in matches {
-                let fullMatch = match.range
-                let altRange = match.range(at: 1)
-                let urlRange = match.range(at: 2)
-                
-                let alt = (attributedString.string as NSString).substring(with: altRange)
-                let urlString = (attributedString.string as NSString).substring(with: urlRange)
-                
-                // Mostrar como bloco de imagem com estilo diferenciado
-                let imageDisplayText = "🖼️ \(alt.isEmpty ? "Imagem" : alt)"
-                
-                if let url = URL(string: urlString) {
-                    let imageText = NSMutableAttributedString(string: imageDisplayText, attributes: [
-                        .font: UIFont.systemFont(ofSize: 17, weight: .light),
-                        .link: url,
-                        .foregroundColor: UIColor.systemIndigo,
-                        .backgroundColor: UIColor.systemGray6
-                    ])
-                    attributedString.replaceCharacters(in: fullMatch, with: imageText)
-                } else {
-                    // Se não tiver URL válida, só mostra o texto
-                    let imageText = NSAttributedString(string: imageDisplayText, attributes: [
-                        .font: UIFont.systemFont(ofSize: 17, weight: .light),
-                        .foregroundColor: UIColor.systemGray
-                    ])
-                    attributedString.replaceCharacters(in: fullMatch, with: imageText)
-                }
-            }
-        }
-        
-        // Links [texto](url) - processar DEPOIS das imagens
-        let linkPattern = "\\[([^\\]]+)\\]\\(([^\\)]+)\\)"
-        if let linkRegex = try? NSRegularExpression(pattern: linkPattern) {
-            let matches = linkRegex.matches(in: attributedString.string, range: NSRange(location: 0, length: attributedString.length)).reversed()
-            for match in matches {
-                let fullMatch = match.range
-                let textRange = match.range(at: 1)
-                let urlRange = match.range(at: 2)
-                
-                let linkText = (attributedString.string as NSString).substring(with: textRange)
-                let urlString = (attributedString.string as NSString).substring(with: urlRange)
-                
-                if let url = URL(string: urlString) {
-                    let linkedText = NSAttributedString(string: linkText, attributes: [
-                        .font: UIFont.systemFont(ofSize: 17, weight: .light),
-                        .link: url,
-                        .foregroundColor: UIColor.systemBlue,
-                        .underlineStyle: NSUnderlineStyle.single.rawValue
-                    ])
-                    attributedString.replaceCharacters(in: fullMatch, with: linkedText)
-                }
-            }
+        // Só troca o texto quando mudou: reatribuir reseta a seleção e o layout
+        if !textView.attributedText.isEqual(to: rendered) {
+            textView.attributedText = rendered
+            textView.invalidateIntrinsicContentSize()
         }
     }
     
@@ -391,7 +96,7 @@ struct HighlightableTextView: UIViewRepresentable {
         func textViewDidChangeSelection(_ textView: UITextView) {
             // Se não estiver no modo destaque, limpar seleção
             // (mas ainda permite cliques em links)
-            if !parent.isHighlightMode, let selectedRange = textView.selectedTextRange {
+            if !parent.isHighlightMode, !parent.allowsTextSelection, let selectedRange = textView.selectedTextRange {
                 // Verificar se há texto selecionado (não é apenas o cursor)
                 if !selectedRange.isEmpty {
                     textView.selectedTextRange = nil
@@ -404,10 +109,9 @@ struct HighlightableTextView: UIViewRepresentable {
             let selectedText = (textView.text as NSString).substring(with: range)
             
             // Verificar se o texto selecionado está em um highlight existente
-            let existingHighlight = parent.highlights.first { highlight in
-                let highlightRange = NSRange(location: highlight.rangeStart, length: highlight.rangeLength)
-                return NSIntersectionRange(range, highlightRange).length > 0
-            }
+            let existingHighlight = parent.highlights.first { resolved in
+                NSIntersectionRange(range, resolved.range).length > 0
+            }?.highlight
             
             var actions: [UIMenuElement] = []
             
@@ -436,7 +140,10 @@ struct HighlightableTextView: UIViewRepresentable {
                 actions.append(removeAction)
             }
             
-            guard !actions.isEmpty else { return nil }
+            // Seleção livre (comentários): mantém o menu padrão com Copiar
+            guard !actions.isEmpty else {
+                return parent.allowsTextSelection ? UIMenu(children: suggestedActions) : nil
+            }
             
             return UIMenu(title: "", children: actions)
         }

@@ -60,83 +60,9 @@ extension String {
         }
     }
     
-    /// Remove markdown comum para previews de texto puro (feed, TTS, etc.)
+    /// Texto puro do Markdown para prévia do feed e leitura em voz alta
     var plainTextFromMarkdown: String {
-        var cleaned = self
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"!\[([^\]]*)\]\(([^\)]+)\)"#,
-            with: "",
-            options: .regularExpression
-        )
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"\[([^\]]+)\]\(([^\)]+)\)"#,
-            with: "$1",
-            options: .regularExpression
-        )
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"https?://[^\s<>]+"#,
-            with: "",
-            options: .regularExpression
-        )
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"\*\*([^*]+)\*\*"#,
-            with: "$1",
-            options: .regularExpression
-        )
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"(?<!\*)\*([^*]+)\*(?!\*)"#,
-            with: "$1",
-            options: .regularExpression
-        )
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"(?m)^#{1,6}\s+"#,
-            with: "",
-            options: .regularExpression
-        )
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"(?m)^---+\s*$"#,
-            with: "",
-            options: .regularExpression
-        )
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"(?m)^-\s+"#,
-            with: "",
-            options: .regularExpression
-        )
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"`([^`]+)`"#,
-            with: "$1",
-            options: .regularExpression
-        )
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"<!--[\s\S]*?-->"#,
-            with: "",
-            options: .regularExpression
-        )
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"\n{3,}"#,
-            with: "\n\n",
-            options: .regularExpression
-        )
-        
-        cleaned = cleaned.replacingOccurrences(
-            of: #"[ \t]{2,}"#,
-            with: " ",
-            options: .regularExpression
-        )
-        
-        return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+        MarkdownRenderer.plainText(from: self)
     }
     
     func feedPreview(maxLength: Int = 600) -> String {

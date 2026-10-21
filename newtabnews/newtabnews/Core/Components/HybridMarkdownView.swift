@@ -7,221 +7,145 @@
 
 import SwiftUI
 
+/// Destaque já localizado dentro de um bloco de texto
+struct ResolvedHighlight {
+    let highlight: Highlight
+    let range: NSRange
+}
+
 struct HybridMarkdownView: View {
     let markdown: String
     let postId: String
     let highlights: [Highlight]
     let isHighlightMode: Bool
+    var style: MarkdownStyle = .post
+    var allowsTextSelection = false
     let onHighlight: (String, NSRange) -> Void
     let onRemoveHighlight: (Highlight) -> Void
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            ForEach(Array(processedContent.enumerated()), id: \.offset) { index, content in
-                switch content {
+        let blocks = MarkdownRenderer.blocks(for: markdown, style: style)
+        let layout = TextLayout(blocks: blocks)
+        let resolved = layout.resolve(highlights)
+
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(Array(blocks.enumerated()), id: \.offset) { index, block in
+                switch block {
                 case .text(let text):
+                    let offset = layout.offsets[index] ?? 0
                     HighlightableTextView(
-                        text: text,
-                        postId: postId,
-                        highlights: highlights,
+                        attributedText: text,
+                        highlights: resolved[index] ?? [],
                         isHighlightMode: isHighlightMode,
-                        onHighlight: onHighlight,
+                        allowsTextSelection: allowsTextSelection,
+                        onHighlight: { selected, range in
+                            // Posição no texto do post inteiro, não só deste bloco
+                            onHighlight(selected, NSRange(location: range.location + offset, length: range.length))
+                        },
                         onRemoveHighlight: onRemoveHighlight
                     )
-                    
-                case .image(let url, let alt):
-                    ImageView(urlString: url, alt: alt)
+
+                case .code(let code, let language):
+                    CodeBlockView(code: code, language: language)
+
+                case .table(let table):
+                    MarkdownTableView(table: table)
+
+                case .image(let url, let alt, let link):
+                    if let link {
+                        Link(destination: link) {
+                            ImageView(urlString: url, alt: alt)
+                        }
+                    } else {
+                        ImageView(urlString: url, alt: alt)
+                    }
+
+                case .divider:
+                    Divider()
+                        .padding(.vertical, 8)
                 }
             }
         }
-    }
-    
-    private var processedContent: [ContentBlock] {
-        var blocks: [ContentBlock] = []
-        var currentText = ""
-        
-        let fixedMarkdown = normalizeContent(markdown)
-        
-        let lines = fixedMarkdown.components(separatedBy: "\n")
-        
-        for line in lines {
-            let trimmed = line.trimmingCharacters(in: .whitespaces)
-            
-            if trimmed.hasPrefix("![") {
-                if !currentText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    blocks.append(.text(currentText))
-                    currentText = ""
-                }
-                
-                // Extrair informações da imagem
-                let (url, alt) = extractImageInfo(from: line)
-                if !url.isEmpty {
-                    blocks.append(.image(url, alt))
-                    continue
-                }
-            }
-            
-            // Acumular texto normal
-            if !currentText.isEmpty {
-                currentText += "\n"
-            }
-            currentText += line
-        }
-        
-        if !currentText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            blocks.append(.text(currentText))
-        }
-        
-        return blocks
-    }
-    
-    private func normalizeContent(_ text: String) -> String {
-        let withMarkdownImages = convertHTMLImagesToMarkdown(text)
-        let withoutWrappers = stripHTMLWrapperTags(withMarkdownImages)
-        return fixMultilineImages(withoutWrappers)
-    }
-    
-    private func convertHTMLImagesToMarkdown(_ text: String) -> String {
-        let pattern = #"<img\b[\s\S]*?/?>"#
-        guard let regex = try? NSRegularExpression(
-            pattern: pattern,
-            options: [.caseInsensitive]
-        ) else {
-            return text
-        }
-        
-        let nsString = text as NSString
-        let matches = regex.matches(
-            in: text,
-            range: NSRange(location: 0, length: nsString.length)
-        )
-        
-        var result = text
-        for match in matches.reversed() {
-            let tag = nsString.substring(with: match.range)
-            guard let src = extractHTMLAttribute("src", from: tag), !src.isEmpty else {
-                continue
-            }
-            
-            let alt = extractHTMLAttribute("alt", from: tag) ?? ""
-            let markdown = "![\(alt)](\(src))"
-            result = (result as NSString).replacingCharacters(in: match.range, with: markdown)
-        }
-        
-        return result
-    }
-    
-    private func extractHTMLAttribute(_ name: String, from tag: String) -> String? {
-        let patterns = [
-            "\(name)\\s*=\\s*\"([^\"]*)\"",
-            "\(name)\\s*=\\s*'([^']*)'"
-        ]
-        
-        for pattern in patterns {
-            guard let regex = try? NSRegularExpression(
-                pattern: pattern,
-                options: [.caseInsensitive]
-            ) else {
-                continue
-            }
-            
-            let nsString = tag as NSString
-            guard let match = regex.firstMatch(
-                in: tag,
-                range: NSRange(location: 0, length: nsString.length)
-            ), match.range(at: 1).location != NSNotFound else {
-                continue
-            }
-            
-            let value = nsString.substring(with: match.range(at: 1))
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            
-            if !value.isEmpty {
-                return value
-            }
-        }
-        
-        return nil
-    }
-    
-    private func stripHTMLWrapperTags(_ text: String) -> String {
-        let patterns = [
-            #"<div[^>]*>"#,
-            #"</div>"#
-        ]
-        
-        var result = text
-        for pattern in patterns {
-            guard let regex = try? NSRegularExpression(
-                pattern: pattern,
-                options: [.caseInsensitive]
-            ) else {
-                continue
-            }
-            
-            result = regex.stringByReplacingMatches(
-                in: result,
-                range: NSRange(result.startIndex..., in: result),
-                withTemplate: ""
-            )
-        }
-        
-        return result.replacingOccurrences(
-            of: #"\n{3,}"#,
-            with: "\n\n",
-            options: .regularExpression
-        )
-    }
-    
-    private func extractImageInfo(from line: String) -> (String, String?) {
-        let pattern = #"!\[([^\]]*)\]\(([^\)]+)\)"#
-        guard let regex = try? NSRegularExpression(pattern: pattern) else {
-            return ("", nil)
-        }
-        
-        let nsString = line as NSString
-        guard let match = regex.firstMatch(in: line, range: NSRange(location: 0, length: nsString.length)) else {
-            return ("", nil)
-        }
-        
-        let alt = match.range(at: 1).location != NSNotFound ? nsString.substring(with: match.range(at: 1)) : nil
-        var urlPart = match.range(at: 2).location != NSNotFound ? nsString.substring(with: match.range(at: 2)) : ""
-        
-        // Remove o título se houver (tudo depois de espaços + ")
-        if let quoteIndex = urlPart.range(of: #"\s+"#, options: .regularExpression) {
-            urlPart = String(urlPart[..<quoteIndex.lowerBound])
-        }
-        
-        let url = urlPart.trimmingCharacters(in: .whitespacesAndNewlines)
-        return (url, alt)
-    }
-    
-    // Junta linhas de imagens que foram quebradas
-    private func fixMultilineImages(_ text: String) -> String {
-        var result = text
-        
-        // Pattern para detectar ![alt]( sem fechar na mesma linha
-        // Captura: ![alt]( seguido de quebra de linha e depois url)
-        let pattern = #"!\[([^\]]*)\]\(\s*\n\s*([^\)]+)\)"#
-        
-        if let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators]) {
-            result = regex.stringByReplacingMatches(
-                in: result,
-                range: NSRange(result.startIndex..., in: result),
-                withTemplate: "![$1]($2)"
-            )
-        }
-        
-        return result
     }
 }
 
-enum ContentBlock {
-    case text(String)
-    case image(String, String?) // URL e alt text
+/// Posts sem destaque (comentários, descrições): mesmo renderizador, sem modo de destaque
+struct MarkdownContentView: View {
+    let markdown: String
+    var style: MarkdownStyle = .comment
+
+    var body: some View {
+        HybridMarkdownView(
+            markdown: markdown,
+            postId: "",
+            highlights: [],
+            isHighlightMode: false,
+            style: style,
+            allowsTextSelection: true,
+            onHighlight: { _, _ in },
+            onRemoveHighlight: { _ in }
+        )
+    }
 }
 
-// View para renderizar imagens (igual ao MDText)
+/// Os blocos de texto, emendados com "\n", formam o texto do post em que os destaques são salvos.
+private struct TextLayout {
+    /// Índice do bloco → posição do bloco no texto emendado
+    var offsets: [Int: Int] = [:]
+    private var ranges: [(index: Int, range: NSRange)] = []
+    private var fullText = ""
+
+    init(blocks: [MarkdownBlock]) {
+        var parts: [String] = []
+        var position = 0
+        for (index, block) in blocks.enumerated() {
+            guard case .text(let text) = block else { continue }
+            if !parts.isEmpty { position += 1 }
+            offsets[index] = position
+            ranges.append((index, NSRange(location: position, length: text.length)))
+            parts.append(text.string)
+            position += text.length
+        }
+        fullText = parts.joined(separator: "\n")
+    }
+
+    /// Encontra cada destaque pelo texto marcado, na ocorrência mais perto da posição salva.
+    /// Assim destaques antigos continuam no lugar mesmo se a renderização mudar o texto.
+    func resolve(_ highlights: [Highlight]) -> [Int: [ResolvedHighlight]] {
+        let text = fullText as NSString
+        var result: [Int: [ResolvedHighlight]] = [:]
+
+        for highlight in highlights {
+            guard let global = locate(highlight, in: text),
+                  let block = ranges.first(where: { NSLocationInRange(global.location, $0.range) && NSMaxRange(global) <= NSMaxRange($0.range) })
+            else { continue }
+            let local = NSRange(location: global.location - block.range.location, length: global.length)
+            result[block.index, default: []].append(ResolvedHighlight(highlight: highlight, range: local))
+        }
+        return result
+    }
+
+    private func locate(_ highlight: Highlight, in text: NSString) -> NSRange? {
+        let needle = highlight.highlightedText
+        guard !needle.isEmpty else { return nil }
+
+        var best: NSRange?
+        var searchRange = NSRange(location: 0, length: text.length)
+        while true {
+            let found = text.range(of: needle, options: [], range: searchRange)
+            guard found.location != NSNotFound else { break }
+            if best == nil || abs(found.location - highlight.rangeStart) < abs(best!.location - highlight.rangeStart) {
+                best = found
+            }
+            let next = found.location + 1
+            guard next < text.length else { break }
+            searchRange = NSRange(location: next, length: text.length - next)
+        }
+        return best
+    }
+}
+
+/// Imagem do post, com carregamento, erro e legenda (alt)
 struct ImageView: View {
     let urlString: String
     let alt: String?
