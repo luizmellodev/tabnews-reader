@@ -1,14 +1,16 @@
 <!doctype html>
-<!-- App Store marketing screenshot (iPhone 6.3", 1206x2622).
+<!-- App Store marketing screenshot. The layout is drawn at 1206x2622 (iPhone 6.3") and
+     scaled to fill the window width, so any size works (ex.: 1284x2778 for 6.5").
      Params: ?shot=home&lang=pt-BR  — rendered by screenshot/template/render.sh -->
 <html>
 <head>
 <meta charset="utf-8">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 1206px; height: 2622px; overflow: hidden; }
-  body {
-    background: #0d0d0d;
+  html, body { width: 100vw; height: 100vh; overflow: hidden; background: #0d0d0d; }
+  /* O script escala o canvas para a largura da janela */
+  .canvas {
+    width: 1206px; height: 2622px; transform-origin: 0 0;
     font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
     color: #fff;
     position: relative;
@@ -54,6 +56,7 @@
 </style>
 </head>
 <body>
+<div class="canvas">
   <div class="grid"></div>
   <div class="glow"></div>
   <div class="copy">
@@ -62,6 +65,7 @@
     <h2 id="l2"></h2>
   </div>
   <div class="phone"><div class="screen"><img id="shot"><div class="island"></div></div></div>
+</div>
 <script>
   const copy = {
     home: { accent: "#3b82f6", glow: "rgba(59,130,246,.16)",
@@ -86,8 +90,10 @@
   const p = new URLSearchParams(location.search);
   const shot = p.get("shot") || "home", lang = p.get("lang") || "pt-BR";
   const c = copy[shot];
-  document.body.style.setProperty("--accent", c.accent);
-  document.body.style.setProperty("--glow", c.glow);
+  const canvas = document.querySelector(".canvas");
+  canvas.style.transform = `scale(${innerWidth / 1206})`;
+  canvas.style.setProperty("--accent", c.accent);
+  canvas.style.setProperty("--glow", c.glow);
   [eyebrow.textContent, l1.textContent, l2.textContent] = c[lang];
   // Shrink each line until it fits the copy width.
   for (const el of [l1, l2]) {
