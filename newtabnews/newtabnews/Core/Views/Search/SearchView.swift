@@ -11,6 +11,7 @@ struct SearchView: View {
     @Binding var isViewInApp: Bool
     var isTabActive: Bool = true
     @AppStorage("current_theme") var currentTheme: Theme = .light
+    @AppStorage(PitchFilter.storageKey) private var hidePitchPosts = false
     @Namespace private var zoomNamespace
 
     @State private var discoverVM = DiscoverViewModel()
@@ -63,6 +64,19 @@ struct SearchView: View {
 
     // MARK: - Discover
 
+    /// Respeita "Ocultar posts de Pitch" do Perfil, como o feed da Home
+    private var visibleSections: DiscoverSections? {
+        guard let sections = discoverVM.sections else { return nil }
+        guard hidePitchPosts else { return sections }
+        return DiscoverSections(
+            hero: sections.hero.flatMap { PitchFilter.isPitch(title: $0.title) ? nil : $0 },
+            classics: sections.classics.filter { !PitchFilter.isPitch(title: $0.title) },
+            worthReading: sections.worthReading.filter { !PitchFilter.isPitch(title: $0.title) },
+            missed: sections.missed.filter { !PitchFilter.isPitch(title: $0.title) },
+            cachedAt: sections.cachedAt
+        )
+    }
+
     @ViewBuilder
     private var discoverContent: some View {
         switch discoverVM.state {
@@ -93,7 +107,7 @@ struct SearchView: View {
         case .loaded:
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
-                    if let hero = discoverVM.sections?.hero {
+                    if let hero = visibleSections?.hero {
                         NavigationLink {
                             ListDetailView(
                                 isViewInApp: $isViewInApp,
@@ -110,7 +124,7 @@ struct SearchView: View {
                         .padding(.horizontal)
                     }
 
-                    if let sections = discoverVM.sections {
+                    if let sections = visibleSections {
                         DiscoverBentoSectionView(
                             title: "Clássicos do TabNews",
                             subtitle: "",

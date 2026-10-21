@@ -25,36 +25,45 @@ final class DiscoverService {
         self.defaults = defaults
     }
 
-    func loadSections(forceRefresh: Bool = false) async throws -> DiscoverSections {
-        if !forceRefresh, let cached = loadCachedSections() {
-            return cached
+    /// Seções salvas da última carga (de hoje ou de outro dia), para mostrar sem esperar a rede.
+    func cachedSections() -> DiscoverSections? {
+        if let memory = Self.memoryCache { return memory }
+        guard let data = defaults.data(forKey: Self.cacheKey),
+              let sections = try? JSONDecoder().decode(DiscoverSections.self, from: data) else { return nil }
+        Self.memoryCache = sections
+        return sections
+    }
+
+    /// O SwiftUI recria o ViewModel a cada init do SearchView; evita decodificar o JSON toda vez
+    private nonisolated(unsafe) static var memoryCache: DiscoverSections?
+
+    /// Busca as seções do dia na rede e salva no cache.
+    /// Páginas que falham ficam de fora; só dá erro se nenhuma chegar.
+    func fetchSections() async throws -> DiscoverSections {
+        let seed = daySeed()
+
+        // 7 páginas de 100 posts (antes eram 13 de 30): o RequestThrottler solta uma requisição
+        // a cada 0,35s, então menos requisições é menos tempo de skeleton
+        async let worthRelevant = fetchPage(strategy: "relevant", page: 1)
+        // "relevant" tem só ~140 posts (2 páginas de 100); antes a página era sorteada até a 15
+        // e vinha vazia na maioria dos dias, sumindo com a Surpresa do dia
+        async let heroPosts = fetchPage(strategy: "relevant", page: 2)
+        async let classicAncient = fetchPage(strategy: "old", page: 1)
+        async let classicRecent = fetchPage(strategy: "new", page: (seed % 12) + 18)
+        async let worthNew = fetchPage(strategy: "new", page: (seed % 10) + 3)
+        async let worthOld = fetchPage(strategy: "old", page: (seed % 30) + 7)
+        async let missedPosts = fetchPage(strategy: "new", page: (seed % 15) + 24)
+
+        let pages = await [worthRelevant, heroPosts, classicAncient, classicRecent, worthNew, worthOld, missedPosts]
+        guard pages.contains(where: { $0 != nil }) else {
+            throw NetworkError.badServerResponse
         }
 
-        let seed = daySeed()
-        let heroPage = (seed % 15) + 1
-        let recentClassicPage = (seed % 40) + 60
-        let missedPageA = (seed % 50) + 80
-        let missedPageB = ((seed + 17) % 50) + 100
-
-        async let heroPosts = fetchPage(strategy: "relevant", page: heroPage)
-        async let classicAncient1 = fetchPage(strategy: "old", page: 1)
-        async let classicAncient2 = fetchPage(strategy: "old", page: 2)
-        async let classicAncient3 = fetchPage(strategy: "old", page: 3)
-        async let classicRecentA = fetchPage(strategy: "new", page: recentClassicPage)
-        async let classicRecentB = fetchPage(strategy: "new", page: recentClassicPage + 15)
-        async let worthRelevant1 = fetchPage(strategy: "relevant", page: 1)
-        async let worthRelevant2 = fetchPage(strategy: "relevant", page: (seed % 8) + 2)
-        async let worthNew1 = fetchPage(strategy: "new", page: (seed % 20) + 10)
-        async let worthNew2 = fetchPage(strategy: "new", page: (seed % 30) + 40)
-        async let worthOld = fetchPage(strategy: "old", page: (seed % 100) + 20)
-        async let missedPostsA = fetchPage(strategy: "new", page: missedPageA)
-        async let missedPostsB = fetchPage(strategy: "new", page: missedPageB)
-
-        let ancientClassicPool = try await classicAncient1 + classicAncient2 + classicAncient3
-        let recentClassicPool = try await classicRecentA + classicRecentB
-        let worthPool = try await worthRelevant1 + worthRelevant2 + worthNew1 + worthNew2 + worthOld
-        let missedPool = try await missedPostsA + missedPostsB
-        let surprisePool = try await heroPosts
+        let ancientClassicPool = pages[2] ?? []
+        let recentClassicPool = pages[3] ?? []
+        let worthPool = (pages[0] ?? []) + (pages[4] ?? []) + (pages[5] ?? [])
+        let missedPool = pages[6] ?? []
+        let surprisePool = (pages[0] ?? []) + (pages[1] ?? [])
 
         var usedKeys = Set<String>()
 
@@ -116,10 +125,11 @@ final class DiscoverService {
 
     // MARK: - Private
 
-    private func fetchPage(strategy: String, page: Int) async throws -> [PostRequest] {
-        try await contentService.getContent(
+    /// `nil` quando a página falha, para as outras seções continuarem
+    private func fetchPage(strategy: String, page: Int) async -> [PostRequest]? {
+        try? await contentService.getContent(
             page: String(page),
-            perPage: "30",
+            perPage: "100",
             strategy: strategy
         )
     }
@@ -131,20 +141,19 @@ final class DiscoverService {
         return (year * 366) + day
     }
 
-    private func cacheKey() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return "discover_cache_v4_\(formatter.string(from: Date()))"
-    }
-
-    private func loadCachedSections() -> DiscoverSections? {
-        guard let data = defaults.data(forKey: cacheKey()) else { return nil }
-        return try? JSONDecoder().decode(DiscoverSections.self, from: data)
-    }
+    /// Uma chave só: antes era uma por dia e as antigas nunca eram apagadas
+    private static let cacheKey = "discover_cache_v5"
 
     private func saveCachedSections(_ sections: DiscoverSections) {
+        Self.memoryCache = sections
         guard let data = try? JSONEncoder().encode(sections) else { return }
-        defaults.set(data, forKey: cacheKey())
+        defaults.set(data, forKey: Self.cacheKey)
+
+        // Limpa as chaves por dia das versões anteriores (discover_cache_v4_2026-10-21 etc.)
+        for key in defaults.dictionaryRepresentation().keys
+        where key.hasPrefix("discover_cache_") && key != Self.cacheKey {
+            defaults.removeObject(forKey: key)
+        }
     }
 
     private func pickHero(
@@ -152,9 +161,11 @@ final class DiscoverService {
         seed: Int,
         excluding usedKeys: Set<String>
     ) -> PostRequest? {
+        // Sem Pitch: com "Ocultar Pitch" ligado a surpresa sumiria da tela
         let candidates = posts
             .rootPostsOnly()
             .excludingKeys(usedKeys)
+            .filter { !PitchFilter.isPitch(title: $0.title) }
 
         guard !candidates.isEmpty else { return nil }
 

@@ -14,6 +14,7 @@ Leitura renovada, feed sem Pitch e uma Newsletter mais fácil de ler!
 • Dicas no lugar certo: cada dica aparece uma vez, onde a funcionalidade está, em vez de uma sequência de telas depois do onboarding.
 • Nova animação de abertura e ícones do onboarding animados de novo.
 • Destaques mais confiáveis: em posts com imagens, eles aparecem sempre no trecho certo.
+• Busca mais rápida: as sugestões abrem na hora, e a Surpresa do dia aparece todos os dias.
 • Carregamento do feed mais estável quando a conexão oscila.
 
 ---
@@ -47,6 +48,11 @@ Leitura renovada, feed sem Pitch e uma Newsletter mais fácil de ler!
   - Post: "Destaque e anote" e "Conheça quem escreve".
   - O aviso de app não oficial foi para a primeira página do onboarding.
   - Perfil > "Ver Dicas Novamente" faz todas voltarem.
+- **Busca (Descobrir)**:
+  - Abre na hora com as seções salvas; na virada do dia mostra as de ontem enquanto busca as novas, sem skeleton.
+  - 7 requisições de 100 posts no lugar de 13 de 30: bem menos tempo de carregamento na primeira abertura do dia.
+  - Se uma página falha, as seções são montadas com o que chegou, em vez de mostrar a tela de erro.
+  - Respeita "Ocultar posts de Pitch".
 - **Splash**: o contorno do logo é desenhado, o título entra letra por letra e o logo avança e se dissolve revelando o app. Ficou mais curta.
 - **Onboarding**: os ícones voltaram a entrar girando com zoom.
 
@@ -54,6 +60,8 @@ Leitura renovada, feed sem Pitch e uma Newsletter mais fácil de ler!
 - `snake_case` virava itálico e `**`/`__` dentro de código eram interpretados como negrito.
 - Destaques em posts com imagens apareciam também em outros trechos do post.
 - Negrito dentro de título perdia o tamanho do título.
+- A Surpresa do dia sumia na maioria dos dias: a página sorteada da estratégia "relevantes" passava das ~140 que existem e vinha vazia.
+- O cache da busca criava uma chave nova por dia no `UserDefaults` e nunca apagava as antigas.
 - Retentativas e timeouts do carregamento do feed ajustados para o skeleton não ficar preso.
 
 ### Melhorias técnicas
