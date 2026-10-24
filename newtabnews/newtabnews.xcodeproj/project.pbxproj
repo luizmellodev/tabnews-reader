@@ -10,12 +10,15 @@
 		06BAD6E66F5DE57585863CF2 /* ScenarioQuizEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7353FB1699F499996041099D /* ScenarioQuizEngine.swift */; };
 		1B199B9550F2418CAD3B492F /* DevWordleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC86A73A42F548C99F4ECBE8 /* DevWordleEngine.swift */; };
 		1EA27466A63483E06E1F68D4 /* ScenarioQuizViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2107599A16128E2DB7E73C /* ScenarioQuizViewModel.swift */; };
+		2208920A2C8B47EB8E280E5E /* MarkdownBlockViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA9D38AB8C741509951B785 /* MarkdownBlockViews.swift */; };
+		22EBCC31A8D7448B918EC461 /* MarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E670A684CA94BAE987F0555 /* MarkdownRenderer.swift */; };
 		36D4339C76BA4B97A6769717 /* DevWordleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2688CAC2769D44D3BC9C39FA /* DevWordleView.swift */; };
 		3D6A114927D682EE3A55C5D3 /* RegexGolfEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35225F5C28B402F560206535 /* RegexGolfEngine.swift */; };
 		4437E8073E65D6A3E32D0C77 /* RegexGolfViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA7ACC97CDE604AFC9F96F6 /* RegexGolfViewModel.swift */; };
 		449AA869DB8647A7AA74E861 /* dev_spot_words.json in Resources */ = {isa = PBXBuildFile; fileRef = 6FA87B49DE4E4C3D8D1D30FC /* dev_spot_words.json */; };
 		47C047E951AE83F881306253 /* ScenarioQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A07CE37A1FFAAFD28F442C /* ScenarioQuizView.swift */; };
 		4D18DC27055B09691088DE9D /* regex_golf_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = 8B00D89532958B32A0189EB5 /* regex_golf_daily.json */; };
+		4E19B940E08E4DA68EF1FB10 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 7A4450EF7E3A4A7C8F2AA342 /* Markdown */; };
 		5510150F5C93958E78FA925C /* git_rescue_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = 14F3D8CAE7A2DFED85AD34B9 /* git_rescue_daily.json */; };
 		55A05722FF634FA291B6F9D1 /* RestGameScoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CD64BBD04D07906D36E4 /* RestGameScoring.swift */; };
 		571993F192F0BAF784BF1B87 /* GitRescueGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022BC3A98CB5BD9E4A4F4120 /* GitRescueGame.swift */; };
@@ -161,7 +164,6 @@
 		79F100042F5000020068804C /* ContentStrategyPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F100032F5000020068804C /* ContentStrategyPicker.swift */; };
 		79F100062F5000030068804C /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F100052F5000030068804C /* SearchView.swift */; };
 		79F200022F6000020068804C /* PostRequest+Discover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200012F6000010068804C /* PostRequest+Discover.swift */; };
-		F49D167256724012AE0FF720 /* PostRequest+Pitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = D282D37EFCC342B6B1A2557B /* PostRequest+Pitch.swift */; };
 		79F200062F6000060068804C /* DiscoverService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200052F6000050068804C /* DiscoverService.swift */; };
 		79F200082F6000080068804C /* DiscoverViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200072F6000070068804C /* DiscoverViewModel.swift */; };
 		79F2000A2F60000A0068804C /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F200092F6000090068804C /* SearchViewModel.swift */; };
@@ -218,11 +220,9 @@
 		ED505630C6584CBEA4276195 /* dev_words.json in Resources */ = {isa = PBXBuildFile; fileRef = 56398CBA6EC948BF8027A624 /* dev_words.json */; };
 		EF99794497654680863D2FBD /* RestGameTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAB388B57CD4A79AA767CB7 /* RestGameTheme.swift */; };
 		F1AD9D04C2204BE58A554E67 /* DevSpotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D183E25BBA7467DB659C974 /* DevSpotViewModel.swift */; };
+		F49D167256724012AE0FF720 /* PostRequest+Pitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = D282D37EFCC342B6B1A2557B /* PostRequest+Pitch.swift */; };
 		F60F282683B6AEBF9B35AAFC /* http_status_daily.json in Resources */ = {isa = PBXBuildFile; fileRef = C1E9B8085AD6A08B6BCCB825 /* http_status_daily.json */; };
 		FEF827BB63211266ADE20790 /* RegexGolfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */; };
-		4E19B940E08E4DA68EF1FB10 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 7A4450EF7E3A4A7C8F2AA342 /* Markdown */; };
-		22EBCC31A8D7448B918EC461 /* MarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E670A684CA94BAE987F0555 /* MarkdownRenderer.swift */; };
-		2208920A2C8B47EB8E280E5E /* MarkdownBlockViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA9D38AB8C741509951B785 /* MarkdownBlockViews.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -287,6 +287,7 @@
 		3609D848BF2A48FEA008D3AD /* DevWordleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleViewModel.swift; sourceTree = "<group>"; };
 		4059FD99D3F93806BC39EF3D /* http_status_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = http_status_free.json; sourceTree = "<group>"; };
 		4C1FD96A780758D405915CA4 /* git_rescue_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = git_rescue_free.json; sourceTree = "<group>"; };
+		4E670A684CA94BAE987F0555 /* MarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderer.swift; sourceTree = "<group>"; };
 		52A07CE37A1FFAAFD28F442C /* ScenarioQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioQuizView.swift; sourceTree = "<group>"; };
 		56398CBA6EC948BF8027A624 /* dev_words.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dev_words.json; sourceTree = "<group>"; };
 		69DCCF6F0F8117A1DD386C6D /* RegexGolfView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexGolfView.swift; sourceTree = "<group>"; };
@@ -405,7 +406,6 @@
 		79F100032F5000020068804C /* ContentStrategyPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentStrategyPicker.swift; sourceTree = "<group>"; };
 		79F100052F5000030068804C /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		79F200012F6000010068804C /* PostRequest+Discover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PostRequest+Discover.swift"; sourceTree = "<group>"; };
-		D282D37EFCC342B6B1A2557B /* PostRequest+Pitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PostRequest+Pitch.swift"; sourceTree = "<group>"; };
 		79F200052F6000050068804C /* DiscoverService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverService.swift; sourceTree = "<group>"; };
 		79F200072F6000070068804C /* DiscoverViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewModel.swift; sourceTree = "<group>"; };
 		79F200092F6000090068804C /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
@@ -420,6 +420,7 @@
 		835881F7443246A385749456 /* RestGameSharedViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameSharedViews.swift; sourceTree = "<group>"; };
 		8A2107599A16128E2DB7E73C /* ScenarioQuizViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioQuizViewModel.swift; sourceTree = "<group>"; };
 		8B00D89532958B32A0189EB5 /* regex_golf_daily.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = regex_golf_daily.json; sourceTree = "<group>"; };
+		8BA9D38AB8C741509951B785 /* MarkdownBlockViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownBlockViews.swift; sourceTree = "<group>"; };
 		A1B2C0012F7000010068804C /* GameCenterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterManager.swift; sourceTree = "<group>"; };
 		A1B2C0032F7000010068804C /* GameCenterLeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterLeaderboardView.swift; sourceTree = "<group>"; };
 		A1B2C0052F7000010068804C /* RestGamesBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGamesBanner.swift; sourceTree = "<group>"; };
@@ -435,6 +436,7 @@
 		CA69EED4C427447E9102CB8B /* RestGamesHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGamesHubView.swift; sourceTree = "<group>"; };
 		CEAB388B57CD4A79AA767CB7 /* RestGameTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameTheme.swift; sourceTree = "<group>"; };
 		D00BF01A61E64E60BBEA8B85 /* RestGameFreeModePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameFreeModePolicy.swift; sourceTree = "<group>"; };
+		D282D37EFCC342B6B1A2557B /* PostRequest+Pitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PostRequest+Pitch.swift"; sourceTree = "<group>"; };
 		D4E5F6022F8000010068804C /* DevLeetEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevLeetEngine.swift; sourceTree = "<group>"; };
 		D4E5F6042F8000010068804C /* DevLeetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevLeetView.swift; sourceTree = "<group>"; };
 		D4E5F6062F8000010068804C /* dev_leet_problems.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dev_leet_problems.json; sourceTree = "<group>"; };
@@ -460,8 +462,6 @@
 		F5728D8AF8F2408296178E2D /* DevWordleBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWordleBoardView.swift; sourceTree = "<group>"; };
 		FBB2CD64BBD04D07906D36E4 /* RestGameScoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestGameScoring.swift; sourceTree = "<group>"; };
 		FE4B26D5F3981F5D61FD8829 /* regex_golf_free.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = regex_golf_free.json; sourceTree = "<group>"; };
-		4E670A684CA94BAE987F0555 /* MarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderer.swift; sourceTree = "<group>"; };
-		8BA9D38AB8C741509951B785 /* MarkdownBlockViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownBlockViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -1687,7 +1687,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.3;
+				MARKETING_VERSION = 4.6;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.luizmello.newtabnews;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -1730,7 +1730,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.3;
+				MARKETING_VERSION = 4.6;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.luizmello.newtabnews;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
