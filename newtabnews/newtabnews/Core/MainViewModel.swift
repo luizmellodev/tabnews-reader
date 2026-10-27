@@ -29,7 +29,17 @@ class MainViewModel {
     private let minimumVisiblePerFetch: Int = 5
     private let maxExtraPages: Int = 3
     private let maxCachedPages: Int = 5
-    
+
+    /// Posts cujo body falhou na última tentativa: o card mostra um aviso em vez do skeleton infinito
+    var failedBodyKeys: Set<String> = []
+    private var lastFeedFetch: Date?
+    private let staleFeedInterval: TimeInterval = 15 * 60
+    /// Body por post+versão, para não baixar de novo ao trocar de aba ou paginar
+    private var bodyCache: [String: String] = [:]
+    private var inFlightBodyKeys: Set<String> = []
+    private var lastDigestSync: Date?
+    private let digestSyncInterval: TimeInterval = 6 * 3600
+
     let defaults = UserDefaults.standard
     
     init(service: ContentServiceProtocol = ContentService()) {
@@ -56,6 +66,7 @@ extension MainViewModel {
             let previousContent = self.content
             self.content = mergePostsPreservingBodies(newPosts, existing: previousContent)
             self.state = .requestSucceeded
+            self.lastFeedFetch = Date()
         } catch {
             if content.isEmpty {
                 self.state = .requestFailed
@@ -98,55 +109,106 @@ extension MainViewModel {
     
     @MainActor
     func fetchPost() async {
-        let filled = await fetchBodies(for: content)
-        let filledByKey = Dictionary(filled.map { ($0.stableKey, $0) }, uniquingKeysWith: { first, _ in first })
-
-        // Aplica por chave (não por índice): o feed pode ter mudado durante os awaits (refresh, troca de estratégia)
-        content = content.map { post in
-            guard post.body?.isEmpty != false,
-                  let full = filledByKey[post.stableKey],
-                  full.body?.isEmpty == false else { return post }
-            return full
-        }
+        await loadMissingBodies()
 
         saveCachedContent(page: currentPage)
-        
+
         // Sincronizar com widgets
         WidgetSyncManager.shared.syncRecentPosts(content)
-        
+
         // Sincronizar digest em background
         Task.detached(priority: .background) {
             await self.syncDigestForWidget()
         }
-        
+
         NotificationCenter.default.post(name: .postsLoaded, object: nil)
     }
-    
-    /// Busca o corpo completo dos posts em paralelo, mantendo a ordem. Posts que falharem voltam como vieram.
-    private func fetchBodies(for posts: [PostRequest]) async -> [PostRequest] {
-        let service = self.service
 
-        return await withTaskGroup(of: (Int, PostRequest?).self) { group in
-            for (index, post) in posts.enumerated() where post.body?.isEmpty != false {
-                guard let user = post.ownerUsername, let slug = post.slug else { continue }
+    /// Body baixado fora do feed (ex.: ao abrir o post): preenche o card e o cache
+    @MainActor
+    func applyLoadedBody(_ full: PostRequest) {
+        guard full.hasLoadedBody else { return }
+        let key = full.stableKey
+        bodyCache[bodyCacheKey(full)] = full.body
+        failedBodyKeys.remove(key)
+        if let index = content.firstIndex(where: { $0.stableKey == key }),
+           !content[index].hasLoadedBody {
+            content[index].body = full.body
+        }
+    }
 
-                group.addTask {
-                    do {
-                        return (index, try await service.getPost(user: user, slug: slug))
-                    } catch {
-                        #if DEBUG
-                        print("Erro ao buscar post [\(slug)]: \(error)")
-                        #endif
-                        return (index, nil)
-                    }
+    private func bodyCacheKey(_ post: PostRequest) -> String {
+        "\(post.stableKey)|\(post.updatedAt ?? "")"
+    }
+
+    /// Busca os bodies que faltam no feed e aplica cada um assim que chega: um post lento
+    /// não segura o skeleton dos outros. Aplica por chave (não por índice), porque o feed
+    /// pode mudar durante os awaits.
+    @MainActor
+    private func loadMissingBodies() async {
+        // Bodies já baixados nesta sessão (ex.: o mesmo post em Relevantes e Recentes)
+        for index in content.indices where !content[index].hasLoadedBody {
+            if let body = bodyCache[bodyCacheKey(content[index])] {
+                content[index].body = body
+            }
+        }
+
+        // Outra chamada já está buscando esses posts (ex.: resume durante um refresh)
+        let pending = content.filter { !$0.hasLoadedBody && !inFlightBodyKeys.contains($0.stableKey) }
+        guard !pending.isEmpty else { return }
+        failedBodyKeys.subtract(pending.map(\.stableKey))
+
+        var requests: [(key: String, user: String, slug: String)] = []
+        for post in pending {
+            let key = post.stableKey
+            // Sem usuário/slug não dá para buscar: mostra o aviso em vez do skeleton eterno
+            guard let user = post.ownerUsername, let slug = post.slug else {
+                failedBodyKeys.insert(key)
+                continue
+            }
+            inFlightBodyKeys.insert(key)
+            requests.append((key, user, slug))
+        }
+        guard !requests.isEmpty else { return }
+
+        await Self.fetchBodies(requests, service: service) { key, full in
+            self.inFlightBodyKeys.remove(key)
+            guard let full, full.hasLoadedBody else {
+                self.failedBodyKeys.insert(key)
+                return
+            }
+            self.bodyCache[self.bodyCacheKey(full)] = full.body
+            if let index = self.content.firstIndex(where: { $0.stableKey == key }),
+               !self.content[index].hasLoadedBody {
+                self.content[index] = full
+            }
+        }
+    }
+
+    /// Uma Task por post em vez de withTaskGroup: com o task group, o build do Xcode 26.5
+    /// crashava ~15s após abrir (TaskGroup::offer num grupo já liberado), no iOS 27 e no
+    /// simulador 26.5. Cada resultado é aplicado no MainActor assim que chega.
+    private static func fetchBodies(
+        _ requests: [(key: String, user: String, slug: String)],
+        service: ContentServiceProtocol,
+        onResult: @escaping @MainActor (String, PostRequest?) -> Void
+    ) async {
+        let tasks = requests.map { request in
+            Task {
+                let full: PostRequest?
+                do {
+                    full = try await service.getPost(user: request.user, slug: request.slug)
+                } catch {
+                    #if DEBUG
+                    print("Erro ao buscar post [\(request.slug)]: \(error)")
+                    #endif
+                    full = nil
                 }
+                await onResult(request.key, full)
             }
-
-            var result = posts
-            for await (index, full) in group {
-                if let full { result[index] = full }
-            }
-            return result
+        }
+        for task in tasks {
+            await task.value
         }
     }
 
@@ -213,6 +275,10 @@ extension MainViewModel {
     
     @MainActor
     func syncDigestForWidget() async {
+        // O digest é semanal: não precisa de 2 requisições a cada carregamento do feed
+        if let lastDigestSync, Date().timeIntervalSince(lastDigestSync) < digestSyncInterval { return }
+        lastDigestSync = Date()
+
         do {
             // Buscar o digest mais recente
             let digests = try await service.getDigest(page: "1", perPage: "1", strategy: "new")
@@ -237,6 +303,7 @@ extension MainViewModel {
             #endif
             
         } catch {
+            lastDigestSync = nil
             #if DEBUG
             print("⚠️ [MainViewModel] Erro ao sincronizar digest: \(error)")
             #endif
@@ -257,20 +324,21 @@ extension MainViewModel {
                 excluding: Set(content.map(\.stableKey))
             )
 
-            let filled = await fetchBodies(for: newPosts)
-
             // Usuário trocou de estratégia enquanto carregava: descarta essa página
             guard strategy == currentStrategy else {
                 isLoadingMore = false
                 return
             }
 
-            // Ordenação "relevantes" muda entre páginas; evita posts duplicados (IDs repetidos no ForEach)
+            // Ordenação "relevantes" muda entre páginas; evita posts duplicados (IDs repetidos no ForEach).
+            // Mostra a página na hora; os bodies chegam card a card.
             let existingKeys = Set(content.map(\.stableKey))
-            content.append(contentsOf: filled.filter { !existingKeys.contains($0.stableKey) })
-
-            saveCachedContent(page: currentPage)
+            content.append(contentsOf: newPosts.filter { !existingKeys.contains($0.stableKey) })
             isLoadingMore = false
+
+            let page = currentPage
+            await loadMissingBodies()
+            saveCachedContent(page: page)
         } catch {
             #if DEBUG
             print("Error fetching next page: \(error)")
@@ -280,6 +348,19 @@ extension MainViewModel {
         }
     }
     
+    /// Ao voltar para o app: o iOS suspende o app no meio dos downloads e eles falham em silêncio.
+    /// Feed antigo é recarregado; senão, só busca de novo os bodies que faltam.
+    @MainActor
+    func resumeIfNeeded() async {
+        guard state == .requestSucceeded, !content.isEmpty else { return }
+
+        if let lastFeedFetch, Date().timeIntervalSince(lastFeedFetch) > staleFeedInterval {
+            await refresh()
+        } else if content.contains(where: { !$0.hasLoadedBody }) {
+            await fetchPost()
+        }
+    }
+
     /// Pull to refresh: mantém a lista atual na tela (sem skeleton) e troca quando a resposta chega
     @MainActor
     func refresh() async {
