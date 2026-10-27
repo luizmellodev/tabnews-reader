@@ -69,6 +69,9 @@ struct MainTabView: View {
         }
         .tabBarMinimizeBehavior(.onScrollDown)
         .environment(viewModel)
+        .task {
+            await newsletterVM.refreshUnreadBadge()
+        }
         .alert("Gostando do TabNews Reader?", isPresented: $reviewManager.showPrePrompt) {
             Button("Sim, estou gostando") {
                 reviewManager.confirmPositiveReview()

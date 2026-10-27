@@ -5,7 +5,6 @@ private actor RequestThrottler {
     static let shared = RequestThrottler()
 
     private var nextSlot: Date = .distantPast
-    // Abaixo disso o Cloudflare do TabNews começa a responder 429 em rajadas
     private let minimumInterval: TimeInterval = 0.35
 
     func waitIfNeeded() async {
@@ -65,7 +64,6 @@ class NetworkManager: NetworkManagerProtocol {
         }
         
         var lastError: Error = NetworkError.badServerResponse
-        var lastStatusCode: Int?
 
         // 429 garante que o servidor não processou, então é seguro repetir qualquer método.
         // Já 503/timeout podem acontecer depois do servidor aceitar: só repete GET para não duplicar POSTs.
@@ -78,9 +76,7 @@ class NetworkManager: NetworkManagerProtocol {
             await RequestThrottler.shared.waitIfNeeded()
             
             if attempt > 0 {
-                // 429 vem do Cloudflare e precisa de uma pausa maior para liberar
-                let base = lastStatusCode == 429 ? 2.0 : 0.75
-                let backoff = pow(2.0, Double(attempt - 1)) * base
+                let backoff = pow(2.0, Double(attempt - 1)) * 0.75
                 Logger.info("⏳ Retry \(attempt + 1)/\(maxRetries) para \(endpoint) em \(backoff)s")
                 try await Task.sleep(nanoseconds: UInt64(backoff * 1_000_000_000))
             }
@@ -100,7 +96,6 @@ class NetworkManager: NetworkManagerProtocol {
                 }
                 
                 if !(200...299).contains(httpResponse.statusCode) {
-                    lastStatusCode = httpResponse.statusCode
                     let errorBody = String(data: data, encoding: .utf8) ?? "No error body"
                     Logger.error("⚠️ Error: Bad server response (status code: \(httpResponse.statusCode))")
                     Logger.error("Error body: \(errorBody)")

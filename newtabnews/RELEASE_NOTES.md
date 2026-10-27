@@ -1,25 +1,20 @@
-# TabNews Reader: notas da atualização 4.6.1
+# TabNews Reader: notas da atualização 4.6.2
 
 ## Texto para a App Store ("O que há de novo")
 
-Correção: os cards da Home não ficam mais carregando para sempre quando a conexão oscila ou o app volta do segundo plano.
+Correção de um problema que fazia o app fechar logo depois de abrir.
 
 ## Changelog
 
-- A correção do skeleton (branch `fix-skeleton`) não tinha entrado na 4.6. Agora entra:
-  - Cada card recebe o texto assim que ele chega, sem esperar o mais lento.
-  - Se o texto de um post falha, o card mostra "Não deu para carregar a prévia agora…" no lugar do skeleton.
-  - Ao voltar para o app, os textos que falharam são buscados de novo; feed com mais de 15 min é recarregado.
-  - Abrir um post preenche o card do feed com o texto baixado.
-  - Timeout de 20s por requisição (antes 60s, com até 3 tentativas) e espera maior depois de um 429 do Cloudflare.
-  - Textos já baixados ficam em cache na sessão; o digest do widget sincroniza no máximo a cada 6h.
-- App, Widget e Watch na mesma versão (4.6.1).
+- Volta ao código da 4.6: a 4.6.1 fechava uns 8 segundos depois de abrir no iOS 27
+  (abort no runtime de concorrência do Swift, em `AsyncTask::completeFuture`, quando os textos dos cards terminam de carregar).
+- A correção do skeleton (branch `fix-skeleton`) sai de novo numa próxima versão, depois de testada num iPhone com iOS 27.
 
 ---
 
-# Notas da atualização 4.6 (publicada)
+# TabNews Reader: notas da atualização 4.3
 
-Junta tudo o que foi feito desde a 4.2.4. Preparada como 4.3 e publicada como 4.6.
+Junta tudo o que foi feito desde a 4.2.4 (última versão na App Store): as mudanças preparadas como 4.4, 4.5 e 4.6 nunca foram publicadas.
 
 ## Texto para a App Store ("O que há de novo")
 
